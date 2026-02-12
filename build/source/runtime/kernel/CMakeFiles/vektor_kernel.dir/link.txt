@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../../lib/libvektor_kernel.a CMakeFiles/vektor_kernel.dir/VK_global.cc.o
-/usr/bin/ranlib ../../../lib/libvektor_kernel.a

@@ -1,1 +1,0 @@
-/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/vektor.dir/build_info.c.o CMakeFiles/vektor.dir/creator.cc.o CMakeFiles/vektor.dir/creator_args.cc.o CMakeFiles/vektor.dir/creator_global.cc.o CMakeFiles/vektor.dir/creator_signals.cc.o -o ../../bin/vektor  ../../lib/libvektor_kernel.a ../../lib/libvektor_vklib.a
