@@ -1,0 +1,7 @@
+./build
+./bin
+./lib
+./.vscode
+./.cache
+./game_engine_map.md
+./assets 

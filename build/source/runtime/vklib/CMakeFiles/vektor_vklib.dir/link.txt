@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../lib/libvektor_vklib.a CMakeFiles/vektor_vklib.dir/VKE_assert.cc.o CMakeFiles/vektor_vklib.dir/VKE_fileops_c.cc.o CMakeFiles/vektor_vklib.dir/path_utils.cc.o CMakeFiles/vektor_vklib.dir/test_compile_DoNotCommit.cc.o
+/usr/bin/ranlib ../../../lib/libvektor_vklib.a
