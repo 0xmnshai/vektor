@@ -81,8 +81,9 @@ def main():
     excludes = ['build', 'extern', '.git', 'assets']
     
     for dirpath, dirnames, filenames in os.walk(root_dir):
-        dirnames[:] = [d for d in dirnames if d not in excludes]
-        
+        # dirnames[:] = [d for d in dirnames if d not in excludes]
+        dirnames = [d for d in dirnames if d not in excludes]
+
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
             process_file(filepath)
