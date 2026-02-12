@@ -33,7 +33,7 @@ struct Global {
   std::atomic<size_t> peak{0};
 };
 
-}
+} // namespace vektor
 
 static std::atomic<bool> use_local_counters{true};
 static constexpr int64_t peak_update_threshold = 1024 * 1024;
@@ -81,7 +81,6 @@ vektor::Local::~Local() {
 size_t memory_usage_current() {
   vektor::Global &global = get_global();
   std::lock_guard<std::mutex> lock{global.locals_mutex};
-
 
   int64_t mem_in_use = global.mem_in_use_outside_locals;
   for (const vektor::Local *local : global.locals) {

@@ -21,5 +21,5 @@ public:
   NonMovable(const NonMovable &other) = default;
   NonMovable &operator=(const NonMovable &other) = default;
 };
-}
-}
+} // namespace veklib
+} // namespace vektor
