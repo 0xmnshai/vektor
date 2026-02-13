@@ -5,3 +5,8 @@ lib/
 .cache/
 game_engine_map.md
 assets/
+
+# Ignore files in extern but keep directories
+extern/*
+!extern/**/
+!extern/**/.gitkeep

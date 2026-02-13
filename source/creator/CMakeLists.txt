@@ -1,6 +1,6 @@
 set(SRC_FILES
     build_info.c
-    creator.cc
+    creator.c
     creator_args.cc
     creator_global.cc
     creator_signals.cc

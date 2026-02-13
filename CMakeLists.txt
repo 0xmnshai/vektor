@@ -14,6 +14,8 @@ option(VEKTOR_BUILD_EDITOR "Build the Vektor editor" ON)
 option(VEKTOR_BUILD_SANDBOX "Build the Vektor sandbox" ON)
 option(VEKTOR_BUILD_TESTS "Build Tests" ON)
 
+add_subdirectory(extern)
+
 add_subdirectory(source/runtime)
 
 if(VEKTOR_BUILD_EDITOR)
