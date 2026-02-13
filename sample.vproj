@@ -1,5 +1,5 @@
 {
-    "name": "Sample Project",
+    "name": "VEKTOR Project",
     "version": "0.1.0",
     "assets": "assets/",
     "start_scene": "scenes/main.vmap"
