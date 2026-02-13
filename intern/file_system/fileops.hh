@@ -18,7 +18,7 @@ public:
      * @return true If the directory was created or already exists.
      * @return false If the directory could not be created.
      */
-    static bool        CreateDirectory(const char* path);
+    static bool        create_directory(const char* path);
 
     /**
      * @brief Opens a file with the given mode.
@@ -27,7 +27,7 @@ public:
      * @param mode The mode string (e.g., "w", "r", "a").
      * @return FILE* The file pointer, or nullptr on failure.
      */
-    static FILE*       OpenFile(const char* path,
+    static FILE*       open_file(const char* path,
                                 const char* mode);
 
     /**
@@ -37,7 +37,7 @@ public:
      * @return true If the path exists.
      * @return false If the path does not exist.
      */
-    static bool        Exists(const char* path);
+    static bool        exists(const char* path);
 
     /**
      * @brief Joins two paths together.
@@ -46,7 +46,7 @@ public:
      * @param path Path B.
      * @return std::string The joined path.
      */
-    static std::string JoinPath(const std::string& info,
+    static std::string join_path(const std::string& info,
                                 const std::string& path);
 };
 

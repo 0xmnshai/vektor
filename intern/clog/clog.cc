@@ -3,7 +3,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-#include "../file_system/FileSystem.hh"
+#include "../file_system/fileops.hh"
 #include "COG_log.hh"
 
 #include "../libmv/threading.hh"
@@ -23,7 +23,9 @@ enum eCLogColor
 #define COLOR_LEN (COLOR_RESET + 1)
 static bool                g_quiet                    = false;
 
+
 static struct CLogContext* g_ctx                      = nullptr;
+
 static const char*         clg_color_table[COLOR_LEN] = {nullptr};
 
 static void                clg_color_table_init(bool use_color)
@@ -119,9 +121,9 @@ void CLG_init()
     clg_color_table_init(g_ctx->use_color);
 
     using namespace vektor::file_system;
-    if (FileSystem::CreateDirectory("vektor_logs"))
+    if (FileSystem::create_directory("vektor_logs"))
     {
-        g_ctx->log_file = FileSystem::OpenFile("vektor_logs/vektor.log", "a");
+        g_ctx->log_file = FileSystem::open_file("vektor_logs/vektor.log", "a");
     }
 }
 

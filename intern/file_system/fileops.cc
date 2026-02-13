@@ -1,4 +1,4 @@
-#include "FileSystem.hh"
+#include "fileops.hh"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -11,9 +11,9 @@ namespace vektor
 namespace file_system
 {
 
-bool FileSystem::CreateDirectory(const char* path)
+bool FileSystem::create_directory(const char* path)
 {
-    if (Exists(path))
+    if (exists(path))
     {
         return true;
     }
@@ -27,19 +27,19 @@ bool FileSystem::CreateDirectory(const char* path)
     return (errno == EEXIST);
 }
 
-FILE* FileSystem::OpenFile(const char* path,
+FILE* FileSystem::open_file(const char* path,
                            const char* mode)
 {
     return fopen(path, mode);
 }
 
-bool FileSystem::Exists(const char* path)
+bool FileSystem::exists(const char* path)
 {
     struct stat buffer;
     return (stat(path, &buffer) == 0);
 }
 
-std::string FileSystem::JoinPath(const std::string& info,
+std::string FileSystem::join_path(const std::string& info,
                                  const std::string& path)
 {
     if (info.empty())
