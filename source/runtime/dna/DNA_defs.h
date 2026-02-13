@@ -65,7 +65,7 @@ private:
 
 class ShallowZeroInitializeTag {};
 
-} // namespace vektor
+}
 
 #define DNA_DEFINE_CXX_METHODS(class_name)                                     \
   DNA_DEPRECATED_IGNORE(class_name() = default;)                               \
@@ -105,4 +105,4 @@ template <typename T> inline void shallow_swap(T &a, T &b) {
   _DNA_internal_swap(&a, &b, sizeof(T));
 }
 
-} // namespace
+}

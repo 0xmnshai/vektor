@@ -1,25 +1,29 @@
 #pragma once
 
-namespace vektor {
-namespace veklib {
-class NonCopyable {
+namespace vektor
+{
+namespace veklib
+{
+class NonCopyable
+{
 public:
-  NonCopyable(const NonCopyable &other) = delete;
-  NonCopyable &operator=(const NonCopyable &other) = delete;
+    NonCopyable(const NonCopyable& other)            = delete;
+    NonCopyable& operator=(const NonCopyable& other) = delete;
 
-  NonCopyable() = default;
-  NonCopyable(NonCopyable &&other) = default;
-  NonCopyable &operator=(NonCopyable &&other) = default;
+    NonCopyable()                                    = default;
+    NonCopyable(NonCopyable&& other)                 = default;
+    NonCopyable& operator=(NonCopyable&& other)      = default;
 };
 
-class NonMovable {
+class NonMovable
+{
 public:
-  NonMovable(NonMovable &&other) = delete;
-  NonMovable &operator=(NonMovable &&other) = delete;
+    NonMovable(NonMovable&& other)                 = delete;
+    NonMovable& operator=(NonMovable&& other)      = delete;
 
-  NonMovable() = default;
-  NonMovable(const NonMovable &other) = default;
-  NonMovable &operator=(const NonMovable &other) = default;
+    NonMovable()                                   = default;
+    NonMovable(const NonMovable& other)            = default;
+    NonMovable& operator=(const NonMovable& other) = default;
 };
 } // namespace veklib
 } // namespace vektor

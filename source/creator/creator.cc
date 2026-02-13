@@ -4,9 +4,9 @@
 
 #include <csignal>
 
-#include "creator_args.h"
-#include "creator_global.h"
-#include "creator_intern.h"
+#include "creator_args.hh"
+#include "creator_global.hh"
+#include "creator_intern.hh"
 
 #include "../../intern/clog/COG_log.hh"
 

@@ -9,9 +9,11 @@
 
 #include "VKE_compiler_attrs.h"
 
-namespace vektor {
-namespace vklib {
-FILE *VKE_fopen(const char *filepath, const char *mode) ATTR_WARN_UNUSED_RESULT
-    ATTR_NONNULL();
+namespace vektor
+{
+namespace vklib
+{
+FILE* VKE_fopen(const char* filepath,
+                const char* mode) ATTR_WARN_UNUSED_RESULT ATTR_NONNULL();
 }
-}
+} // namespace vektor

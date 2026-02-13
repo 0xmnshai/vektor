@@ -173,14 +173,12 @@ static void CLG_ctx_output_use_memory_set(CLogContext* ctx,
     ctx->use_memory = (bool)value;
 }
 
-/** Action on error level. */
 static void CLT_ctx_error_fn_set(CLogContext* ctx,
                                  void (*error_fn)(void* file_handle))
 {
     ctx->callbacks.error_fn = error_fn;
 }
 
-/** Action on fatal level. */
 static void CLG_ctx_fatal_fn_set(CLogContext* ctx,
                                  void (*fatal_fn)(void* file_handle))
 {
@@ -255,27 +253,17 @@ bool CLG_quiet_get()
 
 void CLG_logref_init(CLG_LogRef* clg_ref)
 {
-    // If not already registered, register it.
-    // In this simple implementation, we assume global registration handles it or it's self-registering in constructor.
-    // However, the macro CLOG_ENSURE calls this if type is null.
-    // We need to ensure it has a type.
 
     if (g_ctx == nullptr)
     {
         CLG_init();
     }
 
-    // Find or create 'type' for this identifier
-    // For now, let's just use the default type or create a new one.
-    // A proper implementation would look up in a hash map or similar.
-    // Let's create a new type linked to the context.
-
     CLG_LogType* new_type = MEM_new_zeroed<CLG_LogType>(__func__);
     strncpy(new_type->identifier, clg_ref->identifier, sizeof(new_type->identifier) - 1);
     new_type->ctx   = g_ctx;
-    new_type->level = g_ctx->default_type.level; // Inherit default level
+    new_type->level = g_ctx->default_type.level;
 
-    // Add to context list
 #ifdef WITH_CLOG_PTHREADS
     pthread_mutex_lock(&g_ctx->types_lock);
 #endif
@@ -305,7 +293,6 @@ void CLG_logf(const struct CLG_LogType* lg,
     if (!out)
         out = stdout;
 
-    // Simple formatting: [Level] Identifier: Message (File:Line Function)
     const char* level_str = "INFO";
     const char* color_str = "";
     const char* reset_str = "";

@@ -1,9 +1,11 @@
-#include "creator_global.h"
+#include "creator_global.hh"
 
-namespace vektor {
-namespace creator {
+namespace vektor
+{
+namespace creator
+{
 
 Global G;
 
-} // namespace creator
+}
 } // namespace vektor

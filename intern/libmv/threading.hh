@@ -2,8 +2,8 @@
 #ifndef LIBMV_THREADING_THREADING_H_
 #define LIBMV_THREADING_THREADING_H_
 
-#include <mutex>
 #include <pthread.h>
+#include <mutex>
 
 namespace libmv
 {
@@ -14,4 +14,4 @@ using condition_variable = std::condition_variable;
 
 } // namespace libmv
 
-#endif // LIBMV_THREADING_THREADING_H_
+#endif

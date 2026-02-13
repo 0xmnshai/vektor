@@ -17,7 +17,7 @@ namespace bke {
 namespace id {
 struct ID_Runtime;
 }
-} // namespace bke
+}
 namespace bke {
 struct PreviewImageRuntime;
 }
@@ -25,12 +25,12 @@ namespace bke {
 namespace idprop {
 struct IDPropertyGroupChildrenSet;
 }
-} // namespace bke
+}
 namespace bke {
 namespace library {
 struct LibraryRuntime;
 }
-} // namespace bke
+}
 
 struct FileData;
 struct GHash;
@@ -719,4 +719,4 @@ enum eID_Index {
 
 #define INDEX_ID_MAX (INDEX_ID_NULL + 1)
 
-} // namespace blender
+}

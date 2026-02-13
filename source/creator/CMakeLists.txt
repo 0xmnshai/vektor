@@ -1,5 +1,5 @@
 file(GLOB_RECURSE SRC_FILES *.h *.c *.cc *.cpp)
-# list(FILTER SRC_FILES EXCLUDE REGEX "test_args\\.cc$")
+
 
 add_executable(vektor ${SRC_FILES})
 target_link_libraries(vektor PRIVATE vektor_kernel vektor_vklib vektor_dna vektor_clog)

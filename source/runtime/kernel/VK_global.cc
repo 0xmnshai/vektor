@@ -6,4 +6,4 @@ namespace kernel {
 Global G;
 
 }
-} // namespace vektor
+}

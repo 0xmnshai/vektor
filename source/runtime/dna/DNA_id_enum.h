@@ -112,4 +112,4 @@ enum ID_Type {
 
 #define ID_FLUIDSIM MAKE_ID2('F', 'S')
 
-} // namespace blender
+}

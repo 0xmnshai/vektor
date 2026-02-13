@@ -30,7 +30,7 @@ struct CLG_IDFilter
     char                 match;
 };
 
-#define WITH_CLOG_PTHREADS // TESTING
+#define WITH_CLOG_PTHREADS
 
 struct CLogContext
 {
