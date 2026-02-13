@@ -14,3 +14,12 @@ target_compile_definitions(vektor PRIVATE
     VEKTOR_VERSION=100
     VEKTOR_VERSION_PATCH=0
 )
+
+if(APPLE)
+    target_link_libraries(vektor PRIVATE
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
+        "-framework OpenGL"
+    )
+endif()

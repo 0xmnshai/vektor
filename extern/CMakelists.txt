@@ -80,7 +80,7 @@ check_download_status(pybind11)
 FetchContent_Declare(
     pybind11
     GIT_REPOSITORY https://github.com/pybind/pybind11.git
-    GIT_TAG 3.0.1
+    GIT_TAG v3.0.1
 )
 set(PYBIND11_TEST OFF CACHE BOOL "" FORCE)
 set(PYBIND11_INSTALL OFF CACHE BOOL "" FORCE)
@@ -121,7 +121,7 @@ check_download_status(tinyobjloader)
 FetchContent_Declare(
     tinyobjloader
     GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
-    GIT_TAG v1.0.6
+    GIT_TAG v2.0.0rc13
 )
 set(TINYOBJLOADER_BUILD_TEST_LOADER OFF CACHE BOOL "" FORCE)
 set(TINYOBJLOADER_BUILD_Obj_Sticher OFF CACHE BOOL "" FORCE)
@@ -207,11 +207,4 @@ set(DRACO_TESTS OFF CACHE BOOL "" FORCE)
 set(DRACO_JS_GLUE OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(draco)
 
-if(APPLE)
-    target_link_libraries(vektor PRIVATE
-        "-framework Cocoa"
-        "-framework IOKit"
-        "-framework CoreVideo"
-        "-framework OpenGL"
-    )
-endif()
+
