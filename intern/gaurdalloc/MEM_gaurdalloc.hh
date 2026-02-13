@@ -42,6 +42,6 @@ inline void MEM_delete(const T* ptr)
     {
         ptr->~T();
     }
-    mem_guarded::internal::mem_freeN_ex(const_cast<void*>(complete_ptr),
-                                        mem_guarded::internal::DestructorType::NonTrivial);
+    vektor::mem_guarded::internal::mem_freeN_ex(const_cast<void*>(complete_ptr),
+                                                vektor::mem_guarded::internal::DestructorType::NonTrivial);
 }

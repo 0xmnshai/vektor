@@ -1,6 +1,7 @@
-
 #include <time.h>
 #include <unistd.h>
+#include <cstdarg>
+#include <cstdio>
 
 #include "COG_log.hh"
 
@@ -238,4 +239,134 @@ void CLG_quiet_set(bool quiet)
 bool CLG_quiet_get()
 {
     return g_quiet;
+}
+
+void CLG_logref_init(CLG_LogRef* clg_ref)
+{
+    // If not already registered, register it.
+    // In this simple implementation, we assume global registration handles it or it's self-registering in constructor.
+    // However, the macro CLOG_ENSURE calls this if type is null.
+    // We need to ensure it has a type.
+
+    if (g_ctx == nullptr)
+    {
+        CLG_init();
+    }
+
+    // Find or create 'type' for this identifier
+    // For now, let's just use the default type or create a new one.
+    // A proper implementation would look up in a hash map or similar.
+    // Let's create a new type linked to the context.
+
+    CLG_LogType* new_type = MEM_new_zeroed<CLG_LogType>(__func__);
+    strncpy(new_type->identifier, clg_ref->identifier, sizeof(new_type->identifier) - 1);
+    new_type->ctx   = g_ctx;
+    new_type->level = g_ctx->default_type.level; // Inherit default level
+
+    // Add to context list
+#ifdef WITH_CLOG_PTHREADS
+    pthread_mutex_lock(&g_ctx->types_lock);
+#endif
+    new_type->next = g_ctx->types;
+    g_ctx->types   = new_type;
+#ifdef WITH_CLOG_PTHREADS
+    pthread_mutex_unlock(&g_ctx->types_lock);
+#endif
+
+    clg_ref->type = new_type;
+}
+
+void CLG_logf(const struct CLG_LogType* lg,
+              enum CLG_Level            level,
+              const char*               file_line,
+              const char*               fn,
+              const char*               format,
+              ...)
+{
+    if (g_quiet && level > CLG_LEVEL_ERROR)
+        return;
+
+    va_list args;
+    va_start(args, format);
+
+    FILE* out = g_ctx ? g_ctx->output_file : stdout;
+    if (!out)
+        out = stdout;
+
+    // Simple formatting: [Level] Identifier: Message (File:Line Function)
+    const char* level_str = "INFO";
+    const char* color_str = "";
+    const char* reset_str = "";
+
+    if (g_ctx && g_ctx->use_color)
+    {
+        reset_str = "\033[0m";
+    }
+
+    switch (level)
+    {
+        case CLG_LEVEL_FATAL:
+            level_str = "FATAL";
+            if (g_ctx && g_ctx->use_color)
+                color_str = "\033[1;31m";
+            break;
+        case CLG_LEVEL_ERROR:
+            level_str = "ERROR";
+            if (g_ctx && g_ctx->use_color)
+                color_str = "\033[31m";
+            break;
+        case CLG_LEVEL_WARN:
+            level_str = "WARN";
+            if (g_ctx && g_ctx->use_color)
+                color_str = "\033[33m";
+            break;
+        case CLG_LEVEL_INFO:
+            level_str = "INFO";
+            if (g_ctx && g_ctx->use_color)
+                color_str = "\033[32m";
+            break;
+        case CLG_LEVEL_DEBUG:
+            level_str = "DEBUG";
+            break;
+        case CLG_LEVEL_TRACE:
+            level_str = "TRACE";
+            break;
+    }
+
+    fprintf(out, "%s[%s] %s: ", color_str, level_str, lg ? lg->identifier : "Unknown");
+    vfprintf(out, format, args);
+    if (file_line && fn)
+    {
+        fprintf(out, " (%s %s)", file_line, fn);
+    }
+    fprintf(out, "%s\n", reset_str);
+
+    va_end(args);
+
+    if (level == CLG_LEVEL_FATAL)
+    {
+        if (g_ctx && g_ctx->callbacks.fatal_fn)
+        {
+            g_ctx->callbacks.fatal_fn(out);
+        }
+        abort();
+    }
+}
+
+void CLG_log_str(const struct CLG_LogType* lg,
+                 enum CLG_Level            level,
+                 const char*               file_line,
+                 const char*               fn,
+                 const char*               message)
+{
+    CLG_logf(lg, level, file_line, fn, "%s", message);
+}
+
+void CLG_log_raw(const struct CLG_LogType* lg,
+                 const char*               message)
+{
+    FILE* out = g_ctx ? g_ctx->output_file : stdout;
+    if (!out)
+        out = stdout;
+    fprintf(out, "%s", message);
 }

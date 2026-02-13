@@ -12,6 +12,8 @@
 
 #include "mallocn_defines.hh"
 
+namespace vektor
+{
 namespace mem_guarded
 {
 namespace internal
@@ -54,3 +56,4 @@ extern void* (*mem_dupallocN)(const void* vmemh) /* ATTR_MALLOC */ ATTR_WARN_UNU
 
 } // namespace internal
 } // namespace mem_guarded
+} // namespace vektor
