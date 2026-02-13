@@ -9,6 +9,7 @@
 #include "creator_intern.hh"
 
 #include "../../intern/clog/COG_log.hh"
+#include "../runtime/vklib/VKE_assert.h"
 
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "Application");
@@ -42,8 +43,11 @@ int main(int          argc,
 
     vektor::creator::Args args;
     vektor::creator::main_args_setup(args);
+    int result = args.parse(argc, argv);
 
-    int result = vektor::creator::main_args_handle(argc, argv);
+    VKE_assert(argc > 0);
+    VKE_assert_msg(argv != nullptr, "Argument vector cannot be null");
+
     if (result != 0)
         return result;
 
