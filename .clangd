@@ -1,0 +1,21 @@
+---
+CompileFlags:
+  Add:
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/box2d-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/cereal-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/draco-src/src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/draco-build"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/eigen-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/entt-src/src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad-build/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glfw-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glm-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/imgui-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/jolt-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/pybind11-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/slang-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/spdlog-src/include"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/stb-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/tinygltf-src"
+    - "-I/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/tinyobjloader-src"

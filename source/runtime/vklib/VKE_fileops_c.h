@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -8,7 +7,7 @@
 
 #include <limits.h>
 
-#include "VKEcompiler_attrs.h"
+#include "VKE_compiler_attrs.h"
 
 namespace vektor {
 namespace vklib {

@@ -6,9 +6,9 @@
 #include "creator_global.h"
 #include "creator_intern.h"
 
-using namespace vektor::creator;
-
 #include "../runtime/vklib/VKE_fileops_c.h"
+
+using namespace vektor::creator;
 
 #ifndef FILE_MAX
 #define FILE_MAX PATH_MAX
@@ -62,6 +62,7 @@ static void crashlog_file_generate(const char *filepath, const void *os_info) {
   fflush(stdout);
 
   errno = 0;
+
   fp = vklib::VKE_fopen(filepath, "wb");
   if (fp == nullptr) {
     fprintf(stderr, "Unable to save '%s': %s\n", filepath,

@@ -1,9 +1,10 @@
 set(SRC_FILES
     build_info.c
-    creator.c
+    creator.cc
     creator_args.cc
     creator_global.cc
     creator_signals.cc
+    build_info.c
 )
 
 add_executable(vektor ${SRC_FILES})
