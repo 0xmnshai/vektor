@@ -48,6 +48,7 @@ struct CLogContext
 
     int                  output;
     FILE*                output_file;
+    FILE*                log_file;
 
     uint64_t             timestamp_tick_start;
 

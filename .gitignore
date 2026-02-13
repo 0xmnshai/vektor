@@ -6,6 +6,7 @@ lib/
 game_engine_map.md
 assets/
 extern/deps/
+vektor_logs/
 
 # Ignore files in extern but keep directories
 extern/deps/*

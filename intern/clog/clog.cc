@@ -3,6 +3,7 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include "../file_system/FileSystem.hh"
 #include "COG_log.hh"
 
 #include "../libmv/threading.hh"
@@ -83,6 +84,10 @@ static void CLG_ctx_free(CLogContext* ctx)
     pthread_mutex_destroy(&ctx->types_lock);
 #endif
     MEM_delete(ctx);
+    if (ctx->log_file)
+    {
+        fclose(ctx->log_file);
+    }
 }
 
 void CLG_logref_register(CLG_LogRef* clg_ref)
@@ -112,6 +117,12 @@ void CLG_init()
     g_ctx = CLG_ctx_init();
 
     clg_color_table_init(g_ctx->use_color);
+
+    using namespace vektor::file_system;
+    if (FileSystem::CreateDirectory("vektor_logs"))
+    {
+        g_ctx->log_file = FileSystem::OpenFile("vektor_logs/vektor.log", "a");
+    }
 }
 
 void CLG_exit()
@@ -341,6 +352,21 @@ void CLG_logf(const struct CLG_LogType* lg,
     }
     fprintf(out, "%s\n", reset_str);
 
+    if (g_ctx && g_ctx->log_file)
+    {
+        va_list args_copy;
+        va_copy(args_copy, args);
+        fprintf(g_ctx->log_file, "[%s] %s: ", level_str, lg ? lg->identifier : "Unknown");
+        vfprintf(g_ctx->log_file, format, args_copy);
+        if (file_line && fn)
+        {
+            fprintf(g_ctx->log_file, " (%s %s)", file_line, fn);
+        }
+        fprintf(g_ctx->log_file, "\n");
+        fflush(g_ctx->log_file);
+        va_end(args_copy);
+    }
+
     va_end(args);
 
     if (level == CLG_LEVEL_FATAL)
@@ -369,4 +395,9 @@ void CLG_log_raw(const struct CLG_LogType* lg,
     if (!out)
         out = stdout;
     fprintf(out, "%s", message);
+    if (g_ctx && g_ctx->log_file)
+    {
+        fprintf(g_ctx->log_file, "%s", message);
+        fflush(g_ctx->log_file);
+    }
 }
