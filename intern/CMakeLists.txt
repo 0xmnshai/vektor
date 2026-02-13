@@ -1,0 +1,5 @@
+add_subdirectory(atomic)
+add_subdirectory(clog)
+add_subdirectory(gaurdalloc)
+add_subdirectory(libmv)
+add_subdirectory(cycles)

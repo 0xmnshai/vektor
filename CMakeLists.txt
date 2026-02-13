@@ -22,8 +22,9 @@ if(VEKTOR_BUILD_EDITOR)
 
 endif()
 
-add_subdirectory(source/creator)
+add_subdirectory(intern)
 
+add_subdirectory(source/creator)
 
 if(VEKTOR_BUILD_SANDBOX)
 

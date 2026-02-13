@@ -1,11 +1,5 @@
-set(SRC_FILES
-    build_info.c
-    creator.cc
-    creator_args.cc
-    creator_global.cc
-    creator_signals.cc
-    build_info.c
-)
+file(GLOB_RECURSE SRC_FILES *.h *.c *.cc *.cpp)
+# list(FILTER SRC_FILES EXCLUDE REGEX "test_args\\.cc$")
 
 add_executable(vektor ${SRC_FILES})
 target_link_libraries(vektor PRIVATE vektor_kernel vektor_vklib vektor_dna)
