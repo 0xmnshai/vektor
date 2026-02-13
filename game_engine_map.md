@@ -30,259 +30,92 @@ This selection balances the user's constraints (OpenGL, Box2D) with the goal of 
 
 ## 2. The "Vektor" Folder Structure
 
-We adopt the **industrial-grade source tree** of Blender/Cycles. This structure strictly separates the Kernel (`intern`), External dependencies (`extern`), Public API (`sdk`), and User-Facing Runtime (`runtime`).
+The Vektor project follows a structure inspired by Blender's architecture, separating the core kernel (`intern`), the application layer (`source`), and external dependencies (`extern`).
 
 ### 2.1. Root Directory (`vektor/`)
 
 ```text
 vektor/
-├── AUTHORS                 # Credits (Markdown)
-├── COPYING                 # License (GPL/MIT)
-├── CMakeLists.txt          # Root Build Script (add_subdirectory logic)
-├── GNUmakefile             # Convenience wrappers (make debug, make release)
-├── engine_map.md           # This Document
-├── doc/                    # Documentation
-├── extern/                 # 3rd Party Libs
-├── intern/                 # The Engine Core (Kernel)
-├── runtime/                # Player/Shipping Data
+├── assets/                 # Game assets (Default models, textures, shaders)
+├── extern/                 # Third-party libraries (Dependencies)
+├── intern/                 # The Engine Core (Kernel Library) - Independent of App Logic
+├── source/                 # Application Source (Editor, Runtime, Launcher)
+├── scripts/                # Utility scripts (Python, Shell)
+├── sdk/                    # Public API headers (for Game Logic / Plugins)
 ├── tools/                  # Build tools / Scripts
-├── editor/                 # The Vektor Editor
-├── sdk/                    # Public C++ API
-└── build/                  # Build Artifacts
+├── CMakeLists.txt          # Root Build Script
+├── game_engine_map.md      # This Documentation
+└── sample.vproj            # Sample Project File
 ```
 
-### 2.2. Documentation (`vektor/doc/`)
+### 2.2. The Engine Core (`vektor/intern/`)
 
-Mirrors Blender's `doc/` layout.
+This directory contains the low-level building blocks of the engine. These libraries are designed to be reusable and independent of the higher-level application logic.
 
-```text
-vektor/doc/
-├── doxygen/
-│   ├── Doxyfile            # Doxygen Configuration
-│   ├── api.h               # Main Page documentation
-│   └── internals.h         # Internal Developer Guide
-├── engine_architecture/
-│   ├── ecs.md              # Entity Component System Design
-│   ├── renderer.md         # FrameGraph & RHI Spec
-│   ├── asset_pipeline.md   # Importer/Exporter Flows
-│   └── plugin_abi.md       # C-ABI Plugin Specification
-├── scripting_api/          # Python/C# API Docs
-│   ├── examples/           # Python Script Examples
-│   │   ├── rotator.py
-│   │   └── player_controller.py
-│   ├── rst/                # ReStructuredText source
-│   └── conf.py             # Sphinx Configuration
-└── license/
-    └── third_party.txt     # Orchestrated License File
-```
-
-### 2.3. External Dependencies (`vektor/extern/`)
-
-Strictly managed 3rd-party libraries.
-
-```text
-vektor/extern/
-├── glfw/                   # Windowing
-│   ├── include/
-│   ├── src/
-│   └── CMakeLists.txt
-├── imgui/                  # Immediate Mode UI
-│   ├── imgui.h
-│   ├── imgui_draw.cpp
-│   └── ...
-├── spirv-cross/            # Shader Transpilation
-├── volk/                   # Vulkan Meta-Loader
-├── jolt/                   # Physics (Replaces Bullet/Mantaflow)
-│   ├── Jolt.h
-│   └── ...
-├── stb/                    # Image/Audio Loading
-│   ├── stb_image.h
-│   └── stb_vorbis.c
-└── zstd/                   # Compression
-```
-
-### 2.4. The Engine Core (`vektor/intern/`)
-
-This is the heart of the engine, equivalent to Blender's `intern/`.
-
-#### `intern/atomic/` (Lock-free primitives)
-
-```text
-vektor/intern/atomic/
-├── atomic_ops.h
-├── atomic_ops_win.h
-├── atomic_ops_unix.h
-├── spinlock.h
-└── tests/
-    └── atomic_test.cpp
-```
+#### `intern/atomic/` (Atomic Operations)
+Platform-agnostic atomic operations and synchronization primitives for thread-safe programming.
+- `atomic_ops.h`: Main interface for atomic operations.
+- `atomic_ops_unix.h`: Unix-specific implementation.
 
 #### `intern/clog/` (Logging System)
+Custom logging system (wrapping `spdlog`) providing structured logging macros.
+- `VLOG_log.h`: Defines logging macros like `VLOG_INFO`, `VLOG_ERROR`.
+- `vlog.cc`: Implementation of the logger wrapper.
 
-```text
-vektor/intern/clog/
-├── VLOG_log.h             # Logging Interface (VLOG_INFO...)
-├── vlog.cc                # Implementation (Spdlog wrapper)
-└── CMakeLists.txt
-```
+#### `intern/core/` (Core Utilities)
+Fundamental core utilities, global definitions, and system-wide helpers.
 
-#### `intern/core/` (Kernel / BKE)
-
-```text
-vektor/intern/core/
-├── application.cpp        # App Lifecycle
-├── application.h
-├── time.cpp               # Delta Time / Clock
-├── memory.cpp             # Guarded Allocator Implementation
-├── memory.h               # Guarded Allocator API
-├── job_system.cpp         # Task Scheduler
-├── job_system.h
-├── file_system.cpp        # Virtual File System
-├── platform.cpp           # OS capabilities detect
-└── globals.h              # Global State (Context)
-```
+#### `intern/cyrcles/` (Math Library)
+Math and utility library (Cycles-inspired), containing vector math and common algorithms used throughout the engine.
 
 #### `intern/ecs/` (Entity Component System)
+The Entity Component System implementation. Handles entity storage, component pools, and system execution order.
 
-```text
-vektor/intern/ecs/
-├── world.h                # Registry Wrapper
-├── entity.h               # ID types
-├── component.h            # Base Component Traits
-├── system.h               # Base System Class
-├── scheduler.cpp          # System topological sort
-├── scheduler.h
-├── archetype.cpp          # Archetype storage logic
-└── storage.cpp            # Sparse Set Implementation
-```
+#### `intern/gaurdalloc/` (Guarded Allocator)
+Guarded Memory Allocator for debugging and tracking memory usage.
+- Wraps `malloc` to add guard bytes (`0xDEADBEEF`) around allocations.
+- Tracks memory usage stats and detects buffer overflows/leaks.
+- `mallocn.c`: Main allocator implementation.
+- `memory_usage.cc`: Statistics tracking.
 
-#### `intern/renderer/` (Real-Time Renderer)
+#### `intern/platform/` (Platform Abstraction)
+The "Ghost" platform abstraction layer. Handles window creation, input processing, and OS-specific features (Win32, Cocoa, X11).
 
-```text
-vektor/intern/renderer/
-├── render_api.h           # Public Renderer Interface
-├── graph/
-│   ├── render_graph.cpp
-│   └── pass_node.h
-├── material/
-│   ├── material_system.cpp
-│   └── shader_graph.h
-├── lighting/
-│   ├── light_manager.cpp
-│   └── clustering.h
-├── postprocess/
-│   ├── bloom_pass.cpp
-│   └── tonemap_pass.cpp
-└── framegraph/
-    └── resource_pool.cpp
-```
+#### `intern/plugins/` (Plugin System)
+Plugin system infrastructure for loading dynamic libraries at runtime, allowing for modular extensions to the engine.
 
-#### `intern/gpu/` (RHI - Device)
+#### `intern/asset/` (Asset Management)
+Core asset management and file format importers. Handles loading and processing of game assets.
 
-```text
-vektor/intern/gpu/
-├── device/
-│   ├── vulkan/
-│   │   ├── vk_device.cpp
-│   │   ├── vk_buffer.cpp
-│   │   └── vk_texture.cpp
-│   ├── metal/
-│   └── opengl/
-├── memory.cpp             # VMA / GPU Allocator
-├── shader_compiler.cpp    # Slang Compiler Wrapper
-└── pipeline_cache.cpp     # PSO Cachcing
-```
+### 2.3. Application Source (`vektor/source/`)
 
-#### `intern/asset/` (Data Management)
+This directory contains the high-level application code, divided into the Creator (entry point), Editor, and Runtime.
 
-```text
-vektor/intern/asset/
-├── asset_registry.cpp
-├── importer/
-│   ├── gltf_importer.cpp
-│   ├── texture_importer.cpp
-│   └── audio_importer.cpp
-├── serializer/
-│   ├── yaml_serializer.cpp
-│   └── binary_serializer.cpp
-└── types/                 # DNA Equivalents
-    ├── mesh_asset.h
-    └── material_asset.h
-```
+#### `source/creator/` (The Launcher)
+The entry point of the application.
+- `creator.cc`: The `main()` function. Initializes the engine environment and launches the application.
+- `creator_args.cc`: Command-line argument parsing and handling.
+- `creator_global.cc`: Manages global application state.
+- `creator_signals.cc`: Signal handling for crash reporting and graceful shutdowns.
+- `build_info.c`: Contains build metadata.
 
-#### `intern/platform/` (Ghost)
+#### `source/runtime/` (The Engine Runtime)
+The core runtime engine that powers the game.
+- `kernel/`: The main loop and system managers.
+- `dna/`: List of Data Structure Definitions (SDNA). Defines the memory layout of assets for serialization.
+- `vklib/`: Vulkan Graphics Library wrapper. Handles RHI (Render Hardware Interface) interactions.
+- `utils/`: Runtime-specific utilities and helper functions.
 
-```text
-vektor/intern/platform/
-├── window.h               # Abstract Window
-├── input.h                # Abstract Input
-├── ghost_win32.cpp        # Windows Implementation
-├── ghost_x11.cpp          # Linux Implementation
-└── ghost_cocoa.mm         # macOS Implementation
-```
+#### `source/editor/` (The Editor)
+The content creation suite (Editor) used to build games.
+- `imgui/`: Integration of Dear ImGui for the editor UI.
+- `inspectors/`: Logic for inspecting and editing components and assets in the editor.
+- `viewport/`: 3D Viewport rendering and interaction logic.
 
-#### `intern/plugins/` (Hydra-style)
+### 2.4. External Dependencies (`vektor/extern/`)
 
-```text
-vektor/intern/plugins/
-├── loader.cpp             # DLL/So Loader
-├── loader.h
-├── abi.h                  # Stable C ABI
-├── host.cpp               # Host Interface
-└── plugins/
-    ├── renderer_forward/
-    ├── renderer_deferred/
-    └── physics_jolt/
-```
+Managed 3rd-party libraries. This folder contains external code that the engine links against, ensuring a self-contained build environment.
 
-### 2.5. Runtime (`vektor/runtime/`)
-
-What ships to the end-user.
-
-```text
-vektor/runtime/
-├── vektor_player          # Launcher Executable
-├── shaders/               # Compiled .spv files
-│   ├── pbr_vert.spv
-│   └── pbr_frag.spv
-├── engine.pak             # Compressed Assets
-└── plugins/               # Dynamic Libraries
-    ├── librenderer_deferred.so
-    └── libphysics_jolt.so
-```
-
-### 2.6. Editor (`vektor/editor/`)
-
-The content creation suite.
-
-```text
-vektor/editor/
-├── main.cpp               # Editor Entry Point
-├── editor_app.cpp         # Editor logic
-├── viewport/
-│   ├── view_3d.cpp        # 3D Viewport logic
-│   └── camera_control.cpp
-├── inspectors/
-│   ├── entity_inspector.cpp
-│   └── asset_inspector.cpp
-├── asset_browser/
-│   ├── asset_grid.cpp
-│   └── thumbnail_gen.cpp
-└── imgui_layer/
-    ├── imgui_impl_vektor.cpp
-    └── theme_blender.cpp
-```
-
-### 2.7. Public SDK (`vektor/sdk/`)
-
-```text
-vektor/sdk/
-├── vektor.h               # Main include
-├── ecs.h                  # ECS API
-├── plugin_api.h           # Plugin Development API
-├── gpu_api.h              # Low-level GFX API
-└── scripting_api.h        # C++/Python bindings
-```
 
 ---
 
@@ -2357,3 +2190,8 @@ Used for "Frame Scratchpad" memory. Things that only exist for one frame (e.g., 
 - At the end of `Application::Update()`, we call `FrameArena.Reset()`.
 
 ---
+
+Resources :
+https://chatgpt.com/c/698e98e7-9ed0-8324-804d-e15e49886afa
+
+https://chatgpt.com/c/698c981b-3cd0-83a3-a2ba-5838650d9788
