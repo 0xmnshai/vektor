@@ -33,6 +33,7 @@ int main(int          argc,
          const char** argv)
 {
     CLG_logref_init(CLG_LogRef_App);
+    CLG_level_set(CLG_LEVEL_INFO);
 
     CLOG_INFO(CLG_LogRef_App, "APPLICATION STARTED");
 
@@ -41,7 +42,7 @@ int main(int          argc,
 
     vektor::creator::Args args;
     vektor::creator::main_args_setup(args);
-    
+
     int result = vektor::creator::main_args_handle(argc, argv);
     if (result != 0)
         return result;
@@ -61,7 +62,7 @@ int main(int          argc,
     }
     else
     {
-        CLOG_INFO(CLG_LogRef_App, "No project file specified. Use 'vektor [path/to/project.vproj]'");
+        CLOG_ERROR(CLG_LogRef_App, "No project file specified. Use 'vektor [path/to/project.vproj]'");
     }
     return 0;
 }
