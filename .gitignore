@@ -5,6 +5,7 @@ lib/
 .cache/
 game_engine_map.md
 assets/
+extern/deps/
 
 # Ignore files in extern but keep directories
 extern/deps/*
