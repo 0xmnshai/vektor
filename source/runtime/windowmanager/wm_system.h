@@ -8,7 +8,10 @@
 
 namespace vektor
 {
-struct vkContext; // Mock context will change later in this project
+struct vkContext
+{
+    void* data;
+};
 
 class wmWindowManager
 {
@@ -32,4 +35,8 @@ private:
 
     void                                  wm_event_do_handlers(vkContext* C);
 };
+
+extern wmWindowManager* G_WM;
+
+void                    init_wm();
 } // namespace vektor

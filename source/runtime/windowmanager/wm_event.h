@@ -2,26 +2,28 @@
 
 #include <cstdint>
 #include "wm_event_types.hh"
+#include "wm_keymap.h"
 
 namespace vektor
 {
+
 struct wmEvent
 {
-    struct wmEvent *  next, *prev;
+    struct wmEvent *next = nullptr, *prev = nullptr;
 
-    const wmEventType type;
-    const int16_t     value;
+    wmEventType     type  = EVENT_NONE;
+    int16_t         value = 0;
 
-    const int         x, y;
-    const int         prev_x, prev_y;
+    int             x = 0, y = 0;
+    int             prev_x = 0, prev_y = 0;
 
-    const uint8_t     modifiers;
+    uint8_t         modifiers  = 0;
 
-    void*             customdata;
+    void*           customdata = nullptr;
 
-    const double      time;
+    double          time       = 0.0;
 
-    bool              is_keyboard() const
+    bool            is_keyboard() const
     {
         return (type >= EVT_AKEY && type <= EVT_ZKEY) || (type >= EVT_ZEROKEY && type <= EVT_TWOKEY) ||
                (type >= EVT_ESCKEY && type <= EVT_LEFTALTKEY);

@@ -85,10 +85,10 @@ struct wmWindowManager
 {
 #ifdef __cplusplus
 
-    static constexpr blender::ID_Type id_type = blender::ID_WM;
+    static constexpr vektor::ID_Type id_type = vektor::ID_WM;
 #endif
 
-    blender::ID                id;
+    vektor::ID                 id;
 
     ListBaseT<wmWindow>        windows;
 
@@ -115,7 +115,7 @@ struct wmWindowManager
 
 #define WM_KEYCONFIG_ARRAY_P(wm) &(wm)->runtime->defaultconf, &(wm)->runtime->addonconf, &(wm)->runtime->userconf
 
-#define WM_KEYCONFIG_STR_DEFAULT "Blender"
+#define WM_KEYCONFIG_STR_DEFAULT "vektor"
 
 #if !(defined(WIN32) || defined(__APPLE__)) && !defined(DNA_DEPRECATED)
 #ifdef __GNUC__

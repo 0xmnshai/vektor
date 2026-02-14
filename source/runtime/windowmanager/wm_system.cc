@@ -2,10 +2,14 @@
 #include <iostream>
 #include "wm_keymap.h"
 
+#include "../../../intern/clog/COG_log.hh"
+
 namespace vektor
 {
 
 wmWindowManager* G_WM = nullptr;
+CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_WM,
+                          "WM");
 
 wmWindowManager::wmWindowManager()
 {
@@ -71,6 +75,8 @@ void wmWindowManager::wm_event_do_handlers(vkContext* C)
         {
             std::cout << "[Event System] Matched Keymap: " << kmi->idname << std::endl;
 
+            CLOG_TRACE(CLG_LogRef_WM, "Matched Keymap: %s", kmi->idname.c_str());
+
             wmOperatorType* op_type = operator_find(kmi->idname);
             if (op_type)
             {
@@ -83,6 +89,15 @@ void wmWindowManager::wm_event_do_handlers(vkContext* C)
             }
             return;
         }
+    }
+}
+
+void init_wm()
+{
+    if (!G_WM)
+    {
+        CLG_logref_init(CLG_LogRef_WM);
+        static wmWindowManager* wm_instance = new wmWindowManager();
     }
 }
 } // namespace vektor

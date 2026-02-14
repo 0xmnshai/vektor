@@ -56,10 +56,10 @@ static void sig_handle_vektor_esc(int sig)
 
         if (count)
         {
-            printf("\nBlender killed\n");
+            printf("\nvektor killed\n");
             exit(2);
         }
-        printf("\nSent an internal break event. Press ^C again to kill Blender\n");
+        printf("\nSent an internal break event. Press ^C again to kill vektor\n");
         count++;
     }
 }

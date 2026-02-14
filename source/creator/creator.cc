@@ -3,38 +3,29 @@
 #include <cstring>
 
 #include <csignal>
+#include <iostream>
+
 
 #include "creator_args.hh"
 #include "creator_global.hh"
-#include "creator_intern.hh"
 
 #include "../../intern/clog/COG_log.hh"
 #include "../runtime/vklib/VKE_assert.h"
 
+#include "../runtime/windowmanager/wm_event.hh"
+#include "../runtime/windowmanager/wm_keymap.h"
+#include "../runtime/windowmanager/wm_system.h"
+
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "Application");
 
-namespace vektor
-{
-namespace creator
-{
-ApplicationState app_state = []()
-{
-    ApplicationState app_state{};
-    app_state.signal.use_crash_handler  = true;
-    app_state.signal.use_abort_handler  = true;
-    app_state.exit_code_on_error.python = 0;
-    app_state.main_arg_deferred         = nullptr;
-    return app_state;
-}();
-} // namespace creator
-} // namespace vektor
+// namespace vektor
 
 int main(int          argc,
          const char** argv)
 {
     CLG_logref_init(CLG_LogRef_App);
-    CLG_level_set(CLG_LEVEL_INFO);
+    CLG_level_set(CLG_LEVEL_TRACE);
 
     CLOG_INFO(CLG_LogRef_App, "APPLICATION STARTED");
 
@@ -57,6 +48,23 @@ int main(int          argc,
 
         CLOG_INFO(CLG_LogRef_App, "Engine initialized.");
         CLOG_INFO(CLG_LogRef_App, "Running loop...");
+
+        std::cout << "--- vektor-Style Event System Demo ---\n";
+
+        vektor::init_wm();
+
+        vektor::vkContext ctx;
+
+        vektor::setup_operators();
+        vektor::setup_keymap();
+
+        vektor::simulate_vektor_input();
+
+        std::cout << "\n[System] Processing Events...\n";
+
+        vektor::G_WM->process_events((vektor::vkContext*)&ctx);
+
+        std::cout << "\n--- End of Demo ---\n";
 
         for (int i = 0; i < 3; ++i)
         {
