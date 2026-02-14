@@ -2195,3 +2195,10 @@ Resources :
 https://chatgpt.com/c/698e98e7-9ed0-8324-804d-e15e49886afa
 
 https://chatgpt.com/c/698c981b-3cd0-83a3-a2ba-5838650d9788
+
+https://medium.com/@EDBCBlog/designing-an-event-driven-imgui-architecture-from-zero-to-hero-no-phd-required-82290c082c6a
+
+https://github.com/NodeppOfficial/nodepp
+
+https://en.cppreference.com/w/cpp/language/coroutines.html
+

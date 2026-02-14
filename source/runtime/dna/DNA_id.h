@@ -8,6 +8,7 @@
 
 #include "../vklib/VKE_assert.h"
 
+#include <cstdint>
 #include <cstring>
 #include <type_traits>
 
@@ -214,7 +215,7 @@ enum {
 #
 struct IDOverrideLibraryRuntime {
   struct GHash *rna_path_to_override_properties = nullptr;
-  uint tag = 0;
+  uint16_t tag = 0;
 };
 
 enum {

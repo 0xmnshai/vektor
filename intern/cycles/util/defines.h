@@ -1,6 +1,5 @@
 #define ccl_device_inline static inline __attribute__((always_inline))
 
-
 #define ccl_global
 #define ccl_inline_constant inline constexpr
 #define ccl_static_constexpr static constexpr
