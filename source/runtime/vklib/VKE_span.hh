@@ -20,7 +20,7 @@ class MutableSpan;
 namespace span_internal
 {
 template <typename From, typename To>
-bool is_span_convertible_pointer_v = std::is_convertible<From (*)[], To (*)[]>::value;
+constexpr bool is_span_convertible_pointer_v = std::is_convertible<From (*)[], To (*)[]>::value;
 }
 
 template <typename T>

@@ -5,7 +5,6 @@
 #include <csignal>
 #include <iostream>
 
-
 #include "creator_args.hh"
 #include "creator_global.hh"
 
@@ -15,6 +14,11 @@
 #include "../runtime/windowmanager/wm_event.hh"
 #include "../runtime/windowmanager/wm_keymap.h"
 #include "../runtime/windowmanager/wm_system.h"
+
+// testing python UI
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "Application");
@@ -53,7 +57,7 @@ int main(int          argc,
 
         vektor::init_wm();
 
-        vektor::vkContext ctx;
+        vektor::vkContext vkC;
 
         vektor::setup_operators();
         vektor::setup_keymap();
@@ -62,7 +66,7 @@ int main(int          argc,
 
         std::cout << "\n[System] Processing Events...\n";
 
-        vektor::G_WM->process_events((vektor::vkContext*)&ctx);
+        vektor::G_WM->process_events((vektor::vkContext*)&vkC);
 
         std::cout << "\n--- End of Demo ---\n";
 

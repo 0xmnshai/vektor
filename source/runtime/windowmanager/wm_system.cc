@@ -6,7 +6,6 @@
 
 namespace vektor
 {
-
 wmWindowManager* G_WM = nullptr;
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_WM,
                           "WM");
@@ -26,48 +25,48 @@ wmWindowManager::~wmWindowManager()
 
 void wmWindowManager::push_event(const wmEvent& event)
 {
-    event_queue.push_back(event);
+    event_queue_.push_back(event);
 }
 
-void wmWindowManager::process_events(vkContext* C)
+void wmWindowManager::process_events(vkContext* vkC)
 {
-    while (!event_queue.empty())
+    while (!event_queue_.empty())
     {
-        const wmEvent& event = event_queue.front();
+        const wmEvent& event = event_queue_.front();
 
-        wm_event_do_handlers(C);
+        wm_event_do_handlers(vkC);
 
-        event_queue.pop_front();
+        event_queue_.pop_front();
     }
 }
 
 void wmWindowManager::operator_register(const std::string& idname,
                                         wmOperatorType     op)
 {
-    op.idname         = idname;
-    operators[idname] = op;
+    op.idname          = idname;
+    operators_[idname] = op;
 }
 
 wmOperatorType* wmWindowManager::operator_find(const std::string& idname)
 {
-    auto it = operators.find(idname);
-    if (it != operators.end())
+    auto it = operators_.find(idname);
+    if (it != operators_.end())
     {
         return &it->second;
     }
     return nullptr;
 };
 
-void wmWindowManager::wm_event_do_handlers(vkContext* C)
+void wmWindowManager::wm_event_do_handlers(vkContext* vkC)
 {
-    if (event_queue.empty())
+    if (event_queue_.empty())
         return;
 
-    const wmEvent* event = &event_queue.front();
+    const wmEvent* event = &event_queue_.front();
 
     for (auto& km : default_conf->keymaps)
     {
-        if (!km.poll(C))
+        if (!km.poll(vkC))
             continue;
 
         wmKeyMapItem* kmi = keymap_find_item(&km, event);
@@ -80,11 +79,11 @@ void wmWindowManager::wm_event_do_handlers(vkContext* C)
             wmOperatorType* op_type = operator_find(kmi->idname);
             if (op_type)
             {
-                if (!op_type->poll || op_type->poll(C))
+                if (!op_type->poll || op_type->poll(vkC))
                 {
                     wmOperator op_instance;
                     op_instance.type = op_type;
-                    op_type->exec(C, &op_instance, event);
+                    op_type->exec(vkC, &op_instance, event);
                 }
             }
             return;

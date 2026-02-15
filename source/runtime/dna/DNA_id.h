@@ -1,20 +1,12 @@
-
-
 #pragma once
-
-#include "DNA_defs.h"
-#include "DNA_id_enum.h"
-#include "DNA_listBase.h"
-
-#include "../vklib/VKE_assert.h"
 
 #include <cstdint>
 #include <cstring>
-#include <type_traits>
+
+#include "DNA_id_enum.h"
 
 namespace vektor
 {
-
 namespace bke
 {
 namespace id

@@ -4,7 +4,7 @@
 #include "wm_event.h"
 #include "wm_event_types.hh"
 #include "wm_keymap.h"
-#include "wm_system.h"  
+#include "wm_system.h"
 
 namespace vektor
 {
@@ -125,7 +125,7 @@ wmKeyConfig* get_default_keyconfig()
     return G_WM->default_conf;
 }
 
-bool wmKeyMap::poll(struct vkContext* C)
+bool wmKeyMap::poll(struct vkContext* vkC)
 {
     return true; // Always active for this demo
 }

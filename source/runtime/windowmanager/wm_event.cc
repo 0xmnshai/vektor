@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <thread>
 
@@ -9,21 +10,23 @@
 namespace vektor
 {
 
-int MESH_OT_select_all_exec(vkContext*     C,
+int MESH_OT_select_all_exec(vkContext*     vkC,
                             wmOperator*    op,
                             const wmEvent* event)
 {
     std::cout << "\n>>> [OPERATOR] MESH_OT_select_all Executed! <<<\n";
-    std::cout << "    Context: " << (C ? "Valid" : "Null") << "\n";
+    std::cout << "    Context: " << (vkC ? "Valid" : "Null") << "\n";
     std::cout << "    Triggered by: " << (event->is_keyboard() ? "Keyboard" : "Mouse") << "\n";
     return 1;
 }
 
-int SCREEN_OT_action_zone_exec(vkContext*     C,
+int SCREEN_OT_action_zone_exec(vkContext*     vkC,
                                wmOperator*    op,
                                const wmEvent* event)
 {
     std::cout << "\n>>> [OPERATOR] SCREEN_OT_action_zone Executed! <<<\n";
+    std::cout << "    Context: " << (vkC ? "Valid" : "Null") << "\n";
+    std::cout << "    Triggered by: " << (event->is_keyboard() ? "Keyboard" : "Mouse") << "\n";
     return 1;
 }
 

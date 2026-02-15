@@ -4,7 +4,6 @@
 
 #include "DNA_defs.h"
 #include "DNA_id.h"
-#include "DNA_id_enum.h"
 
 #include "DNA_listBase.h"
 
@@ -42,15 +41,13 @@ struct PointerRNA;
 struct Report;
 struct ReportList;
 struct Stereo3dFormat;
-struct vkContext;
+struct vkC;
 struct bScreen;
 struct wmTimer;
 
 #define OP_MAX_TYPENAME 64
 #define KMAP_MAX_NAME 64
 
-#
-#
 struct ReportTimerInfo
 {
     float widthfac       = 0;
@@ -85,10 +82,10 @@ struct wmWindowManager
 {
 #ifdef __cplusplus
 
-    static constexpr vektor::ID_Type id_type = vektor::ID_WM;
+    static constexpr ID_Type id_type = ID_WM;
 #endif
 
-    vektor::ID                 id;
+    ID                 id;
 
     ListBaseT<wmWindow>        windows;
 
@@ -307,7 +304,7 @@ struct wmKeyMap
 
     short                       kmi_id        = 0;
 
-    bool (*poll)(struct vkContext*);
+    bool (*poll)(struct vkC*);
     bool (*poll_modal_item)(const struct wmOperator* op,
                             int                      value) = {};
 

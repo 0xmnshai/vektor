@@ -2,9 +2,7 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
-
 #include <stddef.h>
-
 #include <limits.h>
 
 #include "VKE_compiler_attrs.h"

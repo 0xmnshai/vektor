@@ -2,8 +2,10 @@
 
 #include <cstddef>
 
-namespace vektor {
-namespace kernel {
+namespace vektor
+{
+namespace kernel
+{
 void VKE_tempdir_session_purge();
 }
-}
+} // namespace vektor

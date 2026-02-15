@@ -5,7 +5,6 @@
 
 namespace vektor
 {
-
 enum wmEventType : int16_t
 {
     EVENT_NONE = 0x0000,

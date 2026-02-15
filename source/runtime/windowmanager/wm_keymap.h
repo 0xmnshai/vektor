@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+
 #include "wm_event_types.hh"
 
 namespace vektor
@@ -44,7 +45,7 @@ struct wmKeyMap
 
     std::vector<wmKeyMapItem> items;
 
-    bool                      poll(struct vkContext* C);
+    bool                      poll(struct vkContext* vkC);
 };
 
 struct wmKeyConfig

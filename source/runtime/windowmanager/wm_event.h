@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+
 #include "wm_event_types.hh"
 #include "wm_keymap.h"
 

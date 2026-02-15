@@ -19,7 +19,8 @@ add_subdirectory(extern)
 add_subdirectory(source/runtime)
 
 if(VEKTOR_BUILD_EDITOR)
-
+    find_package(Python3 REQUIRED COMPONENTS Development)
+    add_subdirectory(source/editor)
 endif()
 
 add_subdirectory(intern)

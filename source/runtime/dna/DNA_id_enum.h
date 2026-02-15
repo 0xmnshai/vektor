@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 namespace vektor
@@ -57,7 +55,7 @@ enum eIDPropertyFlag
 
     IDP_FLAG_STATIC_TYPE           = 1 << 4,
 
-    IDP_FLAG_VEKTOR                 = 1 << 7,
+    IDP_FLAG_VEKTOR                = 1 << 7,
 };
 
 #define MAKE_ID2(c, d) ((d) << 8 | (c))

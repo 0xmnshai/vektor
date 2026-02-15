@@ -13,51 +13,33 @@ struct RecentFile;
 
 struct Global
 {
-
     Main*                 main;
-
     Main*                 pr_main;
-
     char                  filepath_last_image[1024];
     char                  filepath_last_library[1024];
     char                  filepath_last_blend[1024];
 
     ListBaseT<RecentFile> recent_files;
-
     bool                  is_break;
-
     bool                  background;
-
     bool                  factory_startup;
-
     short                 moving;
-
     bool                  is_rendering;
-
     short                 debug_value;
-
     int                   f;
 
     struct
     {
-
         int   level;
-
         void* file;
     } log;
 
     int  debug;
-
     bool randomize_geometry_element_order;
-
     int  fileflags;
-
     char autoexec_fail[200];
-
     char gpu_debug_scope_name[100];
-
     char gpu_debug_shader_source_name[100];
-
     bool profile_gpu;
 };
 
@@ -124,7 +106,7 @@ enum
     G_DEBUG_XR                          = (1 << 24),
     G_DEBUG_XR_TIME                     = (1 << 25),
 
-    G_DEBUG_VEKTOR                       = (1 << 26),
+    G_DEBUG_VEKTOR                      = (1 << 26),
     G_DEBUG_WINTAB                      = (1 << 27),
 
     G_DEBUG_GPU_SHADER_NO_PREPROCESSOR  = (1 << 28),

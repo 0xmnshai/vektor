@@ -18,20 +18,20 @@ struct BitwiseNotEnumValue
 } // namespace vektor
 
 #define ENUM_OPERATORS(_enum_type)                                                                                     \
-    [[maybe_unused]] [[nodiscard]] inline constexpr _enum_type operator|(_enum_type a, _enum_type b)                   \
+    [[maybe_unused]] [[nodiscard]] inline _enum_type operator|(_enum_type a, _enum_type b)                             \
     {                                                                                                                  \
         return (_enum_type)(uint64_t(a) | uint64_t(b));                                                                \
     }                                                                                                                  \
-    [[maybe_unused]] [[nodiscard]] inline constexpr _enum_type operator&(_enum_type a, _enum_type b)                   \
+    [[maybe_unused]] [[nodiscard]] inline _enum_type operator&(_enum_type a, _enum_type b)                             \
     {                                                                                                                  \
         return (_enum_type)(uint64_t(a) & uint64_t(b));                                                                \
     }                                                                                                                  \
-    [[maybe_unused]] [[nodiscard]] inline constexpr _enum_type operator&(_enum_type                                a,  \
-                                                                         ::vektor::BitwiseNotEnumValue<_enum_type> b)  \
+    [[maybe_unused]] [[nodiscard]] inline _enum_type operator&(_enum_type                                a,            \
+                                                               ::vektor::BitwiseNotEnumValue<_enum_type> b)            \
     {                                                                                                                  \
         return (_enum_type)(uint64_t(a) & uint64_t(b.value));                                                          \
     }                                                                                                                  \
-    [[maybe_unused]] [[nodiscard]] inline constexpr ::vektor::BitwiseNotEnumValue<_enum_type> operator~(_enum_type a)  \
+    [[maybe_unused]] [[nodiscard]] inline ::vektor::BitwiseNotEnumValue<_enum_type> operator~(_enum_type a)            \
     {                                                                                                                  \
         ::vektor::BitwiseNotEnumValue<_enum_type> result = {~uint64_t(a)};                                             \
         return result;                                                                                                 \
@@ -52,7 +52,7 @@ struct BitwiseNotEnumValue
     {                                                                                                                  \
         return a = (_enum_type)(uint64_t(a) ^ uint64_t(b));                                                            \
     }                                                                                                                  \
-    [[maybe_unused]] [[nodiscard]] inline constexpr bool flag_is_set(_enum_type flags, _enum_type flag_to_test)        \
+    [[maybe_unused]] [[nodiscard]] inline bool flag_is_set(_enum_type flags, _enum_type flag_to_test)                  \
     {                                                                                                                  \
         return (uint64_t(flags) & uint64_t(flag_to_test)) != 0;                                                        \
     }
