@@ -7,7 +7,7 @@ slider_val = 0.5
 
 def draw():
     global checkbox_val, slider_val
-    
+
     # Create a Python-driven window
     if vektor_ui.begin("Properties (Python)", 1, 0): # Name, Open, Flags
         vektor_ui.text("This window is defined in Python!")
