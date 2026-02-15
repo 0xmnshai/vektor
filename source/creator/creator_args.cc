@@ -5,6 +5,7 @@
 #include "creator_global.hh"
 
 #include "creator_args.hh"
+#include "vektor_config.h"
 
 namespace vektor
 {
@@ -113,7 +114,10 @@ static int arg_handle_version(int,
                               void*)
 {
 
-    std::cout << "Vektor Engine 0.0.1 (Alpha)\n";
+    std::cout << "Vektor Engine \n";
+    std::cout << "Version: " << VEKTOR_VERSION << "\n";
+    std::cout << "Build Date: " << __DATE__ << "\n";
+    std::cout << "Build Time: " << __TIME__ << "\n";
     exit(0);
     return 0;
 }

@@ -1,5 +1,4 @@
 import vektor_ui
-import sys
 
 # State
 checkbox_val = True
