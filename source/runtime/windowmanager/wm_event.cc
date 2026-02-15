@@ -61,6 +61,9 @@ void simulate_vektor_input()
 {
     std::cout << "[VEKTOR] Simulating OS Inputs...\n";
 
+    std::cout << "[VEKTOR] User Moved Mouse to (150, 250)\n";
+    event_push(MOUSEMOVE, EVENT_NONE, 0, 150, 250);
+
     std::cout << "[VEKTOR] User pressed 'A'\n";
     event_push(EVT_AKEY, EVT_PRESS, 0);
 

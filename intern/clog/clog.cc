@@ -123,6 +123,10 @@ void CLG_init()
     if (FS_create_directory("vektor_logs"))
     {
         g_ctx->log_file = FS_fopen("vektor_logs/vektor.log", "a");
+        if (g_ctx->log_file)
+        {
+            setvbuf(g_ctx->log_file, NULL, _IONBF, 0);
+        }
     }
 }
 
@@ -352,6 +356,7 @@ void CLG_logf(const struct CLG_LogType* lg,
         }
         fprintf(g_ctx->log_file, "\n");
         fflush(g_ctx->log_file);
+        fsync(fileno(g_ctx->log_file));
         va_end(args_copy);
     }
 
@@ -387,5 +392,6 @@ void CLG_log_raw(const struct CLG_LogType* lg,
     {
         fprintf(g_ctx->log_file, "%s", message);
         fflush(g_ctx->log_file);
+        fsync(fileno(g_ctx->log_file));
     }
 }

@@ -11,19 +11,27 @@ enum wmEventType : int16_t
 
 #define _EVT_MOUSE_MIN 0x0001
 
-    LEFTMOUSE    = 0x0001, /* 1 */
-    MIDDLEMOUSE  = 0x0002, /* 2 */
-    RIGHTMOUSE   = 0x0003, /* 3 */
-    MOUSEMOVE    = 0x0004, /* 4 */
+    LEFTMOUSE           = 0x0001, /* 1 */
+    MIDDLEMOUSE         = 0x0002, /* 2 */
+    RIGHTMOUSE          = 0x0003, /* 3 */
+    MOUSEMOVE           = 0x0004, /* 4 */
+    INBETWEEN_MOUSEMOVE = 0x0005, /* 5 */
 
-    BUTTON4MOUSE = 0x0007, /* 7 */
-    BUTTON5MOUSE = 0x0008, /* 8 */
+    BUTTON4MOUSE        = 0x0007, /* 7 */
+    BUTTON5MOUSE        = 0x0008, /* 8 */
 
-    BUTTON6MOUSE = 0x0012, /* 18 */
-    BUTTON7MOUSE = 0x0013, /* 19 */
+    BUTTON6MOUSE        = 0x0012, /* 18 */
+    BUTTON7MOUSE        = 0x0013, /* 19 */
 
-    MOUSEPAN     = 0x000e, /* 14 */
-    MOUSEZOOM    = 0x000f, /* 15 */
+    MOUSEPAN            = 0x000e, /* 14 */
+    MOUSEZOOM           = 0x000f, /* 15 */
+
+    EVT_MOUSEMOVE       = 0x0010, /* 16 */
+    EVT_MOUSEWHEEL      = 0x0011, /* 17 */
+
+    // wheel up / down
+    EVT_WHEELUP         = 0x0012, /* 18 */
+    EVT_WHEELDOWN       = 0x0013, /* 19 */
 
 #define _EVT_MOUSE_MAX 0x0015
 
@@ -144,7 +152,7 @@ constexpr bool ELEM(const T& v,
 
 #define ISMOUSE(event_type) ((event_type) >= _EVT_MOUSE_MIN && (event_type) <= _EVT_MOUSE_MAX)
 
-#define ISMOUSE_MOTION(event_type) ELEM(event_type, MOUSEMOVE, INBETWEEN_MOUSEMOVE)
+#define ISMOUSE_MOTION(event_type) ELEM(event_type, MOUSEMOVE, INBETWEEN_MOUSEMOVE, EVT_MOUSEMOVE)
 
 #define ISMOUSE_BUTTON(event_type)                                                                                     \
     (ELEM(event_type, LEFTMOUSE, MIDDLEMOUSE, RIGHTMOUSE, BUTTON4MOUSE, BUTTON5MOUSE, BUTTON6MOUSE, BUTTON7MOUSE))

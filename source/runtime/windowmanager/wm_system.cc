@@ -14,7 +14,13 @@ wmWindowManager::wmWindowManager()
 {
     default_conf         = new wmKeyConfig();
     default_conf->idname = "Default";
+    window_              = std::make_shared<wmWindow>();
     G_WM                 = this;
+}
+
+wmWindowManager* wmWindowManager::get()
+{
+    return G_WM;
 }
 
 wmWindowManager::~wmWindowManager()
@@ -33,6 +39,25 @@ void wmWindowManager::process_events(vkContext* vkC)
     while (!event_queue_.empty())
     {
         const wmEvent& event = event_queue_.front();
+
+        if (ISMOUSE_MOTION(event.type))
+        {
+            CLOG_TRACE(CLG_LogRef_WM, "Mouse Move: type=%d, pos=(%d, %d)", event.type, event.x, event.y);
+        }
+        else if (ISMOUSE_BUTTON(event.type))
+        {
+            CLOG_TRACE(CLG_LogRef_WM, "Mouse Button: type=%d, val=%d, pos=(%d, %d)", event.type, event.value, event.x,
+                       event.y);
+        }
+        else if (ISKEYBOARD(event.type))
+        {
+            CLOG_TRACE(CLG_LogRef_WM, "Keyboard Event: type=%d, val=%d, mods=%d", event.type, event.value,
+                       event.modifiers);
+        }
+        else
+        {
+            CLOG_TRACE(CLG_LogRef_WM, "Other Event: type=%d, val=%d", event.type, event.value);
+        }
 
         wm_event_do_handlers(vkC);
 
@@ -87,6 +112,42 @@ void wmWindowManager::wm_event_do_handlers(vkContext* vkC)
                 }
             }
             return;
+        }
+    }
+}
+
+void wmWindowManager::on_update(float ts)
+{
+    if (!window_ || !window_->screen)
+    {
+        return;
+    }
+    for (auto& area : window_->screen->areabase)
+    {
+        for (auto& region : area->regionbase)
+        {
+            if (region->on_update)
+            {
+                region->on_update(region.get(), ts);
+            }
+        }
+    }
+}
+
+void wmWindowManager::on_render()
+{
+    if (!window_ || !window_->screen)
+    {
+        return;
+    }
+    for (auto& area : window_->screen->areabase)
+    {
+        for (auto& region : area->regionbase)
+        {
+            if (region->on_draw)
+            {
+                region->on_draw(region.get());
+            }
         }
     }
 }

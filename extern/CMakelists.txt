@@ -103,8 +103,14 @@ if(NOT TARGET imgui)
         ${imgui_SOURCE_DIR}/imgui_draw.cpp
         ${imgui_SOURCE_DIR}/imgui_tables.cpp
         ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     )
-    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+    target_include_directories(imgui PUBLIC 
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
+    )
+    target_link_libraries(imgui PUBLIC glfw)
 endif()
 
 # TinyGLTF
@@ -176,16 +182,12 @@ FetchContent_Declare(
 set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glm)
 
-# glad
-check_download_status(glad)
-FetchContent_Declare(
-    glad
-    GIT_REPOSITORY https://github.com/Dav1dde/glad.git
-    GIT_TAG v2.0.8
+# glad (Local source)
+set(GLAD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/glad")
+add_library(glad STATIC 
+    "${GLAD_DIR}/src/glad.c"
 )
-set(GLAD_INSTALL OFF CACHE BOOL "" FORCE)
-set(GLAD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(glad)
+target_include_directories(glad PUBLIC "${GLAD_DIR}/include")
 
 # Eigen
 check_download_status(eigen)

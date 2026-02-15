@@ -2,7 +2,7 @@
 file(GLOB_RECURSE SRC_FILES *.h *.c *.cc *.cpp)
 
 add_executable(vektor ${SRC_FILES})
-target_link_libraries(vektor PRIVATE vektor_kernel vektor_vklib vektor_dna vektor_clog vektor_windowmanager vektor_editor)
+target_link_libraries(vektor PRIVATE vektor_kernel vektor_vklib vektor_dna vektor_clog vektor_windowmanager vektor_editor glad glfw)
 target_include_directories(vektor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_compile_definitions(vektor PRIVATE

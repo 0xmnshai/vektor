@@ -29,7 +29,18 @@ struct wmEvent
         return (type >= EVT_AKEY && type <= EVT_ZKEY) || (type >= EVT_ZEROKEY && type <= EVT_TWOKEY) ||
                (type >= EVT_ESCKEY && type <= EVT_LEFTALTKEY);
     }
-
     bool is_mouse_move() const { return type == MOUSEMOVE; }
 };
+
+int  MESH_OT_select_all_exec(vkContext*     vkC,
+                             wmOperator*    op,
+                             const wmEvent* event);
+
+int  SCREEN_OT_action_zone_exec(vkContext*     vkC,
+                                wmOperator*    op,
+                                const wmEvent* event);
+
+void setup_operators();
+void setup_keymap();
+void simulate_vektor_input();
 } // namespace vektor
