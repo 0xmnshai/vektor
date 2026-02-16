@@ -1,19 +1,26 @@
 #pragma once
 
 #include <functional>
-#include <list>
 #include <memory>
 #include <string>
 
-#include "wm_event.h"
+#include "../dna/DNA_listBase.h"
+#include "../dna/DNA_space_enums.h"
 
 namespace vektor
 {
+struct vkContext;
+struct wmEvent;
 struct bScreen;
 struct ScrArea;
 struct ARegion;
 struct wmWindow;
-struct EventHandler;
+struct WindowRuntime;
+
+using EventHandlerPoll = bool (*)(const wmWindow* win,
+                                  const ScrArea*  area,
+                                  const ARegion*  region,
+                                  const wmEvent*  event);
 
 enum class SpaceType
 {
@@ -88,7 +95,7 @@ struct ARegion
     int                                  winx, winy; // Size
     int                                  x, y;       // Position relative to Area
 
-    std::list<std::shared_ptr<Handler>>  handlers;
+    ListBaseT<Handler>                   handlers;
 
     void*                                custom_data = nullptr;
 
@@ -107,18 +114,18 @@ struct ARegion
     }
 };
 
-struct ScrArea
+struct ScrArea : public ListBaseT<ScrArea>
 {
-    SpaceType                           spacetype;
+    char               spacetype = eSpace_Type::SPACE_EMPTY;
 
-    int                                 x, y;
-    int                                 winx, winy;
+    int                x, y;
+    int                winx, winy;
 
-    std::list<std::shared_ptr<ARegion>> regionbase;
+    ListBaseT<ARegion> regionbase;
 
-    std::list<std::shared_ptr<Handler>> handlers;
+    ListBaseT<Handler> handlers;
 
-    ScrArea(SpaceType type)
+    ScrArea(char type)
         : spacetype(type)
         , x(0)
         , y(0)
@@ -127,34 +134,70 @@ struct ScrArea
     {
     }
 
-    void add_region(std::shared_ptr<ARegion> region) { regionbase.push_back(region); }
+    void add_region(std::shared_ptr<ARegion> region)
+    {
+        regionbase.last  = region.get();
+        regionbase.first = region.get();
+    }
 };
 
-struct bScreen
+struct bScreen : public ListBaseT<bScreen>
 {
-    std::string                         name;
-    std::list<std::shared_ptr<ScrArea>> areabase;
+    std::string        name;
+
+    ListBaseT<ScrArea> areabase = {nullptr, nullptr};
 
     bScreen(const std::string& n)
         : name(n)
     {
     }
 
-    void add_area(std::shared_ptr<ScrArea> area) { areabase.push_back(area); }
+    void add_area(std::shared_ptr<ScrArea> area)
+    {
+        areabase.last  = area.get();
+        areabase.first = area.get();
+    }
 };
 
 struct wmWindow
 {
-    std::shared_ptr<bScreen>            screen;
+public:
+    std::shared_ptr<bScreen> screen;
 
-    std::list<std::shared_ptr<Handler>> handlers;
+    ListBaseT<Handler>       handlers;
 
-    std::shared_ptr<ScrArea>            active_area;
-    std::shared_ptr<ARegion>            active_region;
+    std::shared_ptr<ScrArea> active_area;
+    std::shared_ptr<ARegion> active_region;
 
-    wmWindow() {}
+    int                      posx, posy;
+    int                      sizex, sizey;
+    std::string              title;
 
-    void SetScreen(std::shared_ptr<bScreen> s) { screen = s; }
+    WindowRuntime*           runtime = nullptr;
+
+    /// need to define them in wm_window_manager
+    struct wmWindow *        next = nullptr, *prev = nullptr;
+
+    struct wmWindow*         parent                           = nullptr;
+
+    struct Scene*            scene                            = nullptr; // active
+
+    struct Scene*            new_scene                        = nullptr; // temporary when switching
+
+    char                     view_layer_name[/*MAX_NAME*/ 64] = "";
+
+    bool                     is_temp_screen                   = false;
+
+    wmWindow()
+        : posx(0)
+        , posy(0)
+        , sizex(1280)
+        , sizey(720)
+        , title("Vektor")
+    {
+    }
+
+    void set_screen(std::shared_ptr<bScreen> s) { screen = s; }
 };
 
 } // namespace vektor

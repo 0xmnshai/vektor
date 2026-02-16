@@ -16,6 +16,8 @@
 
 namespace vektor
 {
+const char* FS_dir_home(void);
+
 namespace file_system
 {
 

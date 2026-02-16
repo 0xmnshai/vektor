@@ -7,6 +7,14 @@
 #define STRINGIFY_APPEND(a, b) "" a #b
 #define STRINGIFY(x) STRINGIFY_APPEND("", x)
 
+#include <string.h>
+#include <stdio.h>
+
+#define SNPRINTF_UTF8(buff, fmt, ...) snprintf(buff, sizeof(buff), fmt, ##__VA_ARGS__)
+
+#define STREQ(a, b) (strcmp(a, b) == 0)
+#define STREQLEN(a, b, n) (strncmp(a, b, n) == 0)
+
 #define _CLOG_ATTR_ALWAYS_INLINE
 
 #include <stdint.h>

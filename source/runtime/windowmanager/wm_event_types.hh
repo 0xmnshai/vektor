@@ -136,14 +136,6 @@ inline std::ostream& operator<<(std::ostream& os,
     return os << static_cast<uint16_t>(key);
 }
 
-template <typename T,
-          typename... Args>
-constexpr bool ELEM(const T& v,
-                    const Args&... args)
-{
-    return ((v == args) || ...);
-}
-
 #define ISTIMER(event_type) ((event_type) >= TIMER && (event_type) <= _TIMER_MAX)
 
 #define ISKEYBOARD(event_type)                                                                                         \

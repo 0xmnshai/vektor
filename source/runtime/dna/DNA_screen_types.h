@@ -106,7 +106,6 @@ struct ARegion
 
 struct ScrArea
 {
-
     struct ScrArea *                 next = nullptr, *prev = nullptr;
 
     ScrVert *                        v1 = nullptr, *v2 = nullptr, *v3 = nullptr, *v4 = nullptr;

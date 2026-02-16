@@ -7,6 +7,15 @@
 
 namespace vektor
 {
+
+template <typename T,
+          typename... Args>
+constexpr bool ELEM(const T& v,
+                    const Args&... args)
+{
+    return ((v == args) || ...);
+}
+
 namespace bke
 {
 namespace id

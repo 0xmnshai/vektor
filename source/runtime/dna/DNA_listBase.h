@@ -1,9 +1,10 @@
 
 #pragma once
 
+#include "../vklib/VKE_compiler_compat.h"
+
 namespace vektor
 {
-
 struct Link
 {
     struct Link *next, *prev;
@@ -68,6 +69,11 @@ struct ListBaseT : public ListBase
         return *reinterpret_cast<ListBaseT<OtherT>*>(this);
     }
 };
+
+VKE_INLINE bool VKE_listbase_is_single(const ListBase* lb)
+{
+    return (lb->first && lb->first == lb->last);
+}
 
 #endif
 } // namespace vektor

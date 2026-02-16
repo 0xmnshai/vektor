@@ -1,8 +1,52 @@
+#pragma once
+
 #include <stddef.h>
+#include <new>
 #include <type_traits>
 
 #include "malloc_function_pointers.hh"
 #include "mallocn_lockfree.hh"
+
+#define MEM_CXX_CLASS_ALLOC_FUNCS(_id)                                                                                 \
+public:                                                                                                                \
+    void* operator new(size_t num_bytes)                                                                               \
+    {                                                                                                                  \
+        return mem_guarded::internal::mem_mallocN_aligned_ex(num_bytes, __STDCPP_DEFAULT_NEW_ALIGNMENT__, _id,         \
+                                                             mem_guarded::internal::DestructorType::NonTrivial);       \
+    }                                                                                                                  \
+    void* operator new(size_t num_bytes, std::align_val_t alignment)                                                   \
+    {                                                                                                                  \
+        return mem_guarded::internal::mem_mallocN_aligned_ex(num_bytes, size_t(alignment), _id,                        \
+                                                             mem_guarded::internal::DestructorType::NonTrivial);       \
+    }                                                                                                                  \
+    void operator delete(void* mem)                                                                                    \
+    {                                                                                                                  \
+        if (mem)                                                                                                       \
+        {                                                                                                              \
+            mem_guarded::internal::mem_freeN_ex(mem, mem_guarded::internal::DestructorType::NonTrivial);               \
+        }                                                                                                              \
+    }                                                                                                                  \
+    void* operator new[](size_t num_bytes)                                                                             \
+    {                                                                                                                  \
+        return mem_guarded::internal::mem_mallocN_aligned_ex(num_bytes, __STDCPP_DEFAULT_NEW_ALIGNMENT__, _id "[]",    \
+                                                             mem_guarded::internal::DestructorType::NonTrivial);       \
+    }                                                                                                                  \
+    void* operator new[](size_t num_bytes, std::align_val_t alignment)                                                 \
+    {                                                                                                                  \
+        return mem_guarded::internal::mem_mallocN_aligned_ex(num_bytes, size_t(alignment), _id "[]",                   \
+                                                             mem_guarded::internal::DestructorType::NonTrivial);       \
+    }                                                                                                                  \
+    void operator delete[](void* mem)                                                                                  \
+    {                                                                                                                  \
+        if (mem)                                                                                                       \
+        {                                                                                                              \
+            mem_guarded::internal::mem_freeN_ex(mem, mem_guarded::internal::DestructorType::NonTrivial);               \
+        }                                                                                                              \
+    }                                                                                                                  \
+    void* operator new(size_t /*count*/, void* ptr)                                                                    \
+    {                                                                                                                  \
+        return ptr;                                                                                                    \
+    }
 
 void* (*MEM_new_array_zeroed_aligned)(size_t      len,
                                       size_t      size,

@@ -18,7 +18,7 @@
 
 namespace vektor
 {
-namespace veklib
+namespace vklib
 {
 class VektorSubProcess : public NonCopyable
 {
@@ -72,7 +72,7 @@ public:
     void decrement();
     bool try_decrement(int wait_ms = 0);
 };
-} // namespace veklib
+} // namespace vklib
 } // namespace vektor
 
 #endif

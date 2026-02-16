@@ -5,28 +5,25 @@
 
 namespace vektor
 {
-namespace kernel
-{
-
 struct Main;
 struct RecentFile;
 
 struct Global
 {
-    Main*                 main;
-    Main*                 pr_main;
-    char                  filepath_last_image[1024];
-    char                  filepath_last_library[1024];
-    char                  filepath_last_blend[1024];
+    vektor::Main*                 main;
+    vektor::Main*                 pr_main;
+    char                          filepath_last_image[1024];
+    char                          filepath_last_library[1024];
+    char                          filepath_last_blend[1024];
 
-    ListBaseT<RecentFile> recent_files;
-    bool                  is_break;
-    bool                  background;
-    bool                  factory_startup;
-    short                 moving;
-    bool                  is_rendering;
-    short                 debug_value;
-    int                   f;
+    ListBaseT<vektor::RecentFile> recent_files;
+    bool                          is_break;
+    bool                          background;
+    bool                          factory_startup;
+    short                         moving;
+    bool                          is_rendering;
+    short                         debug_value;
+    int                           f;
 
     struct
     {
@@ -149,7 +146,5 @@ enum
 extern Global G;
 
 #define G_MAIN (G).main
-
-} // namespace kernel
 
 } // namespace vektor

@@ -8,6 +8,7 @@
 namespace vektor
 {
 
+    
 struct wmEvent
 {
     struct wmEvent *next = nullptr, *prev = nullptr;

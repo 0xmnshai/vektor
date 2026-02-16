@@ -17,12 +17,14 @@
 #include "wm_event_types.hh"
 
 // testing python UI
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <GLUT/glut.h>
 
 #include <pylifecycle.h>
 #include <pythonrun.h>
