@@ -71,14 +71,14 @@ void setup_vektor_theme(const vkTheme* theme_chk)
         colors[ImGuiCol_SliderGrab]           = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
         colors[ImGuiCol_SliderGrabActive]     = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
 
-        // Blender Selection / Buttons
+        // Vektor Selection / Buttons
         colors[ImGuiCol_Button]               = theme.tspace.button;
         colors[ImGuiCol_ButtonHovered]        = theme.tspace.button_hi;
         colors[ImGuiCol_ButtonActive]      = ImVec4(0.33f, 0.60f, 0.86f, 1.00f); // Blue-ish for active in some contexts
 
         colors[ImGuiCol_Header]            = theme.tspace.header;
         colors[ImGuiCol_HeaderHovered]     = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-        colors[ImGuiCol_HeaderActive]      = ImVec4(0.93f, 0.54f, 0.08f, 1.00f); // Blender Orange
+        colors[ImGuiCol_HeaderActive]      = ImVec4(0.93f, 0.54f, 0.08f, 1.00f); // Vektor Orange
 
         colors[ImGuiCol_Separator]         = theme.tui.widget_border;
         colors[ImGuiCol_SeparatorHovered]  = theme.tui.widget_border;

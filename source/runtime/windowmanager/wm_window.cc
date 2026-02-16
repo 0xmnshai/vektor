@@ -138,6 +138,3 @@ void WM_window_title_refresh(wmWindowManager* wm,
     wm_window_title_state_refresh(wm, win);
 }
 } // namespace vektor
-
-// later check screen_draw.cc in blender
-// need to implment this : WM_window_open

@@ -78,7 +78,7 @@ int main(int          argc,
     if (result != 0)
         return result;
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Blender Style ImGui + Python", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Vektor Style ImGui + Python", NULL, NULL);
 
     if (!window)
     {

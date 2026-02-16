@@ -50,6 +50,6 @@ void GLFW_Window::create_window(std::shared_ptr<wmWindow> window)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
 
-    // GLFWwindow* window = glfwCreateWindow(1280, 720, "Blender Style ImGui + Python", NULL, NULL);
+    // GLFWwindow* window = glfwCreateWindow(1280, 720, "Vektor Style ImGui + Python", NULL, NULL);
 }
 } // namespace vektor

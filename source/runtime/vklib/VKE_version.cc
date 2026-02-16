@@ -14,7 +14,7 @@ bool        VKE_vektor_version_is_lts()
 
 const char* version_suffix = VKE_vektor_version_is_lts() ? " LTS" : "";
 
-static void blender_version_init()
+static void vektor_version_init()
 {
     const char* version_cycle         = "";
 
