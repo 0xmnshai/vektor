@@ -1,6 +1,6 @@
 import re
 import os
-import sys
+import sys 
 
 def remove_c_cpp_comments(text):
     def replacer(match):
