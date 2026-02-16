@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <ostream>
 
+#include "../dna/DNA_id.h"
+
 namespace vektor
 {
 enum wmEventType : int16_t

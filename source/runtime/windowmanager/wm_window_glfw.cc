@@ -1,5 +1,6 @@
 
 #include <iostream>
+
 #include "GLFW/glfw3.h"
 
 #include "../../intern/clog/COG_log.hh"

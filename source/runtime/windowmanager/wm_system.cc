@@ -1,5 +1,7 @@
 #include "wm_system.h"
 #include <iostream>
+#include "../vklib/VKE_listbase_iterator.hh" // IWYU pragma: keep
+#include "wm_event_types.hh"
 #include "wm_keymap.h"
 
 #include "../../../intern/clog/COG_log.hh"
@@ -124,11 +126,11 @@ void wmWindowManager::on_update(float ts)
     }
     for (auto& area : window_->screen->areabase)
     {
-        for (auto& region : area->regionbase)
+        for (auto& region : area.regionbase)
         {
-            if (region->on_update)
+            if (region.on_update)
             {
-                region->on_update(region.get(), ts);
+                region.on_update(&region, ts);
             }
         }
     }
@@ -142,11 +144,11 @@ void wmWindowManager::on_render()
     }
     for (auto& area : window_->screen->areabase)
     {
-        for (auto& region : area->regionbase)
+        for (auto& region : area.regionbase)
         {
-            if (region->on_draw)
+            if (region.on_draw)
             {
-                region->on_draw(region.get());
+                region.on_draw(&region);
             }
         }
     }
