@@ -1,10 +1,11 @@
-#include "wm_system.h"
 #include <iostream>
 #include "../vklib/VKE_listbase_iterator.hh" // IWYU pragma: keep
 #include "wm_event_types.hh"
-#include "wm_keymap.h"
 
 #include "../../../intern/clog/COG_log.hh"
+#include "../dna/DNA_windowmanager_types.h"
+#include "wm_event.h"
+#include "wm_keymap.h"
 
 namespace vektor
 {

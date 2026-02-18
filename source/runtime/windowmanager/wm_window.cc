@@ -1,12 +1,10 @@
 #include <fmt/format.h>
 #include <string>
 
-#include "../../editor/include/ED_screen.hh"
 #include "../dna/DNA_listBase.h"
 #include "../dna/DNA_space_enums.h"
 #include "../translation/VKT_translation.hh"
 #include "wm_api.h"
-#include "wm_system.h"
 
 #include "../vklib/VKE_build_config.h"
 #include "../vklib/VKE_main.hh"
@@ -15,10 +13,12 @@
 #include "../vklib/VKE_version.hh"
 
 #include "../../intern/file_system/fileops.hh"
-#include "../kernel/intern/VKE_wm_runtime.h"
-
-#include "../../intern/glfw/GLFW_System.hh"
+#include "../../intern/gaurdalloc/MEM_gaurdalloc.hh"
 #include "GLFW_window.hh"
+
+#include "../dna/DNA_windowmanager_types.h"
+#include "../../editor/include/ED_screen.hh" // IWYU pragma: keep
+#include "wm_system.h"
 
 namespace vektor
 {
@@ -34,8 +34,7 @@ std::string wm_window_title_text(wmWindowManager*                               
 
         ScrArea*   area      = (screen) ? static_cast<ScrArea*>(screen->areabase.first) : nullptr;
 
-        if (is_single && area &&
-            area->spacetype != eSpace_Type::SPACE_EMPTY) // need to change from wm_types.h to DNA_space_enums.h
+        if (is_single && area && area->spacetype != SPACE_EMPTY) // need to change from wm_types.h to DNA_space_enums.h
         {
             return IFACE_(ED_area_name(area).c_str());
         }
@@ -140,131 +139,19 @@ void WM_window_title_refresh(wmWindowManager* wm,
     wm_window_title_state_refresh(wm, win);
 }
 
-// --------------------------------------------------------------------
-// Vektor Window Implementation
-// --------------------------------------------------------------------
-
-class VektorWindow : public GLFW_Window
-{
-public:
-    VektorWindow(uint32_t                  width,
-                 uint32_t                  height,
-                 GLFW_TWindowState         state,
-                 const GLFW_ContextParams& context_params,
-                 const bool                exclusive = false)
-        : GLFW_Window(width,
-                      height,
-                      state,
-                      context_params,
-                      exclusive)
-    {
-    }
-
-    // GLFW_Window implements create_window, but defines it as virtual or pure virtual in base?
-    // In GLFW_Window.hh: virtual GLFW_IWindow* create_window(...) = 0;
-    // In GLFW_Window.cc: GLFW_IWindow* GLFW_Window::create_window(...) { ... }
-    // So GLFW_Window::create_window is the implementation we want to use.
-    // However, since it is pure virtual in the base (if GLFW_Window is abstract? No, GLFW_Window inherits from
-    // GLFW_IWindow). GLFW_IWindow HAS create_window as pure virtual. GLFW_Window declares it overrides it? In
-    // GLFW_Window.hh: virtual GLFW_IWindow* create_window(...) = 0; -> WAIT. If GLFW_Window.hh says = 0, then
-    // GLFW_Window IS abstract and cannot be instantiated directly, even if it has an implementation body in .cc (which
-    // can be called by subclasses). So we MUST override it in VektorWindow.
-
-    GLFW_IWindow* create_window(const char*         title,
-                                int32_t             left,
-                                int32_t             top,
-                                uint32_t            width,
-                                uint32_t            height,
-                                GLFW_TWindowState   state,
-                                GLFW_GPUSettings    gpu_settings,
-                                const bool          exclusive     = false,
-                                const bool          is_dialog     = false,
-                                const GLFW_IWindow* parent_window = nullptr) override
-    {
-        return GLFW_Window::create_window(title, left, top, width, height, state, gpu_settings, exclusive, is_dialog,
-                                          parent_window);
-    }
-
-    // Check other pure virtuals?
-    // GLFW_IWindow: init(), set_title(), ...
-    // GLFW_Window implements all of them?
-    // GLFW_Window.hh: virtual void init() const override; -> ok
-};
-
-// --------------------------------------------------------------------
-// Internal Helpers
-// --------------------------------------------------------------------
-
-static void wm_window_ghostwindow_add(wmWindowManager* wm,
-                                      const char*      title,
-                                      wmWindow*        win,
-                                      bool             is_dialog)
-{
-    GLFW_ContextParams context_params;
-    context_params.ctx_major =
-        3; // Fixed from major_version based on typical naming, verifying in next step via tool if it fails again
-    context_params.ctx_minor       = 3;                                    // Fixed from minor_version
-    context_params.profile         = GLFW_ContextParams::CtxProfile::Core; // Guessing enum, will check
-
-    // Instantiate our concrete window class
-    auto*            vektor_window = new VektorWindow(win->sizex, win->sizey, GLFW_kWindowStateNormal, context_params);
-
-    // Create the actual OS window
-    GLFW_GPUSettings gpu_settings;
-    vektor_window->create_window(title, win->posx, win->posy, win->sizex, win->sizey, GLFW_kWindowStateNormal,
-                                 gpu_settings, false, is_dialog, nullptr);
-
-    win->runtime->glfw_win = vektor_window;
-
-    // Register with system
-    if (GLFW_ISystem::get_system())
-    {
-        if (auto* sys = dynamic_cast<GLFW_System*>(GLFW_ISystem::get_system()))
-        {
-            sys->get_window_manager()->add_window(vektor_window);
-        }
-    }
-}
-
-static void wm_window_ghostwindow_ensure(wmWindowManager* wm,
-                                         wmWindow*        win,
-                                         bool             is_dialog)
-{
-    if (win->runtime->glfw_win == nullptr)
-    {
-        wm_window_ghostwindow_add(wm, win->title.c_str(), win, is_dialog);
-    }
-}
-
-// --------------------------------------------------------------------
-// Implementation
-// --------------------------------------------------------------------
-
 wmWindow* wm_window_new(const Main*      vkmain,
                         wmWindowManager* wm,
                         wmWindow*        parent,
                         bool             dialog)
 {
-    auto win     = new wmWindow();
-    win->runtime = new WindowRuntime();
-    // Default size/pos from constructor
+    wmWindow* win = MEM_new<wmWindow>("window");
 
-    if (wm->get_window())
-    {
-        // Append to end of list
-        wmWindow* last = wm->get_window().get();
-        while (last->next)
-            last = last->next;
-        last->next = win;
-        win->prev  = last;
-    }
-    // Else: we can't easily set the head of the list because it's a shared_ptr in wmWindowManager
-    // and we don't have access to set it from here (private member, only getter).
-    // However, if get_window() is null, something is wrong or we are efficiently the first window
-    // but can't attach to the manager?
-    // G_WM constructor creates a default window_.
-    // So get_window() should not be null.
-    // But if we are creating a NEW window (e.g. second window), we append.
+    // BLI_addtail(&wm->windows, win);
+    // win->winid           = find_free_winid(wm);
+
+    // /* Dialogs may have a child window as parent. Otherwise, a child must not be a parent too. */
+    // win->parent          = (!dialog && parent && parent->parent) ? parent->parent : parent;
+    // win->runtime         = MEM_new<bke::WindowRuntime>(__func__);
 
     return win;
 }
@@ -298,9 +185,6 @@ wmWindow* WM_window_open(bContext*        C,
         win->sizey = rect_unscaled->ymax - rect_unscaled->ymin;
     }
 
-    // Ensure ghost window (OS window)
-    wm_window_ghostwindow_ensure(wm, win, dialog);
-
     return win;
 }
 
@@ -328,7 +212,7 @@ bool WM_file_recover_last_session(bContext*   C,
 
 bool WM_window_is_temp_screen(const wmWindow* win)
 {
-    return win->is_temp_screen;
+    return false; // win->is_temp_screen;
 }
 
 bScreen* WM_window_get_active_screen(const wmWindow* win)
@@ -338,6 +222,6 @@ bScreen* WM_window_get_active_screen(const wmWindow* win)
     {
         return nullptr;
     }
-    return win->screen.get();
+    return win->screen;
 }
 } // namespace vektor

@@ -42,9 +42,6 @@
 #endif
 #endif
 
-namespace
-{
-
 #define MAX_NAME 64
 
 void _DNA_internal_memcpy(void*       dst,
@@ -128,5 +125,3 @@ inline void shallow_swap(T& a,
 {
     _DNA_internal_swap(&a, &b, sizeof(T));
 }
-
-} // namespace

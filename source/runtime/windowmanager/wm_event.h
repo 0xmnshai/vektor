@@ -3,14 +3,15 @@
 #include <cstdint>
 
 #include "wm_event_types.hh"
-#include "wm_keymap.h"
+
+#include "../dna/DNA_windowmanager_types.h"
 
 namespace vektor
 {
 
-    
 struct wmEvent
 {
+public:
     struct wmEvent *next = nullptr, *prev = nullptr;
 
     wmEventType     type  = EVENT_NONE;

@@ -1,16 +1,20 @@
 #pragma once
 
-#include <cstdint>
+#include <cstdint> 
+#include <functional>
 
 #include "DNA_defs.h"
 #include "DNA_listBase.h"
-#include "DNA_space_types.h"
 #include "DNA_vec_types.h"
 #include "DNA_view2d_types.h"
-#include "DNA_windowmanager_types.h"
 
 namespace vektor
 {
+
+struct bScreen;
+struct SpaceLink;
+struct vkContext;
+struct wmEvent;
 
 #define AREAGRID 1
 #define AREAMINX 29
@@ -77,31 +81,75 @@ struct LayoutPanelState
     uint32_t                 last_used = 0;
 };
 
+struct ARegion; // Forward declaration
+
+class Handler
+{
+public:
+    using PollFn   = std::function<bool(ARegion*, const wmEvent&)>;
+    using HandleFn = std::function<bool(vkContext*, ARegion*, const wmEvent&)>;
+
+    Handler(PollFn   poll,
+            HandleFn handle)
+        : poll_(poll)
+        , handle_(handle)
+    {
+    }
+
+    bool poll(ARegion*       region,
+              const wmEvent& event)
+    {
+        if (poll_)
+            return poll_(region, event);
+        return true;
+    }
+
+    bool handle(vkContext*     ctx,
+                ARegion*       region,
+                const wmEvent& event)
+    {
+        if (handle_)
+            return handle_(ctx, region, event);
+        return false;
+    }
+
+private:
+    PollFn   poll_;
+    HandleFn handle_;
+};
+
 struct ARegion
 {
-    struct ARegion *next = nullptr, *prev = nullptr;
+    struct ARegion *                     next = nullptr, *prev = nullptr;
 
-    View2D          v2d;
+    View2D                               v2d;
 
-    rcti            winrct = {};
+    rcti                                 winrct = {};
 
-    short           winx = 0, winy = 0;
+    short                                winx = 0, winy = 0;
 
-    int             category_scroll = 0;
+    int                                  category_scroll = 0;
 
-    short           regiontype      = 0;
+    short                                regiontype      = 0;
 
-    short           alignment       = 0;
+    short                                alignment       = 0;
 
-    short           flag            = 0;
+    short                                flag            = 0;
 
-    short           sizex = 0, sizey = 0;
+    short                                sizex = 0, sizey = 0;
 
-    short           overlap        = 0;
+    short                                overlap        = 0;
 
-    short           flagfullscreen = 0;
+    short                                flagfullscreen = 0;
 
-    char            _pad[2]        = {};
+    char                                 _pad[2]        = {};
+
+    ListBaseT<Handler>                   handlers;
+
+    void*                                custom_data = nullptr;
+
+    std::function<void(ARegion*)>        on_draw; // ImGui render
+    std::function<void(ARegion*, float)> on_update;
 };
 
 struct ScrArea
@@ -138,7 +186,8 @@ struct ScrArea
     ListBaseT<SpaceLink>             spacedata;
 
     ListBaseT<ARegion>               regionbase;
-    ListBaseT<struct wmEventHandler> handlers;
+    ListBaseT<Handler>               handlers;
+    ListBaseT<struct wmEventHandler> event_handlers;
 
     ListBaseT<struct AZone>          actionzones;
 

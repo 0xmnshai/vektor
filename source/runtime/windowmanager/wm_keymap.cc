@@ -1,18 +1,35 @@
-
 #include <iostream>
 
+#include "wm_api.h"
 #include "wm_event.h"
 #include "wm_event_types.hh"
 #include "wm_keymap.h"
-#include "wm_system.h"
+
+#include "../dna/DNA_windowmanager_types.h"
 
 namespace vektor
 {
 wmKeyMap* keymap_add(wmKeyConfig*       config,
                      const std::string& name)
 {
-    config->keymaps.emplace_back(wmKeyMap());
-    wmKeyMap* km = &config->keymaps.back();
+    wmKeyMap* new_km = new wmKeyMap();
+    new_km->next     = nullptr;
+    new_km->prev     = nullptr;
+
+    // Add to list end
+    if (config->keymaps.last)
+    {
+        ((wmKeyMap*)config->keymaps.last)->next = new_km;
+        new_km->prev                            = (wmKeyMap*)config->keymaps.last;
+        config->keymaps.last                    = new_km;
+    }
+    else
+    {
+        config->keymaps.first = new_km;
+        config->keymaps.last  = new_km;
+    }
+
+    wmKeyMap* km = new_km;
     km->idname   = name;
     return km;
 }
@@ -23,8 +40,24 @@ wmKeyMapItem* keymap_add_item(wmKeyMap*          km,
                               int                val,
                               int                modifier)
 {
-    km->items.emplace_back(wmKeyMapItem());
-    wmKeyMapItem* item = &km->items.back();
+    wmKeyMapItem* new_item = new wmKeyMapItem();
+    new_item->next         = nullptr;
+    new_item->prev         = nullptr;
+
+    // Add to list end
+    if (km->items.last)
+    {
+        ((wmKeyMapItem*)km->items.last)->next = new_item;
+        new_item->prev                        = (wmKeyMapItem*)km->items.last;
+        km->items.last                        = new_item;
+    }
+    else
+    {
+        km->items.first = new_item;
+        km->items.last  = new_item;
+    }
+
+    wmKeyMapItem* item = new_item;
     item->idname       = op_id;
     item->type         = type;
     item->val          = val;
@@ -123,11 +156,6 @@ wmKeyConfig* get_default_keyconfig()
         return nullptr;
     }
     return G_WM->default_conf;
-}
-
-bool wmKeyMap::poll(struct vkContext* vkC)
-{
-    return true; // Always active for this demo
 }
 
 } // namespace vektor

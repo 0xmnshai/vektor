@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include <new>
+#include <new> // IWYU pragma: keep
 #include <type_traits>
 
 #include "malloc_function_pointers.hh"
@@ -48,11 +48,23 @@ public:                                                                         
         return ptr;                                                                                                    \
     }
 
-void* (*MEM_new_array_zeroed_aligned)(size_t      len,
-                                      size_t      size,
-                                      size_t      alignment,
-                                      const char* str,
-                                      size_t&     actual_size) = vektor::mem_lockfree_malloc_arrayN_aligned;
+inline void* (*MEM_new_array_zeroed_aligned)(size_t      len,
+                                             size_t      size,
+                                             size_t      alignment,
+                                             const char* str,
+                                             size_t&     actual_size) = vektor::mem_lockfree_malloc_arrayN_aligned;
+
+template <typename T,
+          typename... Args>
+inline T* MEM_new(const char* allocation_name,
+                  Args&&... args)
+{
+    void* buffer = vektor::mem_guarded::internal::mem_mallocN_aligned_ex(
+        sizeof(T), alignof(T), allocation_name,
+        std::is_trivially_destructible_v<T> ? vektor::mem_guarded::internal::DestructorType::Trivial
+                                            : vektor::mem_guarded::internal::DestructorType::NonTrivial);
+    return new (buffer) T(std::forward<Args>(args)...);
+}
 
 template <typename T>
 inline T* MEM_new_zeroed(const char* allocation_name)

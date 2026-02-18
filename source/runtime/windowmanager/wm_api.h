@@ -11,6 +11,7 @@ namespace vektor
 {
 struct vkContext;
 struct wmWindowManager;
+extern wmWindowManager* G_WM;
 struct bContext;
 struct ReportList;
 struct bScreen;

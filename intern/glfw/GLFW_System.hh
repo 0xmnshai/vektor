@@ -2,8 +2,7 @@
 
 #include "GLFW/glfw3.h"
 #include "GLFW_ISystem.hh"
-#include "GLFW_event_manager.hh"
-#include "GLFW_rect.hh"
+#include "GLFW_event_manager.hh" 
 #include "GLFW_timer_manager.hh"
 #include "GLFW_window_manager.hh"
 

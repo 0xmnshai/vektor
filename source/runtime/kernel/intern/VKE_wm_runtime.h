@@ -1,14 +1,12 @@
 #pragma once
 
 #include "../../runtime/dna/DNA_listBase.h"
-#include "../../runtime/windowmanager/wm_event.h"
 #include "../../runtime/windowmanager/wm_event_system.h"
 
 namespace vektor
 {
 struct WindowRuntime
 {
-
     WindowRuntime() = default;
     ~WindowRuntime();
 

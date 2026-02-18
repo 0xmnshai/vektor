@@ -4,17 +4,12 @@
 
 #include <csignal>
 
-#include "creator_args.hh"
-#include "creator_global.hh"
-
 #include "../../intern/clog/COG_log.hh"
 #include "../runtime/vklib/VKE_assert.h"
 
-#include "../runtime/windowmanager/wm_event.h"
-#include "../runtime/windowmanager/wm_keymap.h"
-#include "../runtime/windowmanager/wm_system.h"
+#include "creator_args.hh"
+#include "creator_global.hh"
 #include "draw/PY_imgui.hh"
-#include "wm_event_types.hh"
 
 // testing python UI
 #include <glad/glad.h>
@@ -29,7 +24,9 @@
 #include <pylifecycle.h>
 #include <pythonrun.h>
 
+#include "../runtime/windowmanager/wm_event.h"
 #include "./imgui/UI_theme.hh"
+#include "wm_system.h"
 
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "Application");

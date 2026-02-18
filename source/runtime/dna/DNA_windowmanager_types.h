@@ -2,48 +2,21 @@
 
 #pragma once
 
+#include <list>
+#include <map>
+#include <string>
+
 #include "DNA_defs.h"
 #include "DNA_id.h"
 
 #include "DNA_listBase.h"
 
-struct ScrAreaMap
-{
-};
+#include "../dna/DNA_screen_types.h"
+#include "../kernel/intern/VKE_wm_runtime.h"
 
 namespace vektor
 {
-
-namespace bke
-{
-struct WindowManagerRuntime;
-struct WindowRuntime;
-} // namespace bke
-
-namespace ui
-{
-struct Layout;
-}
-
-struct wmNotifier;
-struct wmWindow;
-struct wmWindowManager;
-
-struct wmEvent_ConsecutiveData;
-struct wmEvent;
 struct wmKeyConfig;
-struct wmKeyMap;
-struct wmMsgBus;
-struct wmOperator;
-struct wmOperatorType;
-
-struct PointerRNA;
-struct Report;
-struct ReportList;
-struct Stereo3dFormat;
-struct vkC;
-struct bScreen;
-struct wmTimer;
 
 #define OP_MAX_TYPENAME 64
 #define KMAP_MAX_NAME 64
@@ -52,6 +25,16 @@ struct ReportTimerInfo
 {
     float widthfac       = 0;
     float flash_progress = 0;
+};
+
+struct wmOperatorType
+{
+    std::string                                                               idname;
+    std::string                                                               name;
+    std::string                                                               description;
+
+    std::function<int(struct vkContext*, struct wmOperator*, const wmEvent*)> exec;
+    std::function<bool(struct vkContext*)>                                    poll;
 };
 
 enum
@@ -78,36 +61,75 @@ enum
     (WM_OUTLINER_SYNC_SELECT_FROM_OBJECT | WM_OUTLINER_SYNC_SELECT_FROM_EDIT_BONE |                                    \
      WM_OUTLINER_SYNC_SELECT_FROM_POSE_BONE | WM_OUTLINER_SYNC_SELECT_FROM_SEQUENCE)
 
-struct wmWindowManager
+class wmWindowManager
 {
-#ifdef __cplusplus
+public:
+    wmWindowManager();
+    ~wmWindowManager();
 
+#ifdef __cplusplus
     static constexpr ID_Type id_type = ID_WM;
 #endif
 
-    ID                 id;
+    ID                        id;
 
-    ListBaseT<wmWindow>        windows;
+    ListBaseT<wmWindow>       windows;
 
-    uint8_t                    init_flag                  = 0;
-    char                       _pad0[1]                   = {};
+    uint8_t                   init_flag                  = 0;
+    char                      _pad0[1]                   = {};
 
-    short                      file_saved                 = 0;
+    short                     file_saved                 = 0;
 
-    short                      op_undo_depth              = 0;
+    short                     op_undo_depth              = 0;
 
-    short                      outliner_sync_select_dirty = 0;
+    short                     outliner_sync_select_dirty = 0;
 
-    int                        extensions_updates         = 0;
+    int                       extensions_updates         = 0;
 
-    int                        extensions_blocked         = 0;
+    int                       extensions_blocked         = 0;
 
-    struct wmTimer*            autosavetimer              = nullptr;
+    struct wmTimer*           autosavetimer              = nullptr;
 
-    char                       autosave_scheduled         = 0;
-    char                       _pad2[7]                   = {};
+    char                      autosave_scheduled         = 0;
+    char                      _pad2[7]                   = {};
 
-    bke::WindowManagerRuntime* runtime                    = nullptr;
+    WindowRuntime*            runtime                    = nullptr;
+
+    static wmWindowManager*   get();
+
+    std::shared_ptr<wmWindow> get_window() { return window_; }
+
+    void                      process_events(vkContext* vkC);
+
+    void                      operator_register(const std::string& idname,
+                                                wmOperatorType     op);
+
+    wmOperatorType*           operator_find(const std::string& idname);
+
+    void                      on_update(float ts);
+    void                      on_render();
+
+    wmKeyConfig*              default_conf;
+
+    void                      push_event(const wmEvent& event);
+
+private:
+    std::list<wmEvent>                    event_queue_;
+    std::map<std::string, wmOperatorType> operators_;
+    std::shared_ptr<wmWindow>             window_;
+
+    void                                  wm_event_do_handlers(vkContext* vkC);
+
+    bool                                  wm_event_do_region_handlers(vkContext*               vkC,
+                                                                      std::shared_ptr<ARegion> region,
+                                                                      const wmEvent&           event);
+
+    bool                                  wm_event_do_area_handlers(vkContext*               vkC,
+                                                                    std::shared_ptr<ScrArea> area,
+                                                                    const wmEvent&           event);
+
+    bool                                  wm_event_do_window_handlers(vkContext*     vkC,
+                                                                      const wmEvent& event);
 };
 
 #define WM_KEYCONFIG_ARRAY_P(wm) &(wm)->runtime->defaultconf, &(wm)->runtime->addonconf, &(wm)->runtime->userconf
@@ -120,9 +142,9 @@ struct wmWindowManager
 #endif
 #endif
 
-struct wmWindow
+class wmWindow
 {
-
+public:
     struct wmWindow *               next = nullptr, *prev = nullptr;
 
     struct wmWindow*                parent              = nullptr;
@@ -143,9 +165,11 @@ struct wmWindow
 
     int                             winid  = 0;
 
-    short                           posx = 0, posy = 0;
+    std::string                     title;
 
-    short                           sizex = 0, sizey = 0;
+    int                             posx = 0, posy = 0;
+
+    int                             sizex = 0, sizey = 0;
 
     char                            windowstate                           = 0;
 
@@ -180,17 +204,15 @@ struct wmWindow
     char                            addmousemove                          = 0;
     char                            _pad1[7]                              = {};
 
-    struct Stereo3dFormat*          stereo3d_format                       = nullptr;
+    // struct Stereo3dFormat*          stereo3d_format                       = nullptr;
 
-    bke::WindowRuntime*             runtime                               = nullptr;
+    WindowRuntime*                  runtime                               = nullptr;
 };
 
 #ifdef ime_data
 #undef ime_data
 #endif
 
-#
-#
 struct wmOperatorTypeMacro
 {
     struct wmOperatorTypeMacro *next = nullptr, *prev = nullptr;
@@ -205,39 +227,42 @@ struct wmKeyMapItem
 {
     struct wmKeyMapItem *next = nullptr, *prev = nullptr;
 
-    char                 idname[64]        = "";
+    std::string          idname;
 
-    IDProperty*          properties        = nullptr;
+    IDProperty*          properties = nullptr;
 
-    char                 propvalue_str[64] = "";
+    std::string          propvalue_str;
 
-    short                propvalue         = 0;
+    short                propvalue = 0;
 
-    short                type              = 0;
+    short                type      = 0;
 
-    int8_t               val               = 0;
+    int8_t               val       = 0;
 
-    int8_t               direction         = 0;
+    int8_t               direction = 0;
 
-    int8_t               shift             = 0;
-    int8_t               ctrl              = 0;
-    int8_t               alt               = 0;
+    int8_t               shift     = 0;
+    int8_t               ctrl      = 0;
+    int8_t               alt       = 0;
 
-    int8_t               oskey             = 0;
+    int8_t               oskey     = 0;
 
-    int8_t               hyper             = 0;
+    int8_t               hyper     = 0;
 
-    char                 _pad0[7]          = {};
+    std::string          _pad0;
 
-    short                keymodifier       = 0;
+    int                  modifier     = 0;
+    bool                 any_modifier = false;
 
-    uint8_t              flag              = 0;
+    short                keymodifier  = 0;
 
-    uint8_t              maptype           = 0;
+    uint8_t              flag         = 0;
 
-    short                id                = 0;
+    uint8_t              maptype      = 0;
 
-    struct PointerRNA*   ptr               = nullptr;
+    short                id           = 0;
+
+    struct PointerRNA*   ptr          = nullptr;
 };
 
 struct wmKeyMapDiffItem
@@ -292,19 +317,23 @@ struct wmKeyMap
     ListBaseT<wmKeyMapItem>     items;
     ListBaseT<wmKeyMapDiffItem> diff_items;
 
-    char                        idname[64]    = "";
+    std::string                 idname;
+
+    std::string                 name;
+    std::string                 description;
 
     short                       spaceid       = 0;
 
     short                       regionid      = 0;
 
-    char                        owner_id[128] = "";
+    std::string                 owner_id;
 
     short                       flag          = 0;
 
     short                       kmi_id        = 0;
 
-    bool (*poll)(struct vkC*);
+    bool (*poll)(struct vkContext* ctx) = {};
+
     bool (*poll_modal_item)(const struct wmOperator* op,
                             int                      value) = {};
 
@@ -315,7 +344,7 @@ struct wmKeyConfigPref
 {
     struct wmKeyConfigPref *next = nullptr, *prev = nullptr;
 
-    char                    idname[64] = "";
+    std::string             idname;
     IDProperty*             prop       = nullptr;
 };
 
@@ -325,18 +354,22 @@ enum
     KEYCONF_INIT_DEFAULT = (1 << 2),
 };
 
-struct wmKeyConfig
+class wmKeyConfig
 {
-    struct wmKeyConfig *next = nullptr, *prev = nullptr;
+public:
+    struct wmKeyConfig *       next = nullptr, *prev = nullptr;
 
-    char                idname[64]   = "";
+    std::string                idname;
 
-    char                basename[64] = "";
+    std::string                basename;
 
-    ListBaseT<wmKeyMap> keymaps;
-    int                 actkeymap = 0;
-    short               flag      = 0;
-    char                _pad0[2]  = {};
+    ListBaseT<wmKeyMap>        keymaps;
+
+    int                        actkeymap = 0;
+    short                      flag      = 0;
+    char                       _pad0[2]  = {};
+
+    ListBaseT<wmKeyConfigPref> prefs;
 };
 
 struct wmOperator
@@ -361,7 +394,7 @@ struct wmOperator
 
     struct wmOperator*     opm     = nullptr;
 
-    ui::Layout*            layout  = nullptr;
+    // ui::Layout*            layout  = nullptr;
     short                  flag    = 0;
     char                   _pad[6] = {};
 };
