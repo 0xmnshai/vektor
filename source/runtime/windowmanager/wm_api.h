@@ -5,6 +5,8 @@
 #include "../vklib/VKE_compiler_attrs.h"
 #include "wm_types.h"
 
+#include "../vklib/VKE_main.hh"
+
 namespace vektor
 {
 struct vkContext;
@@ -49,6 +51,11 @@ void        wm_window_title_state_refresh(wmWindowManager* wm,
 void        WM_window_title_refresh(wmWindowManager* wm,
                                     wmWindow*        win);
 
+wmWindow*   wm_window_new(const Main*      vkmain,
+                          wmWindowManager* wm,
+                          wmWindow*        parent,
+                          bool             dialog);
+
 // LATER, LAST SESSION CAN BE READ FROM CACHE TO RE-STORE THE
 bool        WM_file_read(bContext*   C,
                          const char* filepath,
@@ -75,6 +82,7 @@ wmWindow*   WM_window_open(bContext*        C,
                            void* area_setup_user_data);
 
 bool        WM_window_is_temp_screen(const wmWindow* win) ATTR_WARN_UNUSED_RESULT;
+
 bScreen*    WM_window_get_active_screen(const wmWindow* win) ATTR_NONNULL() ATTR_WARN_UNUSED_RESULT;
 
 } // namespace vektor

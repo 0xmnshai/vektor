@@ -1,3 +1,4 @@
+#include "../../creator/creator_global.hh"
 #include "wm_api.h"
 
 namespace vektor
@@ -18,10 +19,14 @@ void WM_init(vkContext*   vkC,
     // vektor . cc or main .cc must call : blender_version_init ( vektor_version_init )
     // which is called within BKE_blender_globals_init ( to be defined if not in vektor.h)
     // BKE_blender_globals_init is defined in main .cc
-    // which must be called in creator.cc 
+    // which must be called in creator.cc
 
     // later check screen_draw.cc in blender
     // need to implment this : WM_window_open
+
+    if (!creator::G.background)
+    {
+    }
 }
 
 void WM_exit() {}

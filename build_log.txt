@@ -1,0 +1,42 @@
+[  6%] Built target vektor_filesystem
+[ 13%] Built target glad
+[ 66%] Built target glfw
+[ 73%] Built target vektor_guardedalloc
+[ 80%] Built target vektor_clog
+[ 80%] Building CXX object intern/glfw/CMakeFiles/vektor_glfw.dir/GLFW_window.cc.o
+In file included from /Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/glfw/GLFW_window.cc:3:
+/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad/include/glad/glad.h:887:2: error: OpenGL header already included, remove this include, glad already provides it
+  887 | #error OpenGL header already included, remove this include, glad already provides it
+      |  ^
+/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad/include/glad/glad.h:1202:9: warning: 'GL_ALL_ATTRIB_BITS' macro redefined [-Wmacro-redefined]
+ 1202 | #define GL_ALL_ATTRIB_BITS 0xFFFFFFFF
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h:106:9: note: previous definition is here
+  106 | #define GL_ALL_ATTRIB_BITS                0x000fffff
+      |         ^
+In file included from /Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/glfw/GLFW_window.cc:3:
+/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad/include/glad/glad.h:1290:9: warning: 'GL_LOGIC_OP' macro redefined [-Wmacro-redefined]
+ 1290 | #define GL_LOGIC_OP 0x0BF1
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h:54:9: note: previous definition is here
+   54 | #define GL_LOGIC_OP GL_INDEX_LOGIC_OP
+      |         ^
+In file included from /Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/glfw/GLFW_window.cc:3:
+/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad/include/glad/glad.h:1374:9: warning: 'GL_TEXTURE_COMPONENTS' macro redefined [-Wmacro-redefined]
+ 1374 | #define GL_TEXTURE_COMPONENTS 0x1003
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h:55:9: note: previous definition is here
+   55 | #define GL_TEXTURE_COMPONENTS GL_TEXTURE_INTERNAL_FORMAT
+      |         ^
+In file included from /Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/glfw/GLFW_window.cc:3:
+/Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/glad/include/glad/glad.h:1468:9: warning: 'GL_CLIENT_ALL_ATTRIB_BITS' macro redefined [-Wmacro-redefined]
+ 1468 | #define GL_CLIENT_ALL_ATTRIB_BITS 0xFFFFFFFF
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h:1204:9: note: previous definition is here
+ 1204 | #define GL_CLIENT_ALL_ATTRIB_BITS         0xffffffff
+      |         ^
+4 warnings and 1 error generated.
+make[3]: *** [intern/glfw/CMakeFiles/vektor_glfw.dir/GLFW_window.cc.o] Error 1
+make[2]: *** [intern/glfw/CMakeFiles/vektor_glfw.dir/all] Error 2
+make[1]: *** [intern/glfw/CMakeFiles/vektor_glfw.dir/rule] Error 2
+make: *** [vektor_glfw] Error 2
