@@ -16,8 +16,10 @@
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.hh"
 #include "GLFW_window.hh"
 
-#include "../dna/DNA_windowmanager_types.h"
 #include "../../editor/include/ED_screen.hh" // IWYU pragma: keep
+#include "../dna/DNA_windowmanager_types.h"
+#include "../vklib/VKE_list_base.h"
+#include "../vklib/VKE_listbase_iterator.hh" // IWYU pragma: keep
 #include "wm_system.h"
 
 namespace vektor
@@ -139,6 +141,20 @@ void WM_window_title_refresh(wmWindowManager* wm,
     wm_window_title_state_refresh(wm, win);
 }
 
+static int find_free_winid(wmWindowManager* wm)
+{
+    int id = 1;
+
+    for (wmWindow& win : wm->windows)
+    {
+        if (id <= win.winid)
+        {
+            id = win.winid + 1;
+        }
+    }
+    return id;
+}
+
 wmWindow* wm_window_new(const Main*      vkmain,
                         wmWindowManager* wm,
                         wmWindow*        parent,
@@ -146,12 +162,11 @@ wmWindow* wm_window_new(const Main*      vkmain,
 {
     wmWindow* win = MEM_new<wmWindow>("window");
 
-    // BLI_addtail(&wm->windows, win);
-    // win->winid           = find_free_winid(wm);
+    VKE_addtail(&wm->windows, win);
+    win->winid   = find_free_winid(wm);
 
-    // /* Dialogs may have a child window as parent. Otherwise, a child must not be a parent too. */
-    // win->parent          = (!dialog && parent && parent->parent) ? parent->parent : parent;
-    // win->runtime         = MEM_new<bke::WindowRuntime>(__func__);
+    win->parent  = (!dialog && parent && parent->parent) ? parent->parent : parent;
+    win->runtime = MEM_new<WindowRuntime>(__func__);
 
     return win;
 }
