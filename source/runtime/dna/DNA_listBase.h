@@ -2,7 +2,6 @@
 #pragma once
 
 #include <cstddef>
-#include <iterator>
 
 #include "../vklib/VKE_compiler_compat.h"
 
@@ -27,64 +26,7 @@ struct ListBase
 #ifdef __cplusplus
 
 template <typename T>
-struct ListBaseTIterator
-{
-public:
-    using iterator_category = std::bidirectional_iterator_tag;
-    using value_type        = T;
-    using difference_type   = std::ptrdiff_t;
-    using pointer           = T*;
-    using reference         = T&;
-
-private:
-    T* data_ = nullptr;
-
-public:
-    ListBaseTIterator(T* data)
-        : data_(data)
-    {
-    }
-
-    ListBaseTIterator& operator++()
-    {
-        data_ = reinterpret_cast<T*>((reinterpret_cast<const Link*>(data_))->next);
-        return *this;
-    }
-
-    ListBaseTIterator operator++(int)
-    {
-        ListBaseTIterator tmp = *this;
-        ++(*this);
-        return tmp;
-    }
-
-    ListBaseTIterator& operator--()
-    {
-        data_ = reinterpret_cast<T*>((reinterpret_cast<const Link*>(data_))->prev);
-        return *this;
-    }
-
-    ListBaseTIterator operator--(int)
-    {
-        ListBaseTIterator tmp = *this;
-        --(*this);
-        return tmp;
-    }
-
-    friend bool operator==(const ListBaseTIterator& a,
-                           const ListBaseTIterator& b)
-    {
-        return a.data_ == b.data_;
-    }
-
-    friend bool operator!=(const ListBaseTIterator& a,
-                           const ListBaseTIterator& b)
-    {
-        return a.data_ != b.data_;
-    }
-
-    T& operator*() const { return *data_; }
-};
+struct ListBaseTIterator;
 
 template <typename T>
 struct ListBaseEnumerateWrapper;

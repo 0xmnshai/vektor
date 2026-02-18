@@ -161,7 +161,7 @@ public:
 
     ScrAreaMap                      global_areas;
 
-    DNA_DEPRECATED struct bScreen*  screen = nullptr;
+    struct bScreen*                 screen = nullptr;
 
     int                             winid  = 0;
 
@@ -322,22 +322,22 @@ struct wmKeyMap
     std::string                 name;
     std::string                 description;
 
-    short                       spaceid       = 0;
+    short                       spaceid  = 0;
 
-    short                       regionid      = 0;
+    short                       regionid = 0;
 
     std::string                 owner_id;
 
-    short                       flag          = 0;
+    short                       flag    = 0;
 
-    short                       kmi_id        = 0;
+    short                       kmi_id  = 0;
 
     bool (*poll)(struct vkContext* ctx) = {};
 
     bool (*poll_modal_item)(const struct wmOperator* op,
-                            int                      value) = {};
+                            int                      value)  = {};
 
-    const void* modal_items            = nullptr;
+    const void* modal_items             = nullptr;
 };
 
 struct wmKeyConfigPref
@@ -345,7 +345,7 @@ struct wmKeyConfigPref
     struct wmKeyConfigPref *next = nullptr, *prev = nullptr;
 
     std::string             idname;
-    IDProperty*             prop       = nullptr;
+    IDProperty*             prop = nullptr;
 };
 
 enum
@@ -363,13 +363,13 @@ public:
 
     std::string                basename;
 
-    ListBaseT<wmKeyMap>        keymaps;
+    ListBaseT<wmKeyMap>        keymaps   = {};
 
     int                        actkeymap = 0;
     short                      flag      = 0;
     char                       _pad0[2]  = {};
 
-    ListBaseT<wmKeyConfigPref> prefs;
+    ListBaseT<wmKeyConfigPref> prefs     = {};
 };
 
 struct wmOperator

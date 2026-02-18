@@ -68,25 +68,25 @@ wmKeyMapItem* keymap_add_item(wmKeyMap*          km,
 wmKeyMapItem* keymap_find_item(wmKeyMap*      km,
                                const wmEvent* event)
 {
-    for (wmKeyMapItem& item : km->items)
+    for (wmKeyMapItem* item = (wmKeyMapItem*)km->items.first; item; item = item->next)
     {
-        if (item.type == event->type)
+        if (item->type == event->type)
         {
-            if (item.val == EVENT_NONE || item.val == event->value)
+            if (item->val == EVENT_NONE || item->val == event->value)
             {
-                if (item.any_modifier)
+                if (item->any_modifier)
                 {
-                    return &item;
+                    return item;
                 }
 
-                if (item.modifier == event->modifiers)
+                if (item->modifier == event->modifiers)
                 {
-                    return &item;
+                    return item;
                 }
 
-                if (item.modifier == 0 && event->modifiers == 0)
+                if (item->modifier == 0 && event->modifiers == 0)
                 {
-                    return &item;
+                    return item;
                 }
             }
         }

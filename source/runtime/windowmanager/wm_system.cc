@@ -94,7 +94,7 @@ void wmWindowManager::wm_event_do_handlers(vkContext* vkC)
 
     for (auto& km : default_conf->keymaps)
     {
-        if (!km.poll(vkC))
+        if (km.poll && !km.poll(vkC))
             continue;
 
         wmKeyMapItem* kmi = keymap_find_item(&km, event);
