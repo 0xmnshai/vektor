@@ -5,8 +5,53 @@
 #include "GLFW_System.hh"
 #include "GLFW_TimerTask.hh"
 
+#include "../../intern/clog/COG_log.hh"
+
 namespace vektor
 {
+
+CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
+                          "GLFW System");
+
+void error_callback(int         error,
+                    const char* description)
+{
+    CLOG_ERROR(CLG_LogRef_App, "GLFW Error %d: %s", error, description);
+}
+
+void BLI_system_backtrace_with_os_info(FILE*       fp,
+                                       const void* os_info);
+
+void BLI_system_backtrace_with_os_info(FILE* fp,
+                                       const void* /*os_info*/)
+{
+
+#define SIZE 100
+    void*  buffer[SIZE];
+    int    nptrs;
+    char** strings;
+    int    i;
+
+    // nptrs   = backtrace(buffer, SIZE);
+    // strings = backtrace_symbols(buffer, nptrs);
+
+    // for (i = 0; i < nptrs; i++)
+    // {
+    //     fputs(strings[i], fp);
+    //     fputc('\n', fp);
+    // }
+
+    // free(strings);
+};
+
+void BLI_system_backtrace(FILE* fp);
+
+void BLI_system_backtrace(FILE* fp)
+{
+    static std::mutex mutex;
+    std::scoped_lock  lock(mutex);
+    BLI_system_backtrace_with_os_info(fp, nullptr);
+}
 
 GLFW_TSuccess GLFW_System::init()
 {
@@ -14,12 +59,72 @@ GLFW_TSuccess GLFW_System::init()
     timer_manager_  = new GLFW_TimerManager();
     window_manager_ = new GLFW_WindowManager();
 
+    // will init system cc here which will init glfw window cc
+
     if (timer_manager_ && window_manager_ && event_manager_)
     {
+        if (!glfwInit())
+        {
+            CLOG_ERROR(CLG_LogRef_App, "Failed to initialize GLFW");
+        }
+
+        glfwSetErrorCallback(error_callback);
+        set_backtrace_fn(BLI_system_backtrace);
+
         return GLFW_kSuccess;
     }
     return GLFW_kFailure;
 }
+
+void GLFW_System::set_use_window_frame(bool use_window_frame) const
+{
+    use_window_frame_ = use_window_frame;
+};
+
+void          GLFW_System::get_window_bounds(GLFW_Rect& rect) const {}
+
+GLFW_TSuccess GLFW_System::create_system(bool verbose,
+                                         bool background)
+{
+
+    try
+    {
+        CLOG_INFO(CLG_LogRef_App, "Create GLFW system");
+        system_backend_id_ = "GLFW";
+        init();
+    }
+    catch (const std::runtime_error& e)
+    {
+        CLOG_STR_INFO_NOCHECK(CLG_LogRef_App, e.what());
+        delete this;
+    }
+
+    return GLFW_kFailure;
+};
+
+GLFW_TSuccess GLFW_System::create_system_background()
+{
+    GLFW_TSuccess success;
+    if (!system_)
+    {
+
+        CLOG_INFO(CLG_LogRef_App, "Create background system");
+        success = create_system(false, true);
+        if (success)
+        {
+            return success;
+        }
+    }
+    else
+    {
+        success = GLFW_kFailure;
+    }
+    if (success)
+    {
+        success = init();
+    }
+    return success;
+};
 
 GLFW_TSuccess GLFW_System::exit()
 {

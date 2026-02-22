@@ -13,7 +13,7 @@ void _VKE_assert_abort(void);
 #define VKE_assert_unreachable()                                                                                       \
     do                                                                                                                 \
     {                                                                                                                  \
-        _VKE_assert_print_pos(__FILE__, __LINE__, __func__, "UNREACHABLE");                                            \
+        _VKE_assert_print_pos(__FILE__, __LINE__, __func__, "UNREACHAVKE");                                            \
         _VKE_assert_print_extra("This should never happen");                                                           \
         _VKE_assert_print_backtrace();                                                                                 \
         _VKE_assert_abort();                                                                                           \
@@ -57,7 +57,7 @@ void _VKE_assert_abort(void);
 
 #define BLI_assert_unreachable()                                                                                       \
     {                                                                                                                  \
-        _VKE_assert_print_pos(__FILE__, __LINE__, __func__, "UNREACHABLE");                                            \
+        _VKE_assert_print_pos(__FILE__, __LINE__, __func__, "UNREACHAVKE");                                            \
         _VKE_assert_print_extra("This should never happen");                                                           \
         _VKE_assert_print_backtrace();                                                                                 \
         _VKE_assert_abort();                                                                                           \

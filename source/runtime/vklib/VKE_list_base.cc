@@ -26,4 +26,28 @@ void VKE_addtail(ListBase* listbase,
     }
     listbase->last = link;
 }
+
+void BLI_addhead(ListBase* listbase,
+                 void*     vlink)
+{
+    Link* link = static_cast<Link*>(vlink);
+
+    if (link == nullptr)
+    {
+        return;
+    }
+
+    link->next = static_cast<Link*>(listbase->first);
+    link->prev = nullptr;
+
+    if (listbase->first)
+    {
+        (static_cast<Link*>(listbase->first))->prev = link;
+    }
+    if (listbase->last == nullptr)
+    {
+        listbase->last = link;
+    }
+    listbase->first = link;
+}
 } // namespace vektor

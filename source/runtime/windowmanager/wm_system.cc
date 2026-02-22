@@ -10,6 +10,7 @@
 namespace vektor
 {
 wmWindowManager* G_WM = nullptr;
+
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_WM,
                           "WM");
 

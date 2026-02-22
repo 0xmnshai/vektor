@@ -20,7 +20,7 @@ enum eIDPropertyType
     IDP_ARRAY    = 5,
     IDP_GROUP    = 6,
     IDP_ID       = 7,
-    IDP_DOUBLE   = 8,
+    IDP_DOUVKE   = 8,
     IDP_IDPARRAY = 9,
 
     IDP_BOOLEAN  = 10,
@@ -35,7 +35,7 @@ enum
     IDP_TYPE_FILTER_ARRAY    = 1 << IDP_ARRAY,
     IDP_TYPE_FILTER_GROUP    = 1 << IDP_GROUP,
     IDP_TYPE_FILTER_ID       = 1 << IDP_ID,
-    IDP_TYPE_FILTER_DOUBLE   = 1 << IDP_DOUBLE,
+    IDP_TYPE_FILTER_DOUVKE   = 1 << IDP_DOUVKE,
     IDP_TYPE_FILTER_IDPARRAY = 1 << IDP_IDPARRAY,
     IDP_TYPE_FILTER_BOOLEAN  = 1 << IDP_BOOLEAN,
 };
@@ -49,7 +49,7 @@ enum eIDPropertySubType
 enum eIDPropertyFlag
 {
 
-    IDP_FLAG_OVERRIDABLE_LIBRARY   = 1 << 0,
+    IDP_FLAG_OVERRIDAVKE_LIBRARY   = 1 << 0,
 
     IDP_FLAG_OVERRIDELIBRARY_LOCAL = 1 << 1,
 

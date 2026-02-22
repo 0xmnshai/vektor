@@ -7,11 +7,6 @@
 namespace vektor
 {
 
-struct vkContext
-{
-    void* data;
-};
-
 enum wmTimerFlags
 {
     WM_TIMER_NO_FREE_CUSTOM_DATA = 1 << 0,

@@ -20,12 +20,12 @@ enum GLFW_TSuccess
 class GLFW_ISystem
 {
 public:
-    static GLFW_TSuccess      create_system(bool verbose    = true,
-                                            bool background = false);
+    virtual GLFW_TSuccess     create_system(bool verbose    = true,
+                                            bool background = false) = 0;
 
-    static GLFW_TSuccess      create_system_background();
+    virtual GLFW_TSuccess     create_system_background()             = 0;
 
-    static GLFW_TSuccess      destroy_system();
+    virtual GLFW_TSuccess     destroy_system() const                 = 0;
 
     static GLFW_TSuccess      destroy_system_background();
 
@@ -35,15 +35,13 @@ public:
 
     static const char*        get_system_backend();
 
-    static bool               get_use_window_frame();
+    virtual void              set_use_window_frame(bool use_window_frame) const = 0;
 
-    static void               set_use_window_frame(bool use_window_frame);
-
-    virtual uint64_t          get_milli_seconds() const = 0;
+    virtual uint64_t          get_milli_seconds() const                         = 0;
 
     virtual GLFW_TBackTraceFn get_backtrace_fn();
 
-    static void               set_backtrace_fn(GLFW_TBackTraceFn backtrace_fn);
+    static void               set_backtrace_fn(GLFW_TBackTraceFn backtrace_fn) { backtrace_fn_ = backtrace_fn; };
 
     virtual GLFW_TSuccess     dispose_window(GLFW_IWindow* window)                 = 0;
 
@@ -57,7 +55,7 @@ public:
 
     virtual GLFW_TSuccess     push_event(std::unique_ptr<const GLFW_IEvent> event) = 0;
 
-private:
+protected:
     virtual GLFW_TSuccess init() = 0;
 
     virtual GLFW_TSuccess exit() = 0;
@@ -69,5 +67,6 @@ private:
 protected:
     GLFW_ISystem();
     virtual ~GLFW_ISystem() = default;
+    static GLFW_TBackTraceFn backtrace_fn_;
 };
 } // namespace vektor

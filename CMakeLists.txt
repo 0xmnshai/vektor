@@ -26,12 +26,13 @@ option(VEKTOR_BUILD_EDITOR "Build the Vektor editor" ON)
 option(VEKTOR_BUILD_SANDBOX "Build the Vektor sandbox" ON)
 option(VEKTOR_BUILD_TESTS "Build Tests" ON)
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development) 
+
 add_subdirectory(extern)
 
 add_subdirectory(source/runtime)
 
 if(VEKTOR_BUILD_EDITOR)
-    find_package(Python3 REQUIRED COMPONENTS Development)
     add_subdirectory(source/editor)
 endif()
 

@@ -2,11 +2,14 @@
 #pragma once
 
 #include "../dna/DNA_listBase.h"
+#include "../vklib/VKE_main.hh"
 
 namespace vektor
 {
 struct Main;
 struct RecentFile;
+
+#define errno (*__error())
 
 struct Global
 {

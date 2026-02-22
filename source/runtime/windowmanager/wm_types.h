@@ -3,8 +3,8 @@
 #include <memory>
 #include <string>
 
+#include "../dna/DNA_id.h"
 #include "../dna/DNA_listBase.h"
-#include "../dna/DNA_screen_types.h"
 
 namespace vektor
 {
@@ -13,6 +13,8 @@ struct wmEvent;
 struct bScreen;
 struct wmWindow;
 struct WindowRuntime;
+struct ScrArea;
+struct ARegion;
 
 using EventHandlerPoll = bool (*)(const wmWindow* win,
                                   const ScrArea*  area,
@@ -52,9 +54,15 @@ enum class RegionAlignment
 
 struct bScreen : public ListBaseT<bScreen>
 {
-    std::string        name;
+    static constexpr ID_Type id_type = ID_SCR;
 
-    ListBaseT<ScrArea> areabase = {nullptr, nullptr};
+    ID                       id;
+
+    std::string              name;
+
+    char                     state    = 0;
+
+    ListBaseT<ScrArea>       areabase = {nullptr, nullptr};
 
     bScreen(const std::string& n)
         : name(n)
@@ -66,5 +74,10 @@ struct bScreen : public ListBaseT<bScreen>
         areabase.last  = area.get();
         areabase.first = area.get();
     }
+
+    void /*bContextDataCallback*/* context = nullptr;
+
+    /** Window-ID from WM, starts with 1. */
+    short                          winid   = 0;
 };
 } // namespace vektor

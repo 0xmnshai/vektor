@@ -1,4 +1,5 @@
 #include "VKE_version.hh"
+#include <cstring>
 #include "../../intern/clog/COG_log.hh"
 #include "vektor_config.h"
 

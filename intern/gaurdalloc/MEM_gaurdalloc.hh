@@ -54,6 +54,31 @@ inline void* (*MEM_new_array_zeroed_aligned)(size_t      len,
                                              const char* str,
                                              size_t&     actual_size) = vektor::mem_lockfree_malloc_arrayN_aligned;
 
+void* MEM_new_array_uninitialized(size_t      len,
+                                  size_t      size,
+                                  const char* str) /* ATTR_MALLOC */ ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1,
+                                                                                                             2)
+    ATTR_NONNULL(3);
+
+extern void* (*MEM_new_array_uninitialized_aligned)(size_t      len,
+                                                    size_t      size,
+                                                    size_t      alignment,
+                                                    const char* str) /* ATTR_MALLOC */ ATTR_WARN_UNUSED_RESULT
+    ATTR_ALLOC_SIZE(1,
+                    2) ATTR_NONNULL(4);
+
+template <typename T>
+inline T* MEM_new_array_uninitialized(const size_t length,
+                                      const char*  allocation_name)
+{
+#ifdef _MSC_VER
+    static_assert(std::is_trivially_constructible_v<T>, "For non-trivial types, MEM_new must be used.");
+#else
+    static_assert(std::is_trivial_v<T>, "For non-trivial types, MEM_new must be used.");
+#endif
+    return static_cast<T*>(MEM_new_array_uninitialized_aligned(length, sizeof(T), alignof(T), allocation_name));
+}
+
 template <typename T,
           typename... Args>
 inline T* MEM_new(const char* allocation_name,
@@ -100,4 +125,24 @@ inline void MEM_delete(const T* ptr)
     }
     vektor::mem_guarded::internal::mem_freeN_ex(const_cast<void*>(complete_ptr),
                                                 vektor::mem_guarded::internal::DestructorType::NonTrivial);
+
+#define MEM_SAFE_DELETE(v)                                                                                             \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (v)                                                                                                         \
+        {                                                                                                              \
+            MEM_delete(v);                                                                                             \
+            (v) = nullptr;                                                                                             \
+        }                                                                                                              \
+    } while (0)
+}
+
+void* MEM_new_uninitialized(size_t      len,
+                            const char* str) /* ATTR_MALLOC */ ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1)
+    ATTR_NONNULL(2);
+
+template <typename T>
+inline T* MEM_new_uninitialized(const char* allocation_name)
+{
+    return static_cast<T*>(MEM_new_array_uninitialized_aligned(1, sizeof(T), alignof(T), allocation_name));
 }

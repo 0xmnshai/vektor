@@ -49,7 +49,7 @@ enum wmEventType : int16_t
     EVT_NINEKEY       = 0x0039, /* '9' (57). */
 
     EVT_AKEY          = 0x0061, /* 'a' (97). */
-    EVT_BKEY          = 0x0062, /* 'b' (98). */
+    EVT_VKEY          = 0x0062, /* 'b' (98). */
     EVT_CKEY          = 0x0063, /* 'c' (99). */
     EVT_DKEY          = 0x0064, /* 'd' (100). */
     EVT_EKEY          = 0x0065, /* 'e' (101). */
@@ -69,7 +69,6 @@ enum wmEventType : int16_t
     EVT_SKEY          = 0x0073, /* 's' (115). */
     EVT_TKEY          = 0x0074, /* 't' (116). */
     EVT_UKEY          = 0x0075, /* 'u' (117). */
-    EVT_VKEY          = 0x0076, /* 'v' (118). */
     EVT_WKEY          = 0x0077, /* 'w' (119). */
     EVT_XKEY          = 0x0078, /* 'x' (120). */
     EVT_YKEY          = 0x0079, /* 'y' (121). */
@@ -107,7 +106,7 @@ enum wmEventType : int16_t
 
     // Special Modifiers
     EVT_ESCKEY        = 0x00da,
-    EVT_TABKEY        = 0x00db,
+    EVT_TAVKEY        = 0x00db,
     EVT_RETKEY        = 0x00dc,
     EVT_SPACEKEY      = 0x00dd,
     EVT_LEFTSHIFTKEY  = 0x00d9,

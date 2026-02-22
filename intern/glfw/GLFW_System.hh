@@ -1,8 +1,7 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
 #include "GLFW_ISystem.hh"
-#include "GLFW_event_manager.hh" 
+#include "GLFW_event_manager.hh"
 #include "GLFW_timer_manager.hh"
 #include "GLFW_window_manager.hh"
 
@@ -10,17 +9,20 @@ namespace vektor
 {
 class GLFW_System : public GLFW_ISystem
 {
-protected:
+public:
     GLFW_System();
 
     ~GLFW_System() override;
-
-public:
     GLFW_TSuccess              init() override;
 
     GLFW_TSuccess              exit() override;
 
-    GLFWwindow*                get_window() const { return window_; }
+    virtual GLFW_TSuccess      create_system(bool verbose    = true,
+                                             bool background = false) override;
+
+    virtual GLFW_TSuccess      create_system_background() override;
+
+    GLFW_TSuccess              destroy_system() const override;
 
     virtual GLFW_ITimerTask*   install_timer(uint64_t          delay,
                                              uint64_t          interval,
@@ -36,6 +38,10 @@ public:
     bool                       valid_window(GLFW_IWindow* window) const override;
 
     uint64_t                   get_milli_seconds() const override;
+
+    void                       get_window_bounds(GLFW_Rect& rect) const override;
+
+    void                       set_use_window_frame(bool use_window_frame) const override;
 
     inline GLFW_WindowManager* get_window_manager() const { return window_manager_; }
 
@@ -58,6 +64,8 @@ private:
 
     GLFW_EventManager*  event_manager_;
 
-    GLFWwindow*         window_;
+    static bool         use_window_frame_;
+
+    static std::string  system_backend_id_;
 };
 } // namespace vektor

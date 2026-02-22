@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace vektor
@@ -71,6 +72,64 @@ struct GLFW_GPUSettings
     GLFW_GPUDevice           preferred_device;
 };
 
+enum GLFW_TStandardCursor
+{
+#define GLFW_kStandardCursorFirstCursor int(GLFW_kStandardCursorDefault)
+    GLFW_kStandardCursorDefault = 0,
+    GLFW_kStandardCursorRightArrow,
+    GLFW_kStandardCursorLeftArrow,
+    GLFW_kStandardCursorInfo,
+    GLFW_kStandardCursorDestroy,
+    GLFW_kStandardCursorHelp,
+    GLFW_kStandardCursorWait,
+    GLFW_kStandardCursorText,
+    /** Crosshair: default. */
+    GLFW_kStandardCursorCrosshair,
+    /** Crosshair: with outline. */
+    GLFW_kStandardCursorCrosshairA,
+    /** Crosshair: a single "dot" (not really a crosshair). */
+    GLFW_kStandardCursorCrosshairB,
+    /** Crosshair: stippled/half-tone black/white. */
+    GLFW_kStandardCursorCrosshairC,
+    GLFW_kStandardCursorPencil,
+    GLFW_kStandardCursorUpArrow,
+    GLFW_kStandardCursorDownArrow,
+    GLFW_kStandardCursorVerticalSplit,
+    GLFW_kStandardCursorHorizontalSplit,
+    GLFW_kStandardCursorEraser,
+    GLFW_kStandardCursorKnife,
+    GLFW_kStandardCursorEyedropper,
+    GLFW_kStandardCursorZoomIn,
+    GLFW_kStandardCursorZoomOut,
+    GLFW_kStandardCursorMove,
+    GLFW_kStandardCursorNSEWScroll,
+    GLFW_kStandardCursorNSScroll,
+    GLFW_kStandardCursorEWScroll,
+    GLFW_kStandardCursorStop,
+    GLFW_kStandardCursorUpDown,
+    GLFW_kStandardCursorLeftRight,
+    GLFW_kStandardCursorTopSide,
+    GLFW_kStandardCursorBottomSide,
+    GLFW_kStandardCursorLeftSide,
+    GLFW_kStandardCursorRightSide,
+    GLFW_kStandardCursorTopLeftCorner,
+    GLFW_kStandardCursorTopRightCorner,
+    GLFW_kStandardCursorBottomRightCorner,
+    GLFW_kStandardCursorBottomLeftCorner,
+    GLFW_kStandardCursorCopy,
+    GLFW_kStandardCursorLeftHandle,
+    GLFW_kStandardCursorRightHandle,
+    GLFW_kStandardCursorBothHandles,
+    GLFW_kStandardCursorHandOpen,
+    GLFW_kStandardCursorHandClosed,
+    GLFW_kStandardCursorHandPoint,
+    GLFW_kStandardCursorBlade,
+    GLFW_kStandardCursorSlip,
+    GLFW_kStandardCursorCustom,
+
+#define GLFW_kStandardCursorNumCursors (int(GLFW_kStandardCursorCustom) + 1)
+};
+
 enum GLFW_TEventType
 {
     GLFW_kEventUnknown = 0,
@@ -118,4 +177,44 @@ enum GLFW_TEventType
 #define GLFW_kNumEventTypes (GLFW_kEventImeCompositionEnd + 1)
 };
 
+using GLFW_TUserDataPtr = void*;
+
+struct GLFW_CursorGenerator
+{
+    /**
+     * The main cursor generation callback.
+     *
+     * \note only supports RGBA cursors.
+     *
+     * \param cursor_generator: Pass in to allow accessing the user argument.
+     * \param cursor_size: The cursor size to generate.
+     * \param cursor_size_max: The maximum dimension (width or height).
+     * \param r_bitmap_size: The bitmap width & height in pixels.
+     * The generator must guarantee the resulting size (dimensions written to `r_bitmap_size`)
+     * never exceeds `cursor_size_max`.
+     * \param r_hot_spot: The cursor hot-spot.
+     * \param r_can_invert_color: When true, the call it can be inverted too much dark themes.
+     *
+     * \return the bitmap data or null if it could not be generated.
+     * - The color is "straight" (alpha is not pre-multiplied).
+     * - At least: `sizeof(uint8_t[4]) * r_bitmap_size[0] * r_bitmap_size[1]` allocated bytes.
+     */
+    uint8_t* (*generate_fn)(const struct GLFW_CursorGenerator* cursor_generator,
+                            int                                cursor_size,
+                            int                                cursor_size_max,
+                            uint8_t* (*alloc_fn)(size_t size),
+                            int   r_bitmap_size[2],
+                            int   r_hot_spot[2],
+                            bool* r_can_invert_color);
+    /**
+     * Called onceGLFW_ has finished with this object,
+     * Typically this would free `user_data`.
+     */
+    void (*free_fn)(struct GLFW_CursorGenerator* cursor_generator);
+    /**
+     * Implementation specific data used for rasterization
+     * (could contain SVG data for example).
+     */
+    GLFW_TUserDataPtr user_data;
+};
 } // namespace vektor

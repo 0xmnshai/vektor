@@ -1,13 +1,14 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
-
+#include <type_traits>
+#include "../vklib/VKE_assert.h" // IWYU pragma: keep
 #include "DNA_id_enum.h"
 
 namespace vektor
 {
-
 template <typename T,
           typename... Args>
 constexpr bool ELEM(const T& v,
@@ -16,29 +17,13 @@ constexpr bool ELEM(const T& v,
     return ((v == args) || ...);
 }
 
-namespace bke
-{
-namespace id
-{
 struct ID_Runtime;
-}
-} // namespace bke
-namespace bke
-{
 struct PreviewImageRuntime;
-}
 namespace bke
 {
 namespace idprop
 {
 struct IDPropertyGroupChildrenSet;
-}
-} // namespace bke
-namespace bke
-{
-namespace library
-{
-struct LibraryRuntime;
 }
 } // namespace bke
 
@@ -310,6 +295,85 @@ struct IDHash
 #endif
 };
 
+struct ID_Runtime_Remap
+{
+    /** Status during ID remapping. */
+    int status             = 0;
+    /** During ID remapping the number of skipped use cases that refcount the data-block. */
+    int skipped_refcounted = 0;
+    /**
+     * During ID remapping the number of direct use cases that could be remapped
+     * (e.g. obdata when in edit mode).
+     */
+    int skipped_direct     = 0;
+    /** During ID remapping, the number of indirect use cases that could not be remapped. */
+    int skipped_indirect   = 0;
+};
+
+struct ID_Readfile_Data
+{
+    struct Tags
+    {
+        /* General ID reading related tags. */
+
+        /**
+         * Mark ID placeholders for linked data-blocks needing to be read from their library
+         * blend-files.
+         */
+        bool is_link_placeholder : 1;
+        /**
+         * Mark IDs needing to be expanded (only done once). See #expand_main.
+         */
+        bool needs_expanding : 1;
+        /**
+         * Mark IDs needing to be 'lib-linked', i.e. to get their pointers to other data-blocks
+         * updated from the 'UID' values stored in `.blend` files to the new, actual pointers.
+         */
+        bool needs_linking : 1;
+
+        /**
+         * Memfile undo only: mark IDs used by 'no undo' IDs (e.g. brush dependencies).
+         *
+         * This is currently used to ensure that all linked 'no undo' IDs are preserved and remain
+         * fully valid across undo steps (also used to tag libraries containing such no-undo linked
+         * IDs).
+         */
+        bool used_by_no_undo_id : 1;
+
+        /* Specific ID-type reading/versioning related tags. */
+
+        /**
+         * Set when this ID used a legacy Action, in which case it also should pick
+         * an appropriate slot.
+         *
+         * \see ANIM_versioning.hh
+         */
+        bool action_assignment_needs_slot : 1;
+    } tags;
+};
+
+struct ID_Runtime
+{
+    /**
+     * The last modifification time of the source .blend file where this ID was loaded from.
+     */
+    int64_t           src_blend_modifification_time;
+
+    ID_Runtime_Remap  remap         = {};
+    /**
+     * The depsgraph that owns this data block. This is only set on data-blocks which are
+     * copied-on-eval by the depsgraph. Additional data-blocks created during depsgraph evaluation
+     * are not owned by any specific depsgraph and thus this pointer is null for those.
+     */
+    // Depsgraph*        depsgraph     = nullptr;
+
+    /**
+     * This data is only allocated & used during the readfile process. After that, the memory is
+     * freed and the pointer set to `nullptr`.
+     */
+    ID_Readfile_Data* readfile_data = nullptr;
+};
+
 struct ID
 {
 
@@ -350,32 +414,140 @@ struct ID
 
     struct LibraryWeakReference* library_weak_reference = nullptr;
 
-    bke::id::ID_Runtime*         runtime                = nullptr;
+    ID_Runtime*                  runtime                = nullptr;
+};
+
+template <typename, typename = void>
+struct has_ID_member : std::false_type
+{
+};
+template <typename T>
+struct has_ID_member<T, std::void_t<decltype(&T::id)>> : std::true_type
+{
+};
+template <typename T>
+constexpr bool has_ID_as_first_member()
+{
+    if constexpr (has_ID_member<T>::value)
+    {
+        return std::is_same_v<decltype(T::id), ID>;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template <typename T>
+constexpr bool is_ID_v = has_ID_as_first_member<T>() || std::is_same_v<T, ID>;
+
+#define _VA_NARGS_GLUE(x, y) x y
+#define _VA_NARGS_EXPAND(args) args
+
+#define _VA_NARGS_OVERLOAD_MACRO1(name, count) name##count
+#define _VA_NARGS_OVERLOAD_MACRO(name, count) _VA_NARGS_OVERLOAD_MACRO1(name, count)
+
+#define _VA_NARGS_COUNT_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19,     \
+                             _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, \
+                             _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, \
+                             _56, _57, _58, _59, _60, _61, _62, _63, _64, count, ...)                                  \
+    count
+
+#define VA_NARGS_COUNT(...)                                                                                            \
+    _VA_NARGS_EXPAND(_VA_NARGS_COUNT_IMPL(__VA_ARGS__, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, \
+                                          48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30,  \
+                                          29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11,  \
+                                          10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))
+
+#define VA_NARGS_CALL_OVERLOAD(name, ...)                                                                              \
+    _VA_NARGS_GLUE(_VA_NARGS_OVERLOAD_MACRO(name, VA_NARGS_COUNT(__VA_ARGS__)), (__VA_ARGS__))
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#define _VA_CHECK_TYPE_ANY2(v, a0) ((void)_Generic((v), a0: 0))
+#define _VA_CHECK_TYPE_ANY3(v, a0, b0) ((void)_Generic((v), a0: 0, b0: 0))
+#define _VA_CHECK_TYPE_ANY4(v, a0, b0, c0) ((void)_Generic((v), a0: 0, b0: 0, c0: 0))
+#define _VA_CHECK_TYPE_ANY5(v, a0, b0, c0, d0)                                                                         \
+    #define CHECK_TYPE_ANY(...) VA_NARGS_CALL_OVERLOAD(_VA_CHECK_TYPE_ANY, __VA_ARGS__)
+#else
+#define CHECK_TYPE_ANY(...) (void)0
+#endif
+
+#define GS(a) (CHECK_TYPE_ANY(a, char*, const char*), (ID_Type)(*((const short*)(a))))
+
+template <typename Dst,
+          typename Src,
+          typename SrcRuntime>
+constexpr void id_cast_assert([[maybe_unused]] SrcRuntime* src)
+{
+    static_assert(is_ID_v<Src>);
+    static_assert(is_ID_v<Dst>);
+    if constexpr (std::is_same_v<Src, ID> && !std::is_same_v<Dst, ID>)
+    {
+        /* Runtime check for when converting from #ID to subtype like #Object. */
+        // VKE_assert(src == nullptr || GS(src->name) == Dst::id_type);
+    }
+    else if constexpr (!std::is_same_v<Src, ID> && std::is_same_v<Dst, ID>)
+    {
+        /* Converting from subtype like #Object to #ID is always allowed. */
+    }
+    else
+    {
+        /* Converting between the same types is always allowed. */
+        static_assert(std::is_same_v<Src, Dst>);
+    }
+}
+
+template <typename Dst,
+          typename Src>
+inline Dst id_cast(Src&& id)
+{
+    using DstDecay = std::decay_t<Dst>;
+    using SrcDecay = std::decay_t<Src>;
+    static_assert(std::is_pointer_v<SrcDecay> == std::is_pointer_v<DstDecay>);
+    if constexpr (std::is_pointer_v<SrcDecay>)
+    {
+        id_cast_assert<std::decay_t<std::remove_pointer_t<DstDecay>>, std::decay_t<std::remove_pointer_t<SrcDecay>>>(
+            id);
+    }
+    else
+    {
+        static_assert(std::is_lvalue_reference_v<Src> && std::is_lvalue_reference_v<Dst>);
+        id_cast_assert<DstDecay, SrcDecay>(&id);
+    }
+    /* This also makes sure that we don't cast away constness. */
+    return reinterpret_cast<Dst>(id);
+}
+
+struct Library;
+
+struct LibraryRuntime
+{
+    Library* parent = nullptr;
 };
 
 struct Library
 {
 #ifdef __cplusplus
 
-    static constexpr ID_Type id_type = ID_LI;
+    static constexpr vektor::ID_Type id_type = vektor::ID_Type::ID_LI;
 #endif
 
-    ID                            id;
+    ID                 id;
 
-    char                          filepath[1024]         = "";
+    char               filepath[1024]         = "";
 
-    uint16_t                      flag                   = 0;
+    uint16_t           flag                   = 0;
 
-    uint16_t                      undo_runtime_tag       = 0;
-    char                          _pad[4]                = {};
+    uint16_t           undo_runtime_tag       = 0;
+    char               _pad[4]                = {};
 
-    struct Library*               archive_parent_library = nullptr;
+    struct Library*    archive_parent_library = nullptr;
 
-    struct PackedFile*            packedfile             = nullptr;
+    struct PackedFile* packedfile             = nullptr;
 
-    bke::library::LibraryRuntime* runtime                = nullptr;
+    LibraryRuntime*    runtime                = nullptr;
 
-    void*                         _pad2                  = nullptr;
+    void*              _pad2                  = nullptr;
 };
 
 enum LibraryFlag
@@ -416,13 +588,13 @@ enum
 struct PreviewImage
 {
 
-    unsigned int              w[2]                 = {};
-    unsigned int              h[2]                 = {};
-    short                     flag[2]              = {};
-    short                     changed_timestamp[2] = {};
-    unsigned int*             rect[2]              = {};
+    unsigned int                 w[2]                 = {};
+    unsigned int                 h[2]                 = {};
+    short                        flag[2]              = {};
+    short                        changed_timestamp[2] = {};
+    unsigned int*                rect[2]              = {};
 
-    bke::PreviewImageRuntime* runtime              = nullptr;
+    vektor::PreviewImageRuntime* runtime              = nullptr;
 };
 
 #define ID_FAKE_USERS(id) ((id_cast<const ID*>(id)->flag & ID_FLAG_FAKEUSER) ? 1 : 0)
@@ -437,10 +609,10 @@ struct PreviewImage
 
 #define ID_CHECK_UNDO(id) (!ELEM(GS((id)->name), ID_SCR, ID_WM, ID_WS, ID_BR))
 
-#define ID_BLEND_PATH(_bmain, _id)                                                                                     \
-    ((_id)->lib ? BKE_main_blendfile_path_from_library(*(_id)->lib) : BKE_main_blendfile_path((_bmain)))
-#define ID_BLEND_PATH_FROM_GLOBAL(_id)                                                                                 \
-    ((_id)->lib ? BKE_main_blendfile_path_from_library(*(_id)->lib) : BKE_main_blendfile_path_from_global())
+#define ID_VKEND_PATH(_bmain, _id)                                                                                     \
+    ((_id)->lib ? VKE_main_blendfile_path_from_library(*(_id)->lib) : VKE_main_blendfile_path((_bmain)))
+#define ID_VKEND_PATH_FROM_GLOBAL(_id)                                                                                 \
+    ((_id)->lib ? VKE_main_blendfile_path_from_library(*(_id)->lib) : VKE_main_blendfile_path_from_global())
 
 #define ID_MISSING(_id) ((id_cast<const ID*>(_id)->tag & ID_TAG_MISSING) != 0)
 
@@ -448,19 +620,19 @@ struct PreviewImage
 
 #define ID_IS_PACKED(_id) (ID_IS_LINKED(_id) && ((_id)->flag & ID_FLAG_LINKED_AND_PACKED))
 
-#define ID_TYPE_SUPPORTS_ASSET_EDITABLE(id_type) ELEM(id_type, ID_BR, ID_TE, ID_NT, ID_IM, ID_PC, ID_MA)
+#define ID_TYPE_SUPPORTS_ASSET_EDITAVKE(id_type) ELEM(id_type, ID_BR, ID_TE, ID_NT, ID_IM, ID_PC, ID_MA)
 
-#define ID_IS_EDITABLE(_id)                                                                                            \
+#define ID_IS_EDITAVKE(_id)                                                                                            \
     ((id_cast<const ID*>(_id)->lib == NULL) ||                                                                         \
-     ((id_cast<const ID*>(_id)->lib->runtime->tag & LIBRARY_ASSET_EDITABLE) &&                                         \
-      ID_TYPE_SUPPORTS_ASSET_EDITABLE(GS(id_cast<const ID*>(_id)->name))))
+     ((id_cast<const ID*>(_id)->lib->runtime->tag & LIBRARY_ASSET_EDITAVKE) &&                                         \
+      ID_TYPE_SUPPORTS_ASSET_EDITAVKE(GS(id_cast<const ID*>(_id)->name))))
 
-#define ID_IS_OVERRIDABLE_LIBRARY_HIERARCHY(_id)                                                                       \
+#define ID_IS_OVERRIDAVKE_LIBRARY_HIERARCHY(_id)                                                                       \
     (ID_IS_LINKED(_id) && !ID_MISSING(_id) &&                                                                          \
-     (BKE_idtype_get_info_from_id(id_cast<const ID*>(_id))->flags & IDTYPE_FLAGS_NO_LIBLINKING) == 0 &&                \
+     (VKE_idtype_get_info_from_id(id_cast<const ID*>(_id))->flags & IDTYPE_FLAGS_NO_LIBLINKING) == 0 &&                \
      !ELEM(GS((id_cast<const ID*>(_id))->name), ID_SCE))
-#define ID_IS_OVERRIDABLE_LIBRARY(_id)                                                                                 \
-    (ID_IS_OVERRIDABLE_LIBRARY_HIERARCHY((_id)) && (id_cast<const ID*>(_id)->tag & ID_TAG_EXTERN) != 0)
+#define ID_IS_OVERRIDAVKE_LIBRARY(_id)                                                                                 \
+    (ID_IS_OVERRIDAVKE_LIBRARY_HIERARCHY((_id)) && (id_cast<const ID*>(_id)->tag & ID_TAG_EXTERN) != 0)
 
 #define ID_IS_OVERRIDE_LIBRARY_REAL(_id)                                                                               \
     (id_cast<const ID*>(_id)->override_library != NULL && id_cast<const ID*>(_id)->override_library->reference != NULL)
@@ -484,7 +656,6 @@ struct PreviewImage
 #ifdef GS
 #undef GS
 #endif
-#define GS(a) (CHECK_TYPE_ANY(a, char*, const char*), (ID_Type)(*((const short*)(a))))
 
 #define ID_NEW_SET(_id, _idn)                                                                                          \
     (((id_cast<ID*>)(_id))->newid = (id_cast<ID*>)(_idn), ((id_cast<ID*>)(_id))->newid->tag |= ID_TAG_NEW,             \

@@ -7,7 +7,6 @@
 #define STRINGIFY_APPEND(a, b) "" a #b
 #define STRINGIFY(x) STRINGIFY_APPEND("", x)
 
-#include <string.h>
 #include <stdio.h>
 
 #define SNPRINTF_UTF8(buff, fmt, ...) snprintf(buff, sizeof(buff), fmt, ##__VA_ARGS__)
@@ -201,6 +200,7 @@ void CLG_log_raw(const struct CLG_LogType* lg,
 #define CLOG_INFO(clg_ref, ...) CLOG_AT_LEVEL(clg_ref, CLG_LEVEL_INFO, __VA_ARGS__)
 #define CLOG_DEBUG(clg_ref, ...) CLOG_AT_LEVEL(clg_ref, CLG_LEVEL_DEBUG, __VA_ARGS__)
 #define CLOG_TRACE(clg_ref, ...) CLOG_AT_LEVEL(clg_ref, CLG_LEVEL_TRACE, __VA_ARGS__)
+#define CLOG_ASSERT(clg_ref, cond, ...) CLOG_AT_LEVEL(clg_ref, CLG_LEVEL_FATAL, __VA_ARGS__)
 
 #define CLOG_STR_FATAL(clg_ref, str) CLOG_STR_AT_LEVEL(clg_ref, CLG_LEVEL_FATAL, str)
 #define CLOG_STR_ERROR(clg_ref, str) CLOG_STR_AT_LEVEL(clg_ref, CLG_LEVEL_ERROR, str)

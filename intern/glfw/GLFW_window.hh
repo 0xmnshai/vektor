@@ -1,18 +1,39 @@
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+
 #include <cstring>
 #include <iostream> // IWYU pragma: keep
 
 #include "GLFW_ISystem.hh"
 #include "GLFW_IWindow.hh"
+#include "GLFW_System.hh"
 #include "GLFW_context.hh"
 #include "GLFW_types.h"
 
 namespace vektor
 {
+
+#define GLFW_WINDOW_STATE_DEFAULT GLFW_kWindowStateMaximized
+
+static struct WMInitStruct
+{
+
+    int32_t           size;
+    int32_t           start;
+
+    GLFW_TWindowState windowstate   = GLFW_WINDOW_STATE_DEFAULT;
+
+    bool              window_frame  = true;
+    bool              window_focus  = true;
+    bool              native_pixels = true;
+} wm_init_state;
+
 class GLFW_Window : public GLFW_IWindow
 {
 public:
+    GLFW_Window();
+
     GLFW_Window(uint32_t                  width,
                 uint32_t                  height,
                 GLFW_TWindowState         state,
@@ -30,9 +51,9 @@ public:
                                            GLFW_GPUSettings    gpu_settings,
                                            const bool          exclusive     = false,
                                            const bool          is_dialog     = false,
-                                           const GLFW_IWindow* parent_window = nullptr) = 0;
+                                           const GLFW_IWindow* parent_window = nullptr);
 
-    virtual void             init() const override;
+    virtual void             init() override;
 
     virtual void             set_title(const char* title) override;
 
@@ -69,17 +90,39 @@ public:
 
     inline GLFW_TUserDataPtr get_user_data() const override { return user_data_; }
 
-    inline void              set_user_data(GLFW_TUserDataPtr user_data) { user_data_ = user_data; }
+    inline void              set_user_data(GLFW_TUserDataPtr user_data) override { user_data_ = user_data; }
 
     virtual uint64_t         get_milli_seconds() const { return glfwGetTime() * 1000; }
 
     inline void*             get_os_window() const { return os_window_; }
 
-    inline void                     set_file_path(const char* filepath) const
-    {   
-        filepath_ = filepath;
-    };
+    inline void              set_path(const char* filepath) override { filepath_ = filepath; };
 
+    virtual bool             set_window_cursor_visibility(bool visible) const;
+
+    GLFW_TSuccess            set_cursor_visibility(bool visible) const override;
+
+    bool                     has_cursor_shape(GLFW_TStandardCursor shape);
+
+    static GLFWcursor*       get_standard_cursor_shape(GLFW_TStandardCursor shape);
+
+    static void              set_cursor_shape(GLFW_TStandardCursor shape);
+
+    virtual GLFW_TSuccess    set_window_custom_cursor_generator(GLFW_CursorGenerator* cursor_generator);
+
+    virtual GLFW_TSuccess    set_custom_cursor_generator(GLFW_CursorGenerator* cursor_generator) override;
+
+    virtual GLFW_TSuccess    set_window_custom_cursor_shape(const uint8_t* bitmap,
+                                                            const uint8_t* mask,
+                                                            const int      size[2],
+                                                            const int      hot_size[2],
+                                                            bool           can_invert_color);
+
+    virtual GLFW_TSuccess    set_custom_cursor_shape(const uint8_t* bitmap,
+                                                     const uint8_t* mask,
+                                                     const int      size[2],
+                                                     const int      hot_spot[2],
+                                                     bool           can_invert_color) override;
 
 protected:
     static void error_callback(int         error,
@@ -105,14 +148,18 @@ protected:
                                            int         height);
 
 private:
-    GLFW_Context*     context_;
-    GLFW_TUserDataPtr user_data_;
-    void*             os_window_;
-    static uint32_t   width_;
-    static uint32_t   height_;
-    GLFW_TWindowState state_;
-    const char*       title_;
-    static bool       is_valid_;
-    static const char* filepath_;
+    GLFW_Context*        context_;
+    GLFW_TUserDataPtr    user_data_;
+    void*                os_window_;
+    static uint32_t      width_;
+    static uint32_t      height_;
+    GLFW_TWindowState    state_;
+    const char*          title_;
+    static bool          is_valid_;
+    static const char*   filepath_;
+    static bool          cursor_visible_;
+    GLFW_TStandardCursor cursor_shape_;
+    GLFWcursor*          custom_cursor_;
+    GLFW_System*         system_;
 };
 } // namespace vektor

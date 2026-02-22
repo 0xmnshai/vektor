@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "../dna/DNA_listBase.h"
+#include "../vklib/VKE_compiler_attrs.h"
 
 namespace vektor
 {
@@ -60,4 +61,15 @@ struct ReportList
     /** Mutex for thread-safety, runtime only. */
     std::mutex*       lock;
 };
+
+void VKE_reportf(ReportList* reports,
+                 eReportType type,
+                 const char* format,
+                 ...) ATTR_PRINTF_FORMAT(3,
+                                         4);
+
+void VKE_reports_prependf(ReportList* reports,
+                          const char* prepend_format,
+                          ...) ATTR_PRINTF_FORMAT(2,
+                                                  3);
 } // namespace vektor

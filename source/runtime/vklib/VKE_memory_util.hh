@@ -5,7 +5,6 @@
 
 namespace vektor
 {
-
 template <typename T, typename... Args>
 inline constexpr bool is_same_any_v = (std::is_same<T, Args>::value || ...);
 

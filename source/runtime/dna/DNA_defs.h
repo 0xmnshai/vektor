@@ -86,12 +86,12 @@ class ShallowZeroInitializeTag
     class_name& operator=(const class_name& other) = delete;                                                           \
     class_name& operator=(class_name&& other)      = delete;                                                           \
                                                                                                                        \
-    class_name(const dna::internal::ShallowDataConstRef<class_name> ref)                                               \
+    class_name(const vektor::ShallowDataConstRef<class_name> ref)                                                      \
         : class_name()                                                                                                 \
     {                                                                                                                  \
         _DNA_internal_memcpy(this, ref.get_pointer(), sizeof(class_name));                                             \
     }                                                                                                                  \
-    class_name& operator=(const dna::internal::ShallowDataConstRef<class_name> ref)                                    \
+    class_name& operator=(const vektor::ShallowDataConstRef<class_name> ref)                                           \
     {                                                                                                                  \
         if (this != ref.get_pointer())                                                                                 \
         {                                                                                                              \
@@ -100,12 +100,12 @@ class ShallowZeroInitializeTag
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    class_name(const dna::internal::ShallowZeroInitializeTag)                                                          \
+    class_name(const vektor::ShallowZeroInitializeTag)                                                                 \
         : class_name()                                                                                                 \
     {                                                                                                                  \
         _DNA_internal_memzero(this, sizeof(class_name));                                                               \
     }                                                                                                                  \
-    class_name& operator=(const dna::internal::ShallowZeroInitializeTag)                                               \
+    class_name& operator=(const vektor::ShallowZeroInitializeTag)                                                      \
     {                                                                                                                  \
         _DNA_internal_memzero(this, sizeof(class_name));                                                               \
         return *this;                                                                                                  \

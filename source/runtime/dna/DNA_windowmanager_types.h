@@ -35,6 +35,14 @@ struct wmOperatorType
 
     std::function<int(struct vkContext*, struct wmOperator*, const wmEvent*)> exec;
     std::function<bool(struct vkContext*)>                                    poll;
+    void (*cancel)(struct vkContext*,
+                   struct wmOperator*) = nullptr;
+    short flag                         = 0;
+};
+
+enum
+{
+    OPTYPE_UNDO = (1 << 0),
 };
 
 enum
@@ -145,68 +153,70 @@ private:
 class wmWindow
 {
 public:
-    struct wmWindow *               next = nullptr, *prev = nullptr;
+    struct wmWindow *                          next = nullptr, *prev = nullptr;
 
-    struct wmWindow*                parent              = nullptr;
+    std::list<std::shared_ptr<wmEventHandler>> handlers;
 
-    struct Scene*                   scene               = nullptr;
+    struct wmWindow*                           parent              = nullptr;
 
-    struct Scene*                   new_scene           = nullptr;
+    struct Scene*                              scene               = nullptr;
 
-    char                            view_layer_name[64] = "";
+    struct Scene*                              new_scene           = nullptr;
 
-    struct Scene*                   unpinned_scene      = nullptr;
+    char                                       view_layer_name[64] = "";
 
-    struct WorkSpaceInstanceHook*   workspace_hook      = nullptr;
+    struct Scene*                              unpinned_scene      = nullptr;
 
-    ScrAreaMap                      global_areas;
+    struct WorkSpaceInstanceHook*              workspace_hook      = nullptr;
 
-    struct bScreen*                 screen = nullptr;
+    ScrAreaMap                                 global_areas;
 
-    int                             winid  = 0;
+    struct bScreen*                            screen = nullptr;
 
-    std::string                     title;
+    int                                        winid  = 0;
 
-    int                             posx = 0, posy = 0;
+    std::string                                title;
 
-    int                             sizex = 0, sizey = 0;
+    int                                        posx = 0, posy = 0;
 
-    char                            windowstate                           = 0;
+    int                                        sizex = 0, sizey = 0;
 
-    char                            active                                = 0;
+    char                                       windowstate                           = 0;
 
-    short                           cursor                                = 0;
+    char                                       active                                = 0;
 
-    short                           lastcursor                            = 0;
+    short                                      cursor                                = 0;
 
-    short                           modalcursor                           = 0;
+    short                                      lastcursor                            = 0;
 
-    short                           grabcursor                            = 0;
+    short                                      modalcursor                           = 0;
 
-    short                           pie_event_type_lock                   = 0;
+    short                                      grabcursor                            = 0;
 
-    short                           pie_event_type_last                   = 0;
+    short                                      pie_event_type_lock                   = 0;
 
-    char                            tag_cursor_refresh                    = 0;
+    short                                      pie_event_type_last                   = 0;
 
-    char                            event_queue_check_click               = 0;
+    char                                       tag_cursor_refresh                    = 0;
 
-    char                            event_queue_check_drag                = 0;
+    char                                       event_queue_check_click               = 0;
 
-    char                            event_queue_check_drag_handled        = 0;
+    char                                       event_queue_check_drag                = 0;
 
-    short                           event_queue_consecutive_gesture_type  = 0;
+    char                                       event_queue_check_drag_handled        = 0;
 
-    int                             event_queue_consecutive_gesture_xy[2] = {};
+    short                                      event_queue_consecutive_gesture_type  = 0;
 
-    struct wmEvent_ConsecutiveData* event_queue_consecutive_gesture_data  = nullptr;
+    int                                        event_queue_consecutive_gesture_xy[2] = {};
 
-    char                            addmousemove                          = 0;
-    char                            _pad1[7]                              = {};
+    struct wmEvent_ConsecutiveData*            event_queue_consecutive_gesture_data  = nullptr;
+
+    char                                       addmousemove                          = 0;
+    char                                       _pad1[7]                              = {};
 
     // struct Stereo3dFormat*          stereo3d_format                       = nullptr;
 
-    WindowRuntime*                  runtime                               = nullptr;
+    WindowRuntime*                             runtime                               = nullptr;
 };
 
 #ifdef ime_data
@@ -398,5 +408,4 @@ struct wmOperator
     short                  flag    = 0;
     char                   _pad[6] = {};
 };
-
 } // namespace vektor
