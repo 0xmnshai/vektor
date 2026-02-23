@@ -115,6 +115,7 @@ public:
     wmOperatorType*           operator_find(const std::string& idname);
 
     void                      on_update(float ts);
+    
     void                      on_render();
 
     wmKeyConfig*              default_conf;

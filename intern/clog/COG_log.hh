@@ -7,8 +7,6 @@
 #define STRINGIFY_APPEND(a, b) "" a #b
 #define STRINGIFY(x) STRINGIFY_APPEND("", x)
 
-#include <stdio.h>
-
 #define SNPRINTF_UTF8(buff, fmt, ...) snprintf(buff, sizeof(buff), fmt, ##__VA_ARGS__)
 
 #define STREQ(a, b) (strcmp(a, b) == 0)

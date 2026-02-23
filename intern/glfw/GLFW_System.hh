@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "GLFW_ISystem.hh"
 #include "GLFW_event_manager.hh"
 #include "GLFW_timer_manager.hh"
@@ -21,6 +23,8 @@ public:
                                              bool background = false) override;
 
     virtual GLFW_TSuccess      create_system_background() override;
+
+    inline GLFW_ISystem*       get_system() const override { return system_; };
 
     GLFW_TSuccess              destroy_system() const override;
 
@@ -67,5 +71,9 @@ private:
     static bool         use_window_frame_;
 
     static std::string  system_backend_id_;
+
+    static GLFW_System* system_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_System")
 };
 } // namespace vektor

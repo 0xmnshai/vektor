@@ -29,7 +29,7 @@ public:
 
     static GLFW_TSuccess      destroy_system_background();
 
-    static GLFW_ISystem*      get_system();
+    virtual GLFW_ISystem*     get_system() const                       = 0;
 
     virtual void              get_window_bounds(GLFW_Rect& rect) const = 0;
 
@@ -68,5 +68,7 @@ protected:
     GLFW_ISystem();
     virtual ~GLFW_ISystem() = default;
     static GLFW_TBackTraceFn backtrace_fn_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_ISystem")
 };
 } // namespace vektor

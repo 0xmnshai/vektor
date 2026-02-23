@@ -9,7 +9,6 @@
 
 namespace vektor
 {
-
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "GLFW System");
 
@@ -58,6 +57,8 @@ GLFW_TSuccess GLFW_System::init()
     event_manager_  = new GLFW_EventManager();
     timer_manager_  = new GLFW_TimerManager();
     window_manager_ = new GLFW_WindowManager();
+
+    system_ = this; 
 
     // will init system cc here which will init glfw window cc
 
@@ -253,5 +254,4 @@ GLFW_TSuccess GLFW_System::push_event(std::unique_ptr<const GLFW_IEvent> event)
     }
     return success;
 }
-
 } // namespace vektor

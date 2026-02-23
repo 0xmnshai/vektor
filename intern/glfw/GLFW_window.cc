@@ -1,5 +1,5 @@
-#include <GLFW/glfw3.h>
 #include <glad/glad.h> // IWYU pragma: keep
+#include <GLFW/glfw3.h>
 #include <cstdint>
 
 #include "GLFW_Event.hh"
@@ -15,6 +15,41 @@ namespace vektor
 
 CLG_LOGREF_DECLARE_GLOBAL(CLG_LogRef_App,
                           "GLFW Window");
+
+GLFW_Window::GLFW_Window(uint32_t                  width,
+                         uint32_t                  height,
+                         GLFW_TWindowState         state,
+                         const GLFW_ContextParams& context_params,
+                         const bool                exclusive)
+{
+    user_data_     = nullptr;
+    context_       = nullptr;
+    os_window_     = nullptr;
+    width_         = width;
+    height_        = height;
+    state_         = state;
+    is_valid_      = false;
+    custom_cursor_ = nullptr;
+    system_        = nullptr;
+}
+
+GLFW_Window::~GLFW_Window()
+{
+    // delete the glfw - opengl pointer
+    if (custom_cursor_)
+    {
+        glfwDestroyCursor(custom_cursor_);
+    }
+    glfwDestroyWindow((GLFWwindow*)os_window_);
+    glfwTerminate();
+};
+
+void GLFW_Window::init()
+{
+    system_ = new GLFW_System();
+    system_->set_use_window_frame(wm_init_state.window_frame);
+    system_->create_system();
+};
 
 bool GLFW_Window::set_window_cursor_visibility(bool visible) const
 {
@@ -46,7 +81,7 @@ void GLFW_Window::key_callback(GLFWwindow* window,
                                int         mods)
 {
     GLFW_Window* glfw_window = static_cast<GLFW_Window*>(glfwGetWindowUserPointer(window));
-    if (glfw_window)
+    if (glfw_window && glfw_window->system_)
     {
         GLFW_EventKeyData data;
         data.key             = key;
@@ -55,11 +90,9 @@ void GLFW_Window::key_callback(GLFWwindow* window,
         data.mods            = mods;
 
         GLFW_TEventType type = (action == GLFW_RELEASE) ? GLFW_kEventKeyUp : GLFW_kEventKeyDown;
-        // Basic mapping. Repeat is treated as down.
-
-        auto event = std::make_unique<GLFW_Event>(type, glfw_window, GLFW_ISystem::get_system()->get_milli_seconds(),
-                                                  &data, sizeof(data));
-        GLFW_ISystem::get_system()->push_event(std::move(event));
+        auto event = std::make_unique<GLFW_Event>(type, glfw_window, glfw_window->system_->get_milli_seconds(), &data,
+                                                  sizeof(data));
+        glfw_window->system_->push_event(std::move(event));
     }
 }
 
@@ -69,7 +102,7 @@ void GLFW_Window::mouse_button_callback(GLFWwindow* window,
                                         int         mods)
 {
     GLFW_Window* glfw_window = static_cast<GLFW_Window*>(glfwGetWindowUserPointer(window));
-    if (glfw_window)
+    if (glfw_window && glfw_window->system_)
     {
         GLFW_EventButtonData data;
         data.button          = button;
@@ -78,9 +111,9 @@ void GLFW_Window::mouse_button_callback(GLFWwindow* window,
 
         GLFW_TEventType type = (action == GLFW_RELEASE) ? GLFW_kEventButtonUp : GLFW_kEventButtonDown;
 
-        auto event = std::make_unique<GLFW_Event>(type, glfw_window, GLFW_ISystem::get_system()->get_milli_seconds(),
-                                                  &data, sizeof(data));
-        GLFW_ISystem::get_system()->push_event(std::move(event));
+        auto event = std::make_unique<GLFW_Event>(type, glfw_window, glfw_window->system_->get_milli_seconds(), &data,
+                                                  sizeof(data));
+        glfw_window->system_->push_event(std::move(event));
     }
 }
 
@@ -89,15 +122,15 @@ void GLFW_Window::cursor_pos_callback(GLFWwindow* window,
                                       double      ypos)
 {
     GLFW_Window* glfw_window = static_cast<GLFW_Window*>(glfwGetWindowUserPointer(window));
-    if (glfw_window)
+    if (glfw_window && glfw_window->system_)
     {
         GLFW_EventCursorData data;
         data.x     = xpos;
         data.y     = ypos;
 
         auto event = std::make_unique<GLFW_Event>(GLFW_kEventCursorMove, glfw_window,
-                                                  GLFW_ISystem::get_system()->get_milli_seconds(), &data, sizeof(data));
-        GLFW_ISystem::get_system()->push_event(std::move(event));
+                                                  glfw_window->system_->get_milli_seconds(), &data, sizeof(data));
+        glfw_window->system_->push_event(std::move(event));
     }
 }
 
@@ -106,15 +139,15 @@ void GLFW_Window::scroll_callback(GLFWwindow* window,
                                   double      yoffset)
 {
     GLFW_Window* glfw_window = static_cast<GLFW_Window*>(glfwGetWindowUserPointer(window));
-    if (glfw_window)
+    if (glfw_window && glfw_window->system_)
     {
         GLFW_EventScrollData data;
         data.xoffset = xoffset;
         data.yoffset = yoffset;
 
         auto event   = std::make_unique<GLFW_Event>(GLFW_kEventWheel, glfw_window,
-                                                    GLFW_ISystem::get_system()->get_milli_seconds(), &data, sizeof(data));
-        GLFW_ISystem::get_system()->push_event(std::move(event));
+                                                    glfw_window->system_->get_milli_seconds(), &data, sizeof(data));
+        glfw_window->system_->push_event(std::move(event));
     }
 }
 
@@ -123,7 +156,7 @@ void GLFW_Window::frame_buffer_size_callback(GLFWwindow* window,
                                              int         height)
 {
     GLFW_Window* glfw_window = static_cast<GLFW_Window*>(glfwGetWindowUserPointer(window));
-    if (glfw_window)
+    if (glfw_window && glfw_window->system_)
     {
         width_  = width;
         height_ = height;
@@ -133,8 +166,8 @@ void GLFW_Window::frame_buffer_size_callback(GLFWwindow* window,
         data.height = height;
 
         auto event  = std::make_unique<GLFW_Event>(GLFW_kEventWindowSize, glfw_window,
-                                                   GLFW_ISystem::get_system()->get_milli_seconds(), &data, sizeof(data));
-        GLFW_ISystem::get_system()->push_event(std::move(event));
+                                                   glfw_window->system_->get_milli_seconds(), &data, sizeof(data));
+        glfw_window->system_->push_event(std::move(event));
     }
 }
 
@@ -148,41 +181,8 @@ GLFW_Window::GLFW_Window()
     state_         = GLFW_WINDOW_STATE_DEFAULT;
     is_valid_      = false;
     custom_cursor_ = nullptr;
+    system_        = new GLFW_System();
 }
-
-GLFW_Window::GLFW_Window(uint32_t                  width,
-                         uint32_t                  height,
-                         GLFW_TWindowState         state,
-                         const GLFW_ContextParams& context_params,
-                         const bool                exclusive)
-{
-    user_data_     = nullptr;
-    context_       = nullptr;
-    os_window_     = nullptr;
-    width_         = width;
-    height_        = height;
-    state_         = state;
-    is_valid_      = false;
-    custom_cursor_ = nullptr;
-}
-
-GLFW_Window::~GLFW_Window()
-{
-    // delete the glfw - opengl pointer
-    if (custom_cursor_)
-    {
-        glfwDestroyCursor(custom_cursor_);
-    }
-    glfwDestroyWindow((GLFWwindow*)os_window_);
-    glfwTerminate();
-};
-
-void GLFW_Window::init()
-{
-    system_ = new GLFW_System();
-    system_->set_use_window_frame(wm_init_state.window_frame);
-    system_->create_system();
-};
 
 static GLFWcursor* s_glfw_cursors[GLFW_kStandardCursorNumCursors] = {nullptr};
 
@@ -454,7 +454,7 @@ GLFW_TWindowState GLFW_Window::get_window_state() const
         return GLFW_kWindowStateMaximized;
     if (flags & GLFW_ICONIFIED)
         return GLFW_kWindowStateMinimized;
-    if (flags & GLFW_VISIVKE)
+    if (flags & GLFW_VISIBLE)
         return GLFW_kWindowStateFullScreen;
 
     return GLFW_kWindowStateNormal;

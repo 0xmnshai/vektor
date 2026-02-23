@@ -23,39 +23,39 @@ public:
 
     virtual ~GLFW_Rect() = default;
 
-    virtual inline int32_t getWidth() const;
+    virtual inline int32_t get_width() const;
 
-    virtual inline int32_t getHeight() const;
+    virtual inline int32_t get_height() const;
 
     virtual inline void    set(int32_t l,
                                int32_t t,
                                int32_t r,
                                int32_t b);
 
-    virtual inline bool    isEmpty() const;
+    virtual inline bool    is_empty() const;
 
-    virtual inline bool    isValid() const;
+    virtual inline bool    is_valid() const;
 
     virtual void           inset(int32_t i);
 
-    virtual inline void    unionRect(const GLFW_Rect& r);
+    virtual inline void    union_rect(const GLFW_Rect& r);
 
-    virtual inline void    unionPoint(int32_t x,
-                                      int32_t y);
+    virtual inline void    union_point(int32_t x,
+                                       int32_t y);
 
-    virtual inline void    clampPoint(int32_t& x,
-                                      int32_t& y);
+    virtual inline void    clamp_point(int32_t& x,
+                                       int32_t& y);
 
-    virtual inline bool    isInside(int32_t x,
-                                    int32_t y) const;
+    virtual inline bool    is_inside(int32_t x,
+                                     int32_t y) const;
 
-    virtual void           setCenter(int32_t cx,
-                                     int32_t cy);
+    virtual void           set_center(int32_t cx,
+                                      int32_t cy);
 
-    virtual void           setCenter(int32_t cx,
-                                     int32_t cy,
-                                     int32_t w,
-                                     int32_t h);
+    virtual void           set_center(int32_t cx,
+                                      int32_t cy,
+                                      int32_t w,
+                                      int32_t h);
 
     virtual bool           clip(GLFW_Rect& r) const;
 
@@ -71,12 +71,12 @@ public:
     MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_Rect")
 };
 
-inline int32_t GLFW_Rect::getWidth() const
+inline int32_t GLFW_Rect::get_width() const
 {
     return r_ - l_;
 }
 
-inline int32_t GLFW_Rect::getHeight() const
+inline int32_t GLFW_Rect::get_height() const
 {
     return b_ - t_;
 }
@@ -92,17 +92,17 @@ inline void GLFW_Rect::set(int32_t l,
     b_ = b;
 }
 
-inline bool GLFW_Rect::isEmpty() const
+inline bool GLFW_Rect::is_empty() const
 {
-    return (getWidth() == 0) || (getHeight() == 0);
+    return (get_width() == 0) || (get_height() == 0);
 }
 
-inline bool GLFW_Rect::isValid() const
+inline bool GLFW_Rect::is_valid() const
 {
     return (l_ <= r_) && (t_ <= b_);
 }
 
-inline void GLFW_Rect::unionRect(const GLFW_Rect& r)
+inline void GLFW_Rect::union_rect(const GLFW_Rect& r)
 {
     if (r.l_ < l_)
     {
@@ -122,7 +122,7 @@ inline void GLFW_Rect::unionRect(const GLFW_Rect& r)
     }
 }
 
-inline void GLFW_Rect::unionPoint(int32_t x,
+inline void GLFW_Rect::union_point(int32_t x,
                                   int32_t y)
 {
     if (x < l_)
@@ -143,7 +143,7 @@ inline void GLFW_Rect::unionPoint(int32_t x,
     }
 }
 
-inline void GLFW_Rect::clampPoint(int32_t& x,
+inline void GLFW_Rect::clamp_point(int32_t& x,
                                   int32_t& y)
 {
     if (x < l_)
@@ -165,7 +165,7 @@ inline void GLFW_Rect::clampPoint(int32_t& x,
     }
 }
 
-inline bool GLFW_Rect::isInside(int32_t x,
+inline bool GLFW_Rect::is_inside(int32_t x,
                                 int32_t y) const
 {
     return (x >= l_) && (x <= r_) && (y >= t_) && (y <= b_);

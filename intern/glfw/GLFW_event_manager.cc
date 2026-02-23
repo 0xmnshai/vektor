@@ -72,7 +72,6 @@ void GLFW_EventManager::dispatch_event()
     events_.pop_back();
     const GLFW_IEvent* event_ptr = event.get();
     handled_events_.push_back(std::move(event));
-
     dispatch_event(event_ptr);
 }
 
@@ -155,5 +154,4 @@ void GLFW_EventManager::dispose_event()
         events_.pop_front();
     }
 }
-
 } // namespace vektor

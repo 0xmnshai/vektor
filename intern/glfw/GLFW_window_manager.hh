@@ -35,5 +35,7 @@ public:
 protected:
     std::vector<GLFW_IWindow*> windows_;
     GLFW_IWindow*              active_window_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_WindowManager")
 };
 } // namespace vektor

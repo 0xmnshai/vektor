@@ -3,7 +3,6 @@
 
 namespace vektor
 {
-
 GLFW_Event::GLFW_Event(GLFW_TEventType type,
                        GLFW_IWindow*   window,
                        uint64_t        time,
@@ -39,5 +38,4 @@ GLFW_TEventDataPtr GLFW_Event::get_data() const
 {
     return data_.empty() ? nullptr : data_.data();
 }
-
 } // namespace vektor

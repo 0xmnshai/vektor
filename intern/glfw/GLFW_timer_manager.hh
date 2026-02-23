@@ -35,6 +35,6 @@ protected:
     using TTimerVector = std::vector<GLFW_TimerTask*>;
     TTimerVector timers_;
 
-    // MEM_CXX_CLASS_ALLOC_FUNCS
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_TimerManager")
 };
 } // namespace vektor

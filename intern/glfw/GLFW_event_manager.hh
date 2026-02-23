@@ -14,10 +14,6 @@ namespace vektor
 class GLFW_EventManager
 {
 public:
-    GLFW_EventManager();
-
-    ~GLFW_EventManager();
-
     uint32_t      get_num_events() const;
 
     uint32_t      get_num_events(GLFW_TEventType) const;
@@ -35,8 +31,12 @@ public:
     GLFW_TSuccess remove_consumer(GLFW_IEventConsumer* consumer);
 
     void          remove_window_events(const GLFW_IWindow* window);
-    
+
     void          dispose_event();
+
+    GLFW_EventManager();
+
+    ~GLFW_EventManager();
 
 protected:
     using TEventStack = std::deque<std::unique_ptr<const GLFW_IEvent>>;
@@ -49,6 +49,6 @@ protected:
 
     TConsumerVector consumers_;
 
-    //   MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_EventManager")
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_EventManager")
 };
 } // namespace vektor

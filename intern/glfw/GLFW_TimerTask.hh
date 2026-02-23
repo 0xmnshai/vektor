@@ -42,5 +42,7 @@ private:
     uint64_t                 next_;
     static GLFW_TimerProcPtr timer_proc_;
     static GLFW_TUserDataPtr user_data_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_TimerTask")
 };
 } // namespace vektor

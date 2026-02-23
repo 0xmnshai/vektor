@@ -18,11 +18,7 @@ bool FS_create_directory(const char* path)
         return true;
     }
 
-#ifdef _WIN32
-    if (_mkdir(path) == 0)
-#else
     if (mkdir(path, 0755) == 0)
-#endif
     {
         return true;
     }
@@ -118,6 +114,5 @@ std::string FS_path_basename(const std::string& path)
     }
     return path.substr(pos + 1);
 }
-
 } // namespace file_system
 } // namespace vektor

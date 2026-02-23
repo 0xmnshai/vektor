@@ -4,13 +4,8 @@
 #include <cstdio>
 #include <string>
 
-#ifdef _WIN32
-#define FS_SEP '\\'
-#define FS_SEP_STR "\\"
-#else
 #define FS_SEP '/'
 #define FS_SEP_STR "/"
-#endif
 
 #define FS_ATTR_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 

@@ -4,6 +4,7 @@
 #include "GLFW_ISystem.hh"
 #include "GLFW_rect.hh"
 #include "GLFW_types.h"
+
 namespace vektor
 {
 class GLFW_IWindow
@@ -56,5 +57,7 @@ public:
 
 private:
     GLFW_TUserDataPtr user_data_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_IWindow")
 };
 } // namespace vektor

@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include "GLFW_IEvent.hh"
+#include "MEM_gaurdalloc.hh"
 
 namespace vektor
 {
-
 struct GLFW_EventKeyData
 {
     int key;
@@ -47,6 +47,8 @@ public:
                const void*     data,
                size_t          data_size);
 
+    ~GLFW_Event() = default;
+
     GLFW_TEventType    get_type() const override;
     uint64_t           get_time() const override;
     GLFW_IWindow*      get_window() const override;
@@ -57,5 +59,7 @@ private:
     GLFW_IWindow*        window_;
     uint64_t             time_;
     std::vector<uint8_t> data_;
+
+    MEM_CXX_CLASS_ALLOC_FUNCS("GLFW:GLFW_Event")
 };
 } // namespace vektor

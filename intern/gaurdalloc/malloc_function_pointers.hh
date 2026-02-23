@@ -1,5 +1,3 @@
-
-
 #pragma once
 
 #include <cstddef>
@@ -21,6 +19,7 @@ enum class DestructorType
 
 extern void (*mem_freeN_ex)(void*          vmemh,
                             DestructorType destructor_type);
+
 extern void* (*mem_callocN)(size_t      len,
                             const char* str)ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1) ATTR_NONNULL(2);
 

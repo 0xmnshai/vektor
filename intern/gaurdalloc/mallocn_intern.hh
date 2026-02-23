@@ -1,5 +1,3 @@
-
-
 #ifdef __cplusplus
 #include <cstddef>
 #else
@@ -48,19 +46,25 @@ extern void (*mem_clearmemlist)(void);
 #define UNLIKELY(x) (x)
 
 size_t MEM_lockfree_allocN_len(const void* vmemh) ATTR_WARN_UNUSED_RESULT;
+
 #ifdef __cplusplus
 void MEM_lockfree_freeN(void*                                         vmemh,
                         vektor::mem_guarded::internal::DestructorType destructor_type);
 #endif
+
 void* MEM_lockfree_dupallocN(const void* vmemh) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT;
+
 void* MEM_lockfree_reallocN_id(void*       vmemh,
                                size_t      len,
                                const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(2);
+
 void* MEM_lockfree_recallocN_id(void*       vmemh,
                                 size_t      len,
                                 const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(2);
+
 void* MEM_lockfree_callocN(size_t      len,
                            const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1) ATTR_NONNULL(2);
+
 void* MEM_lockfree_calloc_arrayN(size_t      len,
                                  size_t      size,
                                  const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1,
@@ -119,20 +123,25 @@ void MEM_guarded_freeN(void*                                         vmemh,
                        vektor::mem_guarded::internal::DestructorType destructor_type);
 #endif
 void* MEM_guarded_dupallocN(const void* vmemh) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT;
+
 void* MEM_guarded_reallocN_id(void*       vmemh,
                               size_t      len,
                               const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(2);
+
 void* MEM_guarded_recallocN_id(void*       vmemh,
                                size_t      len,
                                const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(2);
+
 void* MEM_guarded_callocN(size_t      len,
                           const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1) ATTR_NONNULL(2);
+
 void* MEM_guarded_calloc_arrayN(size_t      len,
                                 size_t      size,
                                 const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1,
                                                                                                      2) ATTR_NONNULL(3);
 void* MEM_guarded_mallocN(size_t      len,
                           const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1) ATTR_NONNULL(2);
+
 void* MEM_guarded_malloc_arrayN(size_t      len,
                                 size_t      size,
                                 const char* str) ATTR_MALLOC ATTR_WARN_UNUSED_RESULT ATTR_ALLOC_SIZE(1,

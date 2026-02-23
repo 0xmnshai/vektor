@@ -9,8 +9,6 @@
 
 namespace vektor
 {
-
-struct Local;
 struct Global;
 
 struct alignas(128) Local
@@ -34,6 +32,9 @@ struct Global
     std::atomic<int64_t> mem_in_use_outside_locals{0};
     std::atomic<int64_t> blocks_num_outside_locals{0};
     std::atomic<size_t>  peak{0};
+
+    Global();
+    ~Global();
 };
 
 } // namespace vektor
