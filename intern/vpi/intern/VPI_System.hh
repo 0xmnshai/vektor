@@ -26,7 +26,7 @@ class VPI_System : public VPI_ISystem {
 
   [[nodiscard]] uint64_t get_milliseconds() const noexcept override;
 
-  [[nodiscard]] VPI_IWindow *get_window_under_cursor(int32_t x, int32_t y) const noexcept;
+  [[nodiscard]] VPI_IWindow *get_window_under_cursor(int32_t x, int32_t y) const noexcept override;
 
   [[nodiscard]] inline VPI_WindowManager const &get_window_manager() const noexcept
   {

@@ -28,13 +28,20 @@ void initialize(vpi::VPI_ISystem *sys, vpi::VPI_IWindow *window)
 
 void tick()
 {
-  //         // Run physics, gameplay scripts, etc.
+  int32_t x, y;
+  (void)g_main_window->get_cursor_position(&x, &y);
 
-  std::cout << "tick from runtime creator.cc" << std::endl;
+  vpi::VPI_IWindow *win_under_cursor = g_system->get_window_under_cursor(x, y);
+  if (win_under_cursor) {
+    char const *title = nullptr;
+    (void)win_under_cursor->get_title(&title);
+    if (title) {
+      std::cout << "Window under cursor: " << title << std::endl;
+    }
+  }
 
-  //         // Render the scene using g_graphics_context
+  // std::cout << "tick from runtime creator.cc" << std::endl;
 }
 }  // namespace vektor::runtime
 
-
-// test for commit 
+// test for commit

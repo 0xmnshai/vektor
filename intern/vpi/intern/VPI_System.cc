@@ -21,6 +21,7 @@ VPI_IWindow *VPI_System::create_window(char const *title,
 {
   qt_window_->create_window(title, left, top, width, height, parent_window);
   qt_window_->show();
+  window_manager_->add_window(qt_window_);
   return qt_window_;
 }
 
