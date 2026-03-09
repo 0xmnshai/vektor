@@ -1,8 +1,12 @@
 #pragma once
 
+#include <QApplication>
+#include <QElapsedTimer>
 #include <QMainWindow>
+#include <QOpenGLContext>
 #include <QPoint>
 #include <QSize>
+#include <QSurfaceFormat>
 #include <QWidget>
 
 #include "VPI_Window.hh"
@@ -10,7 +14,7 @@
 namespace vpi {
 class VPI_QtWindow : public VPI_Window, public QMainWindow {
  public:
-  VPI_QtWindow();
+  explicit VPI_QtWindow();
   ~VPI_QtWindow() override;
 
   void create_window(char const *title,
@@ -52,4 +56,7 @@ class VPI_QtWindow : public VPI_Window, public QMainWindow {
 
   void get_client_bounds(VPI_Rect &bounds) const override;
 };
+
+QString get_qt_style();
+
 }  // namespace vpi
