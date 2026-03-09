@@ -1,0 +1,28 @@
+     set(C_FLAGS ${C_FLAGS} -Werror)
+    else()
+        set(C_FLAGS ${C_FLAGS} -Werror=format-security
+            $<$<COMPILE_LANGUAGE:C>:-Werror=implicit -Werror=incompatible-pointer-types
+                -Werror=int-conversion>)
+    endif()
+
+
+to
+
+ set(C_FLAGS ${C_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>)
+    endif()
+
+    if(ALSOFT_WERROR)
+        set(C_FLAGS ${C_FLAGS} -Werror)
+    else()
+        set(C_FLAGS ${C_FLAGS} -Werror=format-security
+            $<$<COMPILE_LANGUAGE:C>:-Werror=implicit -Werror=incompatible-pointer-types
+                -Werror=int-conversion>)
+    endif()
+
+    # NOTE: This essentially provides the equivalent of the C++26 feature to
+    # initialize all local variables with a non-0 bit pattern. Until C++26 is
+    # adopted, the [[gnu::un
+
+
+
+    in /Users/lazycodebaker/Documents/Dev/CPP/vektor/extern/deps/openal-soft-src/CMakeLists.txt

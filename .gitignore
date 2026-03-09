@@ -1,0 +1,12 @@
+/build/
+# Ignore everything in extern/deps
+/extern/deps/*
+# Allow the directory structure
+!/extern/deps/
+!/extern/deps/*/
+# Ignore all content inside the subdirectories
+/extern/deps/*/*
+# But allow the .gitkeep files
+!/extern/deps/*/.gitkeep
+# Explicitly ensure /extern/vendor is not ignored
+!/extern/vendor/

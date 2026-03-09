@@ -1,0 +1,283 @@
+include(FetchContent)
+
+# Suppress warnings from external dependencies
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE BOOL "" FORCE)
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
+if(POLICY CMP0148)
+    cmake_policy(SET CMP0148 OLD)
+endif()
+
+set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps")
+message(STATUS "[Extern] External libraries will be downloaded to: ${FETCHCONTENT_BASE_DIR}")
+
+macro(check_download_status lib_name)
+    string(TOLOWER ${lib_name} lib_lower)
+    set(lib_dir "${FETCHCONTENT_BASE_DIR}/${lib_lower}-src")
+    if(EXISTS "${lib_dir}")
+        message(STATUS " [Extern] check: ${lib_name} found in ${lib_dir} (Skipping download)")
+    else()
+        message(STATUS " [Extern] check: ${lib_name} NOT found. Downloading...")
+    endif()
+endmacro()
+
+# GLFW
+check_download_status(glfw)
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glfw)
+
+# GLM 
+check_download_status(glm)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.3
+)
+set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glm)
+
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# ImGui
+check_download_status(imgui)
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG docking
+)
+FetchContent_MakeAvailable(imgui)
+
+if(NOT TARGET vektor_imgui)
+    add_library(vektor_imgui STATIC
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_demo.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+    target_include_directories(vektor_imgui PUBLIC 
+        ${imgui_SOURCE_DIR}
+        ${imgui_SOURCE_DIR}/backends
+    )
+    target_link_libraries(vektor_imgui PUBLIC glfw)
+endif()
+
+# Assimp (Importing 3D models)
+check_download_status(assimp)
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG v6.0.4
+)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_PUGIXML ON CACHE BOOL "" FORCE)
+set(UNZIP_FOUND OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(assimp)
+
+# OpenAL Soft
+check_download_status(openal-soft)
+FetchContent_Declare(
+    openal-soft
+    GIT_REPOSITORY https://github.com/kcat/openal-soft.git
+    GIT_TAG 1.25.1
+)
+set(ALSOFT_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ALSOFT_TESTS OFF CACHE BOOL "" FORCE)
+set(ALSOFT_UTILS OFF CACHE BOOL "" FORCE)
+set(ALSOFT_NO_CONFIG_UTIL ON CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(openal-soft)
+
+# Slang (Shader Language)
+check_download_status(slang)
+FetchContent_Declare(
+    slang
+    GIT_REPOSITORY https://github.com/shader-slang/slang.git
+    GIT_TAG v2026.3.1
+)
+set(SLANG_ENABLE_CUDA OFF CACHE BOOL "" FORCE)
+set(SLANG_ENABLE_OPTIX OFF CACHE BOOL "" FORCE)
+set(SLANG_INCLUDE_TOOLS OFF CACHE BOOL "" FORCE)
+set(SLANG_INCLUDE_TESTS OFF CACHE BOOL "" FORCE)
+set(SLANG_INCLUDE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SLANG_INCLUDE_DOCS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(slang)
+
+# fmt
+check_download_status(fmt)
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 12.1.0
+)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(fmt)
+
+# EnTT
+check_download_status(entt)
+FetchContent_Declare(
+    entt
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG v3.16.0
+)
+set(ENTT_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(ENTT_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(ENTT_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(ENTT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ENTT_INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(entt)
+
+# Jolt Physics
+check_download_status(jolt)
+FetchContent_Declare(
+    jolt
+    GIT_REPOSITORY https://github.com/jrouwe/JoltPhysics.git
+    GIT_TAG v5.5.0
+)
+set(TARGET_HELLO_WORLD OFF CACHE BOOL "" FORCE)
+set(TARGET_PERFORMANCE_TEST OFF CACHE BOOL "" FORCE)
+set(TARGET_SAMPLES OFF CACHE BOOL "" FORCE)
+set(TARGET_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(TARGET_VIEWER OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(jolt)
+
+# Box2D
+check_download_status(box2d)
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.1.1
+)
+set(BOX2D_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(box2d)
+
+# pybind11
+check_download_status(pybind11)
+FetchContent_Declare(
+  pybind11
+  GIT_REPOSITORY https://github.com/pybind/pybind11.git
+  GIT_TAG v2.13.6
+)
+set(PYBIND11_TEST OFF CACHE BOOL "" FORCE)
+set(PYBIND11_INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(pybind11)
+
+# TinyGLTF
+check_download_status(tinygltf)
+FetchContent_Declare(
+    tinygltf
+    GIT_REPOSITORY https://github.com/syoyo/tinygltf.git
+    GIT_TAG v2.9.7
+)
+set(TINYGLTF_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(TINYGLTF_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(tinygltf)
+
+# TinyObjLoader
+check_download_status(tinyobjloader)
+FetchContent_Declare(
+    tinyobjloader
+    GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
+    GIT_TAG v2.0.0rc13
+)
+set(TINYOBJLOADER_BUILD_TEST_LOADER OFF CACHE BOOL "" FORCE)
+set(TINYOBJLOADER_BUILD_Obj_Sticher OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(tinyobjloader)
+
+# STB
+check_download_status(stb)
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+if(NOT TARGET stb)
+    add_library(stb INTERFACE)
+    target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
+endif()
+
+# cereal
+check_download_status(cereal)
+FetchContent_Declare(
+    cereal
+    GIT_REPOSITORY https://github.com/USCiLab/cereal.git
+    GIT_TAG v1.3.2
+)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SANDBOX OFF CACHE BOOL "" FORCE)
+set(BUILD_DOC OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(cereal)
+
+# Eigen
+check_download_status(eigen)
+FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 5.0.1
+)
+set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(eigen)
+
+# Draco
+check_download_status(draco)
+FetchContent_Declare(
+    draco
+    GIT_REPOSITORY https://github.com/google/draco.git
+    GIT_TAG 1.5.7
+)
+set(DRACO_TESTS OFF CACHE BOOL "" FORCE)
+set(DRACO_JS_GLUE OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(draco)
+
+# nanosvg
+check_download_status(nanosvg)
+FetchContent_Declare(
+    nanosvg
+    GIT_REPOSITORY https://github.com/memononen/nanosvg.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(nanosvg)
+
+if(TARGET nanosvg)
+    target_include_directories(nanosvg INTERFACE $<BUILD_INTERFACE:${nanosvg_SOURCE_DIR}/src>)
+endif() 
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets)
+set(CMAKE_AUTOMOC ON) # Auto-generate MOC files for signals/slots
+set(CMAKE_AUTOUIC ON) # Auto-generate UI files
+set(CMAKE_AUTORCC ON) # Auto-generate Resource files
+
+# glad (Local source from vendor folder)
+add_library(glad "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/src/glad.c")
+target_include_directories(glad PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include")
+
+# stb_image (Local source from vendor folder)
+add_library(stb_image INTERFACE)
+target_include_directories(stb_image INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
