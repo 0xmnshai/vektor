@@ -30,7 +30,7 @@ VPI_TSuccess VPI_System::init()
   static char *argv[] = {(char *)"vektor", nullptr};
 
   QSurfaceFormat format;
-  format.setVersion(4, 1);
+  format.setVersion(6, 1);
   format.setProfile(QSurfaceFormat::CoreProfile);
   format.setDepthBufferSize(24);
   format.setStencilBufferSize(8);
