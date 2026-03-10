@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VPI_ISystem.h"
+#include "../../intern/vpi/VPI_ISystem.h"
 
 namespace vektor::runtime {
 void main_args_parse(int argc, const char **argv);

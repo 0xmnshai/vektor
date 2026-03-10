@@ -1,15 +1,24 @@
-#include "VPI_IContext.h"
 #include "creator.h"
-#include "creator_args.hh"
 #include "../../intern/clog/CLG_log.h"
-#include <filesystem>
+#include "VPI_IContext.h"
+#include "creator_args.hh"
+#include "creator_intern.h"
 #include "vektor_version.h"
+#include <filesystem>
 
 namespace vektor::runtime {
 CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "runtime");
 vpi::VPI_ISystem *g_system = nullptr;
 vpi::VPI_IWindow *g_main_window = nullptr;
 vpi::VPI_IContext *g_graphics_context = nullptr;
+
+creator::ApplicationState app_state = []() {
+  creator::ApplicationState app_state{};
+  app_state.signal.use_crash_handler = true;
+  app_state.signal.use_abort_handler = true;
+  app_state.exit_code_on_error.python = 0;
+  return app_state;
+}();
 
 void main_args_parse(int argc, const char **argv)
 {

@@ -1,10 +1,64 @@
 #include <vector>
 
-#include "VPI_IWindow.h"
-#include "VPI_Rect.h"
 #include "VPI_System.hh"
 
 namespace vpi {
+
+static VPI_ISystem *g_vpi_system = nullptr;
+static VPI_ISystem *g_vpi_system_background = nullptr;
+
+VPI_TSuccess VPI_ISystem::create(bool /*verbose*/, bool background)
+{
+  if (background) {
+    if (g_vpi_system_background) {
+      return VPI_kFailure;
+    }
+    g_vpi_system_background = new VPI_System();
+    return VPI_kSuccess;
+  }
+
+  if (g_vpi_system) {
+    return VPI_kFailure;
+  }
+  g_vpi_system = new VPI_System();
+  return VPI_kSuccess;
+}
+
+VPI_TSuccess VPI_ISystem::create_background()
+{
+  return VPI_ISystem::create(false, true);
+}
+
+VPI_TSuccess VPI_ISystem::dispose()
+{
+  if (g_vpi_system) {
+    delete g_vpi_system;
+    g_vpi_system = nullptr;
+    return VPI_kSuccess;
+  }
+  return VPI_kFailure;
+}
+
+VPI_TSuccess VPI_ISystem::dispose_background()
+{
+  if (g_vpi_system_background) {
+    delete g_vpi_system_background;
+    g_vpi_system_background = nullptr;
+    return VPI_kSuccess;
+  }
+  return VPI_kFailure;
+}
+
+VPI_ISystem *VPI_ISystem::get()
+{
+  return g_vpi_system;
+}
+
+VPI_ISystem *VPI_ISystem::get_background()
+{
+  return g_vpi_system_background;
+}
+
 VPI_System::VPI_System()
     : window_manager_(nullptr), event_manager_(nullptr), qt_window_(nullptr), qt_app_(nullptr)
 {

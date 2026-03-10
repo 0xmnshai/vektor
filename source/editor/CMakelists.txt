@@ -1,10 +1,13 @@
+
+add_subdirectory(windowmanager)
+
 add_executable(editor main.cc)
 
 target_include_directories(editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(editor PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(editor PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
-target_link_libraries(editor PRIVATE runtime)
+target_link_libraries(editor PRIVATE runtime windowmanager)
 
 # macOS Cocoa framework
 if(APPLE)

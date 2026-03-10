@@ -4,6 +4,8 @@ target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(runtime PUBLIC ${CMAKE_BINARY_DIR}/generated)
 
+add_subdirectory(lib)
+
 # macOS Cocoa framework
 if(APPLE)
     target_link_libraries(runtime PUBLIC "-framework Cocoa")
