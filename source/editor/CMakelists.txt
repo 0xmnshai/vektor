@@ -4,7 +4,6 @@ target_include_directories(editor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(editor PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(editor PRIVATE ${CMAKE_BINARY_DIR}/generated)
 
-# Link the engine library — all engine deps are inherited automatically
 target_link_libraries(editor PRIVATE runtime)
 
 # macOS Cocoa framework

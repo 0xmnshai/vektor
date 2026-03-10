@@ -1,4 +1,5 @@
 /build/
+logs/
 # Ignore everything in extern/deps
 /extern/deps/*
 # Allow the directory structure

@@ -1,13 +1,29 @@
+#include <filesystem>
 #include <cstdlib>
-#include <iostream>
 
+#include "../../intern/clog/CLG_log.h"
 #include "creator.h"
 #include "creator_global.h"
 #include "intern/VPI_System.hh"
+#include "vektor_version.h"
 
 int main(int argc, const char **argv)
 {
-  std::cout << "Editor" << std::endl;
+  clog::CLG_init();
+  clog::CLG_level_set(clog::CLG_LEVEL_INFO);
+  clog::CLG_output_use_timestamp_set(1);
+
+  std::filesystem::path log_dir = std::filesystem::path(VEKTOR_SOURCE_DIR) / "logs";
+  std::filesystem::create_directories(log_dir);
+  std::filesystem::path log_path = log_dir / "editor.log";
+
+  FILE *log_file = fopen(log_path.c_str(), "a");
+  if (log_file) {
+    clog::CLG_output_extra_set(log_file);
+  }
+
+  CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "main");
+  CLOG_INFO(V_LOG, "Editor Starting");
 
   vpi::VPI_System system;
   system.init();
@@ -17,8 +33,7 @@ int main(int argc, const char **argv)
   vpi::VPI_IWindow *editor_window = nullptr;
 
   if (!vektor::creator::G.background) {
-    editor_window = system.create_window(
-        "Vektor Editor", 0, 0, 1280, 720, nullptr);
+    editor_window = system.create_window("Vektor Editor", 0, 0, 1280, 720, nullptr);
   }
 
   vektor::runtime::initialize(&system, editor_window);
@@ -35,6 +50,8 @@ int main(int argc, const char **argv)
 
   // vektor::runtime::shutdown();
   system.exit(is_running);
+
+  clog::CLG_exit();
 
   return EXIT_SUCCESS;
 }

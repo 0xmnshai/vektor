@@ -9,4 +9,4 @@ if(APPLE)
     target_link_libraries(runtime PUBLIC "-framework Cocoa")
 endif()
 
-target_link_libraries(runtime PUBLIC vpi)
+target_link_libraries(runtime PUBLIC vpi clog gaurdalloc)

@@ -1,11 +1,15 @@
 #include <iostream>
 #include <utility>
 
+#include "../../intern/clog/CLG_log.h"
 #include "creator_args.hh"
 #include "creator_global.h"
 #include "vektor_version.h"
 
 namespace vektor::creator {
+
+CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "runtime.args");
+
 void Args::add(
     const char *short_arg, const char *long_arg, const char *doc, ArgCallback callback, void *data)
 {
@@ -14,11 +18,11 @@ void Args::add(
 
 void Args::print_help()
 {
-  std::cout << "Vektor Engine Runtime\n";
-  std::cout << "Usage: vektor runtime [args ...]\n\n";
+  CLOG_INFO(V_LOG, "Vektor Engine Runtime\n");
+  CLOG_INFO(V_LOG, "Usage: vektor runtime [args ...]\n\n");
 
   for (const auto &arg : args) {
-    std::cout << "  ";
+    CLOG_INFO(V_LOG, "  ");
     if (arg.short_arg) {
       std::cout << arg.short_arg;
       if (arg.long_arg) {
@@ -29,7 +33,10 @@ void Args::print_help()
       std::cout << arg.long_arg;
     }
 
-    size_t len = strlen(arg.short_arg) + (arg.short_arg ? 0 : 2) + strlen(arg.long_arg);
+    size_t len = (arg.short_arg ? std::strlen(arg.short_arg) : 0) +
+                 (arg.short_arg && arg.long_arg ? 2 : 0) +
+                 (arg.long_arg ? std::strlen(arg.long_arg) : 0);
+
     if (len < 30) {
       std::cout << std::string(30 - len, ' ');
     }
@@ -65,7 +72,7 @@ int Args::parse(int argc, const char **argv)
         G.project_file = argv[i];
       }
       else {
-        std::cerr << "Unknown argument: " << argv[i] << "\n";
+        CLOG_ERROR(V_LOG, "Unknown argument: %s", argv[i]);
         exit(1);
       }
     }
@@ -93,7 +100,7 @@ static int arg_handle_version(int, const char **, void *)
 
 static int arg_handle_background_mode(int, const char **, void *)
 {
-  std::cout << "Running in background mode (headless).\n";
+  CLOG_INFO(V_LOG, "Running in background mode (headless).");
   G.background = true;
   return 0;
 }
