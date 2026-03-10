@@ -94,7 +94,7 @@ void VLO_handle_close(VktHandle *handle)
 {
   if (!handle)
     return;
-  FileData *fd = (FileData *)handle->data;
+  auto *fd = (FileData *)handle->data;
   if (fd->file) {
     fclose(fd->file);
   }
@@ -135,7 +135,7 @@ VktFileData *VLO_read_from_file(const char *filepath)
     free(bh);
   }
 
-  VktFileData *vfd = new VktFileData();
+  auto *vfd = new VktFileData();
   vfd->bmain = nullptr;  // Placeholder for Main database
   vfd->user = nullptr;
 

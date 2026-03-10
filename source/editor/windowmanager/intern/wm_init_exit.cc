@@ -1,5 +1,4 @@
 #include "wm_init_exit.hh"
-
 #include "../../../../intern/clog/CLG_log.h"
 #include "../../../../intern/vpi/VPI_ISystem.h"
 #include "../../../runtime/creator.h"

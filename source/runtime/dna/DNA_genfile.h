@@ -52,7 +52,7 @@ struct SDNA {
 };
 
 /**
- * Decode SDNA from raw bytes (Blender's DNA1 block).
+ * Decode SDNA from raw bytes (Vektor's DNA1 block).
  */
 SDNA *DNA_sdna_from_data(const void *data, int32_t len, bool endian_swapped);
 
@@ -63,7 +63,7 @@ void DNA_sdna_free(SDNA *sdna);
 
 /**
  * Reconstruct a struct from the file's DNA to the memory's DNA.
- * (Simplified version of Blender's DNA_struct_reconstruct)
+ * (Simplified version of Vektor's DNA_struct_reconstruct)
  */
 void *DNA_struct_reconstruct(const SDNA *filesdna, 
                              const SDNA *memsdna, 

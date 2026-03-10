@@ -9,8 +9,6 @@
 
 #pragma once
 
-
-
 namespace vektor::loader {
 
 struct VktFileData;

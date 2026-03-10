@@ -20,7 +20,7 @@ class VPI_WindowManager {
   [[nodiscard]] VPI_IWindow const *get_active_window() const;
 
  private:
-std::vector<VPI_IWindow *> windows_;
+  std::vector<VPI_IWindow *> windows_;
   VPI_IWindow *active_window_ = nullptr;
 };
 }  // namespace vpi

@@ -207,7 +207,7 @@ QString get_qt_style()
                 border-color: #777;
             }
             QPushButton:pressed {
-                background-color: #cf7c06; /* Blender Signature Orange */
+                background-color: #cf7c06; /*  Orange */
             }
 
             /* Label styling */

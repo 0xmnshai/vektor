@@ -46,5 +46,8 @@ class VPI_Window : public VPI_IWindow {
   void get_window_bounds(VPI_Rect &bounds) const override;
 
   void get_client_bounds(VPI_Rect &bounds) const override;
+
+  protected:
+    
 };
 }  // namespace vpi

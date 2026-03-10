@@ -1,13 +1,11 @@
+
 #include "creator.h"
-#include "../../intern/clog/CLG_log.h"
+#include "../../intern/clog/intern/CLG_init.hh"
 #include "VPI_IContext.h"
 #include "creator_args.hh"
 #include "creator_intern.h"
-#include "vektor_version.h"
-#include <filesystem>
 
 namespace vektor::runtime {
-CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "runtime");
 vpi::VPI_ISystem *g_system = nullptr;
 vpi::VPI_IWindow *g_main_window = nullptr;
 vpi::VPI_IContext *g_graphics_context = nullptr;
@@ -25,18 +23,14 @@ void main_args_parse(int argc, const char **argv)
   vektor::creator::main_args_handle(argc, argv);
 }
 
+const char *id = "creator";
+const char *file_name = "runtime.log";
+const char *var = "runtime";
+
 void initialize(vpi::VPI_ISystem *sys, vpi::VPI_IWindow *window)
 {
-  std::filesystem::path log_dir = std::filesystem::path(VEKTOR_SOURCE_DIR) / "logs";
-  std::filesystem::create_directories(log_dir);
-  std::filesystem::path log_path = log_dir / "runtime.log";
+  clog::clog_init(id, file_name, var);
 
-  FILE *log_file = fopen(log_path.c_str(), "a");
-  if (log_file) {
-    clog::CLG_output_extra_set(log_file);
-  }
-
-  CLOG_INFO(V_LOG, "initialize from runtime creator.cc");
   g_system = sys;
   g_main_window = window;
 
@@ -67,8 +61,6 @@ void tick()
       }
     }
   }
-
-  // std::cout << "tick from runtime creator.cc" << std::endl;
 }
 }  // namespace vektor::runtime
 

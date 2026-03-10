@@ -27,3 +27,20 @@ enum VPI_TWindowState {
 enum VPI_TVisibility { VPI_kNotVisible = 0, VPI_kPartiallyVisible, VPI_kFullyVisible };
 
 typedef enum { VPI_kAxisNone = 0, VPI_kAxisX = (1 << 0), VPI_kAxisY = (1 << 1) } VPI_TAxisFlag;
+
+enum VPI_TVSyncModes {
+  /** Up to the GPU driver to choose. */
+  VPI_kVSyncModeUnset = -2,
+  /** Adaptive sync (OpenGL only). */
+  VPI_kVSyncModeAuto = -1,
+  /** Disable, useful for unclasped redraws for testing performance. */
+  VPI_kVSyncModeOff = 0,
+  /** Force enable. */
+  VPI_kVSyncModeOn = 1,
+};
+
+struct VPI_ContextParams {
+  bool is_stereo_visual;
+  bool is_debug;
+  VPI_TVSyncModes vsync;
+};

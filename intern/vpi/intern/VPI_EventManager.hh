@@ -11,8 +11,10 @@
 namespace vpi {
 class VPI_EventManager {
  public:
-  VPI_EventManager() = default;
-  ~VPI_EventManager() = default;
+  explicit VPI_EventManager() = default;
+  ~VPI_EventManager();
+
+  [[nodiscard]] uint32_t get_num_events() const noexcept;
 
   [[nodiscard]] uint32_t get_num_events(VPI_EventType type) const noexcept;
 
@@ -24,7 +26,9 @@ class VPI_EventManager {
 
   [[nodiscard]] VPI_TSuccess dispatch_events();
 
-  [[nodiscard]] VPI_TSuccess dispatch_event(VPI_EventType const *type);
+  [[nodiscard]] VPI_TSuccess dispose_event();
+
+  [[nodiscard]] VPI_TSuccess dispatch_event(VPI_IEvent *event);
 
   [[nodiscard]] VPI_TSuccess add_consumer(VPI_IEventConsumer const *consumer);
 
@@ -34,6 +38,8 @@ class VPI_EventManager {
   uint32_t num_events_ = 0;
 
   std::deque<std::unique_ptr<VPI_IEvent const>> events_;
+  std::deque<std::unique_ptr<VPI_IEvent const>> handled_events_;
+
   std::vector<VPI_IEventConsumer const *> consumers_;
 };
 }  // namespace vpi
