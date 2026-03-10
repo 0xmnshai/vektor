@@ -36,6 +36,11 @@ void *(*mem_mallocN_aligned_ex)(size_t len,
   }
   return ptr;
 };
+
+void *(*mem_mallocN)(size_t len, const char *str) = [](size_t len, const char *str) -> void * {
+  return mem_mallocN_aligned_ex(len, alignof(std::max_align_t), str, DestructorType::Trivial);
+};
+
 }  // namespace mem_guarded::internal
 
 namespace mem {

@@ -73,6 +73,8 @@ template<typename T> inline T *MEM_new_zeroed(const char *allocation_name)
   return static_cast<T *>(MEM_new_array_zeroed_aligned(1, sizeof(T), alignof(T), allocation_name));
 }
 
+#define MEM_mallocN(len, str) mem_guarded::internal::mem_mallocN(len, str)
+
 extern size_t (*MEM_get_memory_in_use)();
 
 }  // namespace mem

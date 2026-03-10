@@ -1,4 +1,10 @@
-add_library(runtime STATIC creator.cc creator_args.cc creator_global.cc)
+add_library(runtime STATIC 
+    creator.cc 
+    creator_args.cc 
+    creator_global.cc
+    loader/readfile.cc
+    dna/DNA_genfile.cc
+)
 
 target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -11,4 +17,4 @@ if(APPLE)
     target_link_libraries(runtime PUBLIC "-framework Cocoa")
 endif()
 
-target_link_libraries(runtime PUBLIC vpi clog gaurdalloc)
+target_link_libraries(runtime PUBLIC vpi clog gaurdalloc fmt::fmt)
