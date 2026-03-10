@@ -1,4 +1,4 @@
-add_library(runtime STATIC creator.cc)
+add_library(runtime STATIC creator.cc creator_args.cc creator_global.cc)
 
 target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(runtime PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
