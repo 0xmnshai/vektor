@@ -11,3 +11,9 @@ logs/
 !/extern/deps/*/.gitkeep
 # Explicitly ensure /extern/vendor is not ignored
 !/extern/vendor/
+
+plan.md
+comprehensive_engine_roadmap.md
+engine_files_deep_dive.md
+epic_engine_roadmap.md
+lang_usage.md

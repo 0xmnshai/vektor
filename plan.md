@@ -86,6 +86,150 @@ Based on your existing projects (`qt_test`, `opengl_practise`, and inspirations 
 5. **Asset Browser:**
    - Create a panel to visually browse `assets/` (Textures, Models, Shaders).
 
+---
+
+## Phase 5 — Qt6 Editor: Folder Structure (Blender/Vektor Style)
+
+This section defines the **exact** files and folders to create for the Qt6 Editor, following the same `source/<module>/intern/` convention used in the rest of vektor.
+
+```
+vektor/
+├── source/
+│   └── editor/                          # Qt6 Editor executable target
+│       ├── CMakelists.txt               # editor CMake target (links runtime, Qt6)
+│       ├── main.cc                      # Entry point — creates QApplication + VektorMainWindow
+│       │
+│       ├── app/                         # Application bootstrap & lifecycle
+│       │   ├── CMakeLists.txt
+│       │   ├── vektor_app.hh            # VektorApp: wraps QApplication, owns Engine instance
+│       │   ├── vektor_app.cc
+│       │   ├── editor_context.hh        # GlobalEditorContext — singleton holding active scene, selection
+│       │   └── editor_context.cc
+│       │
+│       ├── space_view3d/                # 3D Viewport (mirrors Blender's space_view3d)
+│       │   ├── CMakeLists.txt
+│       │   ├── space_view3d.hh          # Declares GameViewWidget (subclass of QOpenGLWidget)
+│       │   ├── space_view3d.cc          # initializeGL(), paintGL(), resizeGL() — hooks Engine render loop
+│       │   ├── view3d_navigate.hh       # Orbit / Pan / Zoom input handler
+│       │   ├── view3d_navigate.cc
+│       │   ├── view3d_gizmo.hh          # Transform gizmo overlay (move/rotate/scale handles)
+│       │   ├── view3d_gizmo.cc
+│       │   └── intern/
+│       │       ├── view3d_intern.h      # Internal shared declarations
+│       │       └── view3d_draw.cc       # Low-level draw calls forwarded to runtime Renderer
+│       │
+│       ├── space_outliner/              # Scene Hierarchy / Outliner (mirrors Blender's space_outliner)
+│       │   ├── CMakeLists.txt
+│       │   ├── space_outliner.hh        # OutlinerWidget: subclass of QTreeView
+│       │   ├── space_outliner.cc        # Polls EnTT registry; builds tree of Entity nodes
+│       │   ├── outliner_tree.hh         # OutlinerTreeModel (QAbstractItemModel)
+│       │   ├── outliner_tree.cc
+│       │   ├── outliner_draw.hh         # Custom QStyledItemDelegate for icons / visibility toggles
+│       │   ├── outliner_draw.cc
+│       │   └── intern/
+│       │       └── outliner_intern.h
+│       │
+│       ├── space_properties/            # Inspector / Properties Panel (mirrors Blender's space_properties)
+│       │   ├── CMakeLists.txt
+│       │   ├── space_properties.hh      # PropertiesWidget: QScrollArea containing dynamic property panels
+│       │   ├── space_properties.cc
+│       │   ├── properties_panel.hh      # Base class for a collapsible panel section
+│       │   ├── properties_panel.cc
+│       │   ├── rna_widget_factory.hh    # Factory: reads RNA metadata → spawns correct Qt widget
+│       │   ├── rna_widget_factory.cc    # QDoubleSpinBox (float), QCheckBox (bool), QColorDialog (color), etc.
+│       │   ├── panels/
+│       │   │   ├── panel_transform.hh   # Transform component panel (location, rotation, scale)
+│       │   │   ├── panel_transform.cc
+│       │   │   ├── panel_mesh.hh        # MeshRenderer component panel
+│       │   │   ├── panel_mesh.cc
+│       │   │   ├── panel_light.hh       # Light component panel
+│       │   │   ├── panel_light.cc
+│       │   │   ├── panel_camera.hh      # Camera component panel
+│       │   │   └── panel_camera.cc
+│       │   └── intern/
+│       │       └── properties_intern.h
+│       │
+│       ├── space_filebrowser/           # Asset Browser (mirrors Blender's space_file)
+│       │   ├── CMakeLists.txt
+│       │   ├── space_filebrowser.hh     # AssetBrowserWidget: QSplitter with tree + icon grid
+│       │   ├── space_filebrowser.cc
+│       │   ├── filebrowser_tree.hh      # Directory QTreeView (left pane)
+│       │   ├── filebrowser_tree.cc
+│       │   ├── filebrowser_grid.hh      # Asset icon grid QListView (right pane) with thumbnails
+│       │   ├── filebrowser_grid.cc
+│       │   ├── filebrowser_thumbnail.hh # Async thumbnail loader (QRunnable / QThreadPool)
+│       │   ├── filebrowser_thumbnail.cc
+│       │   └── intern/
+│       │       └── filebrowser_intern.h
+│       │
+│       ├── windowmanager/               # EXISTING — extend for Qt dock layout
+│       │   ├── CMakeLists.txt           # EXISTING
+│       │   ├── wm_window.hh             # EXISTING — extend: add saveLayout(), restoreLayout()
+│       │   ├── wm_event_types.h         # EXISTING
+│       │   ├── wm_keymap.hh             # [NEW] Hotkey / shortcut mapping table
+│       │   ├── wm_keymap.cc
+│       │   └── intern/
+│       │       ├── wm_draw.cc           # [NEW] Dock panel draw coordination
+│       │       ├── wm_event_system.cc   # [NEW] Qt → VPI event bridge
+│       │       └── wm_intern.h          # EXISTING
+│       │
+│       ├── interface/                   # Shared Qt UI primitives (mirrors Blender's interface/)
+│       │   ├── CMakeLists.txt
+│       │   ├── ui_main_window.hh        # VektorMainWindow (QMainWindow + dock layout)
+│       │   ├── ui_main_window.cc
+│       │   ├── ui_menu.hh               # Menu bar + toolbar builder
+│       │   ├── ui_menu.cc
+│       │   ├── ui_theme.hh              # QSS stylesheet + color palette manager
+│       │   ├── ui_theme.cc
+│       │   ├── ui_icon.hh               # Icon cache (loads from assets/icons/)
+│       │   ├── ui_icon.cc
+│       │   └── intern/
+│       │       └── interface_intern.h
+│       │
+│       └── io/                          # Editor-side import/export dialogs
+│           ├── CMakeLists.txt
+│           ├── io_import_mesh.hh        # "Import Mesh" dialog wrapper around runtime ModelImporter
+│           ├── io_import_mesh.cc
+│           ├── io_import_texture.hh     # "Import Texture" dialog
+│           ├── io_import_texture.cc
+│           ├── io_export_scene.hh       # "Export .vmap" dialog
+│           └── io_export_scene.cc
+│
+├── source/
+│   └── runtime/                         # EXISTING — no structural change needed for Qt work
+│       └── ...
+│
+├── intern/
+│   └── vpi/                             # EXISTING platform abstraction — Qt backend lives here
+│       └── ...                          # (GhostSystemQt wraps QOpenGLWidget window management)
+│
+└── assets/
+    ├── icons/                           # [NEW] SVG/PNG icons for the editor toolbar & panels
+    │   ├── object_mesh.svg
+    │   ├── object_light.svg
+    │   ├── object_camera.svg
+    │   ├── visibility_on.svg
+    │   └── visibility_off.svg
+    └── themes/                          # [NEW] QSS stylesheet files
+        ├── dark.qss                     # Default Blender-dark-like theme
+        └── light.qss
+```
+
+### Key Design Rules (Blender/Vektor Style)
+
+| Rule | Detail |
+|---|---|
+| **`space_<name>/`** | Every major panel is its own `space_` module, identical to Blender's pattern |
+| **`intern/` inside each space** | Private implementation details go in `intern/`, never exposed to other modules |
+| **`<module>_intern.h`** | Each module has a single internal header aggregating private types/functions |
+| **`CMakeLists.txt` per folder** | Each `space_` folder is a separate CMake component, `ADD_LIBRARY` or `OBJECT_LIBRARY` |
+| **`space_<name>.hh` + `.cc`** | The "public face" of each space — only this header is `#include`'d by other modules |
+| **`wm_` prefix** | Window Manager utilities follow `wm_` prefix convention |
+| **`ui_` prefix** | Shared UI primitives (main window, menus, themes) use `ui_` prefix |
+| **`io_` prefix** | Import/Export dialogs use `io_` prefix |
+| **`.hh` for C++ headers** | `.hh` for C++ class headers, `.h` for pure C-style/internal headers |
+| **`.cc` for sources** | Consistent with rest of vektor (not `.cpp`) |
+
 ## Phase 6: Asset Pipeline & Serialization
 *Goal: Seamlessly load external files and save native project files.*
 
