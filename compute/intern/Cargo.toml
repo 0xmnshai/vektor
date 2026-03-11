@@ -1,0 +1,15 @@
+[package]
+name = "intern"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+cxx = "1.0"
+tobj = "4.0"
+math_accel = { path = "../math_accel" }
+
+[build-dependencies]
+cxx-build = "1.0"

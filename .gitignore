@@ -17,3 +17,6 @@ comprehensive_engine_roadmap.md
 engine_files_deep_dive.md
 epic_engine_roadmap.md
 lang_usage.md
+
+# Ignore everything in compute/target
+/compute/target/*

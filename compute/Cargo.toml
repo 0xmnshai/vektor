@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "intern",
+    "math_accel",
+]
+resolver = "2"
