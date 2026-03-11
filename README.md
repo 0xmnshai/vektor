@@ -4,14 +4,14 @@ A hybrid C++20/Rust high-performance game engine and Qt6-powered editor.
 
 ## Stack & Technologies
 * **Language:** C++20, Rust, Python
-* **Graphics API:** OpenGL 4.6 (Hardware Abstraction Layer)
+* **Graphics API:** OpenGL 4.1 / Apple Metal Cpp (Hardware Abstraction Layer)
 * **Shader Compiler:** Slang (GLSL/SPIR-V cross-compilation)
 * **Math Pipeline:** GLM (C++), Rayon (Rust multithreading), `std::simd`/`wide` AVX intrinsics (Rust SIMD)
 * **ECS:** EnTT 
 * **Editor UI:** Qt6 (QOpenGLWidget, Docking system)
-* **Scripting:** Python 3 (pybind11 C++ bindings, PyO3 Rust bindings)
-* **Asset Importers:** Assimp, stb_image
-* **Audio:** OpenAL Soft
+* **Scripting:** Python 3 (pybind11 C++ bindings, PyO3 Rust bindings) (planned)
+* **Asset Importers:** Assimp, stb_image (planned)
+* **Audio:** OpenAL Soft (planned)
 * **Physics:** Jolt / Box2D (planned)
 
 ## Architecture Overview
