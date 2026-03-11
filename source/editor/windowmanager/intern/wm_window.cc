@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "../../intern/clog/CLG_log.h"
-#include "../../intern/gaurdalloc/MEM_gaurdalloc.hh"
+#include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
 
 namespace vektor {
 
@@ -90,15 +90,13 @@ wmWindow *wm_window_new(const Main * /*vkmain*/,
                         wmWindow *parent,
                         bool dialog)
 {
-  wmWindow *win = (wmWindow *)MEM_mallocN(sizeof(wmWindow), "window");
-  memset(win, 0, sizeof(wmWindow));
-
+  auto *win = mem::MEM_new<wmWindow>("window");
+  
   wm->windows.push_back(win);
   win->winid = find_free_winid(wm);
 
   win->parent = (!dialog && parent && parent->parent) ? parent->parent : parent;
-  win->runtime = (WindowRuntime *)MEM_mallocN(sizeof(WindowRuntime), "WindowRuntime");
-  memset(win->runtime, 0, sizeof(WindowRuntime));
+  win->runtime = mem::MEM_new<WindowRuntime>("WindowRuntime");
 
   return win;
 }

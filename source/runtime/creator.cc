@@ -10,6 +10,7 @@ namespace vektor::runtime {
 vpi::VPI_ISystem *g_system = nullptr;
 vpi::VPI_IWindow *g_main_window = nullptr;
 vpi::VPI_IContext *g_graphics_context = nullptr;
+
 CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "Creator");
 
 creator::ApplicationState app_state = []() {

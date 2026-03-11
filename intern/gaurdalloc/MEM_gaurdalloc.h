@@ -57,6 +57,8 @@ extern void *(*MEM_realloc_uninitialized_id)(
     void *vmemh, size_t len, const char *str) /* ATTR_MALLOC */ ATTR_WARN_UNUSED_RESULT
     ATTR_ALLOC_SIZE(2);
 
+extern size_t (*MEM_get_memory_in_use)();
+
 #define MEM_realloc_uninitialized(vmemh, len) MEM_realloc_uninitialized_id(vmemh, len, __func__)
 
 #define MEM_SAFE_DELETE(v) \
@@ -75,6 +77,9 @@ template<typename T> inline T *MEM_new_zeroed(const char *allocation_name)
 
 #define MEM_mallocN(len, str) mem_guarded::internal::mem_mallocN(len, str)
 
-extern size_t (*MEM_get_memory_in_use)();
+#define MEM_freeN(vmemh) \
+  mem_guarded::internal::mem_freeN_ex(vmemh, mem_guarded::internal::DestructorType::Trivial)
 
+#define MEM_freeN_ex(vmemh, destructor_type) \
+  mem_guarded::internal::mem_freeN_ex(vmemh, destructor_type)
 }  // namespace mem

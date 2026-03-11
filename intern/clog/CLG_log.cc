@@ -6,8 +6,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "../gaurdalloc/MEM_gaurdalloc.hh"
+#include "../gaurdalloc/MEM_gaurdalloc.h"
 #include "CLG_log.h"
+#include "MEM_gaurdalloc.h"
 
 namespace clog {
 
@@ -398,7 +399,8 @@ void CLG_log_str(const CLG_LogType *type,
 
   if (type->clg_ctx->use_source) {
     clg_str_append(&cstr, "\n");
-    write_file_line_fn(&cstr, file_line, fn, type->clg_ctx->use_basename, type->clg_ctx->use_color);
+    write_file_line_fn(
+        &cstr, file_line, fn, type->clg_ctx->use_basename, type->clg_ctx->use_color);
   }
 
   clg_str_indent_multiline(&cstr, (uint)multiline_indent_len);
@@ -495,7 +497,8 @@ void CLG_logf(const CLG_LogType *type,
 
   if (type->clg_ctx->use_source) {
     clg_str_append(&cstr, "\n");
-    write_file_line_fn(&cstr, file_line, fn, type->clg_ctx->use_basename, type->clg_ctx->use_color);
+    write_file_line_fn(
+        &cstr, file_line, fn, type->clg_ctx->use_basename, type->clg_ctx->use_color);
   }
 
   clg_str_indent_multiline(&cstr, (uint)multiline_indent_len);
@@ -624,7 +627,9 @@ static void CLG_ctx_free(CLogContext *ctx)
       mem::MEM_delete(item);
     }
   }
-  if (ctx->output_file_extra && ctx->output_file_extra != stdout && ctx->output_file_extra != stderr) {
+  if (ctx->output_file_extra && ctx->output_file_extra != stdout &&
+      ctx->output_file_extra != stderr)
+  {
     fclose(ctx->output_file_extra);
   }
   pthread_mutex_destroy(&ctx->types_lock);

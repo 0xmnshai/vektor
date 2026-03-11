@@ -7,11 +7,23 @@
 #include "VPI_WindowManager.hh"
 #include "intern/VPI_QtWindow.hh"
 
+#include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
+
 namespace vpi {
 class VPI_System : public VPI_ISystem {
  public:
   explicit VPI_System();
   ~VPI_System() override;
+
+  void *operator new(size_t size)
+  {
+    return MEM_mallocN(size, "VPI_System");
+  }
+
+  void operator delete(void *ptr)
+  {
+    MEM_freeN(ptr);
+  }
 
   [[nodiscard]] VPI_IWindow *create_window(char const *title,
                                            int32_t left,

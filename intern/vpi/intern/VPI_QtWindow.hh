@@ -11,11 +11,23 @@
 
 #include "VPI_Window.hh"
 
+#include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
+
 namespace vpi {
 class VPI_QtWindow : public VPI_Window, public QMainWindow {
  public:
   explicit VPI_QtWindow();
   ~VPI_QtWindow() override;
+
+  void *operator new(size_t size)
+  {
+    return MEM_mallocN(size, "VPI_QtWindow");
+  }
+
+  void operator delete(void *ptr)
+  {
+    MEM_freeN(ptr);
+  }
 
   void create_window(char const *title,
                      int32_t left,
