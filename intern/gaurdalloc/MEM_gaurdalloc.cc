@@ -1,6 +1,7 @@
 #include "MEM_gaurdalloc.h"
 #include "../clog/CLG_log.h"
 #include "MEM_function_pointers.h"
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 
@@ -94,6 +95,87 @@ void *(*mem_mallocN)(size_t len, const char *str) = [](size_t len, const char *s
   return mem_mallocN_aligned_ex(len, alignof(std::max_align_t), str, DestructorType::Trivial);
 };
 
+FrameAllocator g_frame_allocator{};
+
+void FrameAllocator::init()
+{
+  assert(buffer == nullptr && "FrameAllocator::init() called more than once");
+  capacity = MEM_FRAME_BUFFER_SIZE;
+  buffer   = static_cast<uint8_t *>(std::malloc(capacity));
+  if (!buffer) {
+    CLOG_ERROR(LOG_MEM, "FrameAllocator: failed to allocate 16 MB frame slab!");
+    std::abort();
+  }
+  cursor.store(0, std::memory_order_relaxed);
+  CLOG_INFO(LOG_MEM, "FrameAllocator: 16 MB slab initialised at %p", (void *)buffer);
+}
+
+void *FrameAllocator::alloc(size_t size, size_t alignment)
+{
+  if (!size)
+    return nullptr;
+
+  /* Bump the cursor with alignment padding using a CAS loop so the allocator
+   * is safe to call from multiple threads concurrently within one frame. */
+  size_t old_cursor = cursor.load(std::memory_order_relaxed);
+  size_t new_cursor;
+  void *result;
+
+  do {
+    /* Round up old_cursor to the requested alignment. */
+    size_t aligned = (old_cursor + alignment - 1) & ~(alignment - 1);
+    new_cursor     = aligned + size;
+
+    if (new_cursor > capacity) {
+      CLOG_ERROR(LOG_MEM,
+                 "FrameAllocator: slab exhausted! Requested %zu bytes, "
+                 "%zu / %zu bytes already used.",
+                 size,
+                 old_cursor,
+                 capacity);
+      return nullptr;
+    }
+
+    result = buffer + aligned;
+  } while (!cursor.compare_exchange_weak(
+      old_cursor, new_cursor, std::memory_order_acq_rel, std::memory_order_relaxed));
+
+  return result;
+}
+
+void FrameAllocator::end_frame()
+{
+  /* Stamp the slab with a recognisable pattern in debug to catch use-after-end_frame bugs. */
+#ifndef NDEBUG
+  size_t used = cursor.load(std::memory_order_relaxed);
+  if (used)
+    std::memset(buffer, 0xCD, used); /* 0xCD = "clean dead" sentinel */
+#endif
+  cursor.store(0, std::memory_order_release);
+}
+
+size_t FrameAllocator::bytes_used() const
+{
+  return cursor.load(std::memory_order_relaxed);
+}
+
+void FrameAllocator::shutdown()
+{
+  std::free(buffer);
+  buffer   = nullptr;
+  capacity = 0;
+  cursor.store(0, std::memory_order_relaxed);
+}
+
+/* Public function-pointer hooks (match the extern declarations in MEM_function_pointers.h). */
+void *(*mem_frame_alloc)(size_t size) = [](size_t size) -> void * {
+  return g_frame_allocator.alloc(size);
+};
+
+void (*mem_frame_end)() = []() {
+  g_frame_allocator.end_frame();
+};
+
 }  // namespace mem_guarded::internal
 
 namespace mem {
@@ -143,7 +225,7 @@ void *(*MEM_realloc_uninitialized_id)(void *vmemh, size_t len, const char * /*st
     return nullptr;
 
   /* After realloc, reconstruct head at the same raw_offset within the new block. */
-  size_t reuse_offset = (size_t)((char *)old_head - (char *)old_raw); /* == old raw_offset */
+  auto reuse_offset = (size_t)((char *)old_head - (char *)old_raw); /* == old raw_offset */
   auto *new_head = (mem_guarded::internal::MemHead *)((char *)raw + reuse_offset);
   new_head->magic = MEM_MAGIC;
   new_head->size = len;

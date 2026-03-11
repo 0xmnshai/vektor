@@ -82,4 +82,64 @@ template<typename T> inline T *MEM_new_zeroed(const char *allocation_name)
 
 #define MEM_freeN_ex(vmemh, destructor_type) \
   mem_guarded::internal::mem_freeN_ex(vmemh, destructor_type)
+
+#define MEM_FRAME_INIT() mem_guarded::internal::g_frame_allocator.init()
+
+/** Release the slab at application shutdown. */
+#define MEM_FRAME_SHUTDOWN() mem_guarded::internal::g_frame_allocator.shutdown()
+
+/**
+ * Allocate `size` bytes from the frame slab with default (max) alignment.
+ * The pointer is valid until MEM_frame_end() is called at the end of the frame.
+ * Do NOT call MEM_freeN on it – the whole slab is rewound as one unit.
+ */
+#define MEM_frame_alloc(size) mem_guarded::internal::mem_frame_alloc(size)
+
+/**
+ * Allocate `size` bytes from the frame slab with an explicit `alignment`.
+ * alignment must be a power-of-two.
+ */
+#define MEM_frame_alloc_aligned(size, alignment) \
+  mem_guarded::internal::g_frame_allocator.alloc(size, alignment)
+
+/**
+ * Rewind the frame slab.  Call exactly once per frame after all frame work
+ * is complete (e.g. after present / swap-buffers).  All previous
+ * MEM_frame_alloc pointers become invalid after this call.
+ */
+#define MEM_frame_end() mem_guarded::internal::mem_frame_end()
+
+/** Query how many slab bytes are currently live (useful for profiling). */
+#define MEM_frame_bytes_used() mem_guarded::internal::g_frame_allocator.bytes_used()
+
 }  // namespace mem
+
+/*
+ * // --- Application / renderer startup ---
+ * MEM_FRAME_INIT();   // allocates the 16 MB slab once
+ *
+ * // --- Inside the render / game loop (called ~60 times per second) ---
+ * void render_frame()
+ * {
+ *     // Build a temporary label – no heap allocation, no free needed.
+ *     char *label = static_cast<char *>(MEM_frame_alloc(128));
+ *     std::snprintf(label, 128, "Frame #%u | dt=%.3f ms", frame_index, delta_ms);
+ *     draw_hud_text(label);   // used this frame only
+ *
+ *     // Scratch matrix for a one-shot transform calculation.
+ *     float *mat = static_cast<float *>(MEM_frame_alloc_aligned(16 * sizeof(float), 16));
+ *     build_projection_matrix(mat, fov, aspect, z_near, z_far);
+ *     upload_uniform("u_proj", mat, 16);
+ *
+ *     // ... rest of the frame ...
+ *
+ *     // Optional: profile how much slab we consumed this frame.
+ *     // size_t used = MEM_frame_bytes_used();
+ *
+ *     // Must be called LAST – invalidates all pointers from this frame.
+ *     MEM_frame_end();
+ * }
+ *
+ * // --- Application shutdown ---
+ * MEM_FRAME_SHUTDOWN();  // frees the 16 MB slab
+ */
