@@ -101,7 +101,7 @@ void FrameAllocator::init()
 {
   assert(buffer == nullptr && "FrameAllocator::init() called more than once");
   capacity = MEM_FRAME_BUFFER_SIZE;
-  buffer   = static_cast<uint8_t *>(std::malloc(capacity));
+  buffer   = static_cast<uint8_t *>(malloc(capacity));
   if (!buffer) {
     CLOG_ERROR(LOG_MEM, "FrameAllocator: failed to allocate 16 MB frame slab!");
     std::abort();

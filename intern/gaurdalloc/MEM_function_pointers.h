@@ -24,7 +24,7 @@ extern void *(*mem_mallocN_aligned_ex)(size_t len,
 extern void *(*mem_mallocN)(size_t len, const char *str) /* ATTR_MALLOC */ ATTR_WARN_UNUSED_RESULT
     ATTR_ALLOC_SIZE(1) ATTR_NONNULL(2);
 
-/* ---------------------------------------------------------------------------
+/* 
  * Frame Allocator
  *
  * A fixed-size linear/bump allocator backed by a 16 MB slab that is committed
@@ -37,7 +37,7 @@ extern void *(*mem_mallocN)(size_t len, const char *str) /* ATTR_MALLOC */ ATTR_
  * allocations from multiple threads within the same frame are safe.  end_frame()
  * must be called from a single "owner" context after all worker threads have
  * finished for the frame.
- * ------------------------------------------------------------------------- */
+ * */
 constexpr size_t MEM_FRAME_BUFFER_SIZE = 16u * 1024u * 1024u; /* 16 MB */
 
 struct FrameAllocator {
