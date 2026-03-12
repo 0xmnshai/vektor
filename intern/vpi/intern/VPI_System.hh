@@ -45,8 +45,9 @@ class VPI_System : public QObject, public VPI_ISystem {
     MEM_freeN(ptr);
   }
 
-  void operator delete(void * /*ptr*/, void * /*place*/) noexcept
+  void operator delete(void *ptr, void * /*place*/) noexcept
   {
+    MEM_freeN(ptr);
   }
 
   [[nodiscard]] VPI_Window *create_window(char const *title,

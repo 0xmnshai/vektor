@@ -3,10 +3,14 @@
 
 #include "../../source/editor/windowmanager/wm_event_types.h"
 #include "VPI_System.hh"
-#include "intern/VPI_QtWindow.hh"
 #include "intern/CLG_init.hh"
+#include "intern/VPI_QtWindow.hh"
+
+#include "../../intern/clog/CLG_log.h"
 
 namespace vpi {
+
+CLG_LOGREF_DECLARE_GLOBAL(SYS_LOG, "system");
 
 static VPI_ISystem *g_vpi_system = nullptr;
 static VPI_ISystem *g_vpi_system_background = nullptr;
@@ -87,6 +91,8 @@ VPI_TSuccess VPI_System::init()
   static int argc = 1;
   static char *argv[] = {(char *)"vektor", nullptr};
 
+  clog::clog_init("system", "editor.log", "editor");
+
   QSurfaceFormat format;
   format.setVersion(6, 1);
   format.setProfile(QSurfaceFormat::CoreProfile);
@@ -100,12 +106,8 @@ VPI_TSuccess VPI_System::init()
   qt_app_->setStyleSheet(vpi::get_qt_style());
   qt_app_->installEventFilter(this);
 
-  clog::clog_init("VPI", "vpi_events.log", "VPI System Initialized");
-
   qt_window_ = new VPI_QtWindow();
   timer_.start();
-  // std::chrono::duration_cast<std::chrono::milliseconds>(
-  //       std::chrono::steady_clock::now().time_since_epoch()).count();
   start_time_ = timer_.elapsed();
 
   return VPI_kSuccess;
@@ -196,6 +198,7 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       data.key = ke->key();
       data.modifiers = ke->modifiers();
       data.is_repeat = ke->isAutoRepeat();
+      CLOG_INFO(SYS_LOG, "Key press: %d", data.key);
       (void)window->event_manager_->push_event(std::make_unique<VPI_KeyEvent>(window, data));
       break;
     }
@@ -221,6 +224,7 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       }
 
       data.modifiers = me->modifiers();
+      CLOG_INFO(SYS_LOG, "Mouse button press: %d at %d, %d", data.button, data.x, data.y);
       (void)window->event_manager_->push_event(std::make_unique<VPI_MouseEvent>(window, data));
       break;
     }
@@ -229,6 +233,7 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       VPI_TEventCursorData data = {};
       data.x = static_cast<int32_t>(me->position().x());
       data.y = static_cast<int32_t>(me->position().y());
+      CLOG_INFO(SYS_LOG, "Mouse move: %d, %d", data.x, data.y);
       (void)window->event_manager_->push_event(std::make_unique<VPI_MouseMoveEvent>(window, data));
       break;
     }
@@ -240,21 +245,26 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       data.delta_x = we->angleDelta().x();
       data.delta_y = we->angleDelta().y();
       data.modifiers = we->modifiers();
+      CLOG_INFO(
+          SYS_LOG, "Mouse Wheel: %d, %d at %d, %d", data.delta_x, data.delta_y, data.x, data.y);
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_MouseWheelEvent>(window, data));
       break;
     }
     case QEvent::Resize: {
+      CLOG_INFO(SYS_LOG, "Window Resize Event Occured");
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_WindowEvent>(VPI_kWindowResize, window));
       break;
     }
     case QEvent::Move: {
+      CLOG_INFO(SYS_LOG, "Window Move Event Occured");
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_WindowEvent>(VPI_kWindowMove, window));
       break;
     }
     case QEvent::Close: {
+      CLOG_INFO(SYS_LOG, "Window Close Event Occured");
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_WindowEvent>(VPI_kWindowClose, window));
       break;

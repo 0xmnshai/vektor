@@ -61,6 +61,10 @@ VPI_TSuccess VPI_EventManager::dispatch_event(VPI_Event *event)
     if (consumer->consume_event(event) == VPI_kSuccess) {
       if (event->is_consumed() == VPI_kSuccess) {
         CLOG_DEBUG(vpi_events, "Event consumed by: %p", (void *)consumer);
+        // VPI_kWindowClose
+        if (event->get_type() == VPI_kWindowClose) {
+          // we will use qt event consumer here and will close the system 
+        }
         break;
       }
     }

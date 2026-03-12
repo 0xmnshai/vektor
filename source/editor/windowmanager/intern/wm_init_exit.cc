@@ -22,6 +22,8 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
 
   if (!vektor::creator::G.background) {
     editor_window = system->create_window("Vektor Editor", 0, 0, 1280, 720, nullptr);
+
+    // we will add a event consumer for this editor in editor window 
   }
 
   vektor::runtime::initialize(system, editor_window);

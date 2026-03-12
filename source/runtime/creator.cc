@@ -11,7 +11,7 @@ vpi::VPI_ISystem *g_system = nullptr;
 vpi::VPI_IWindow *g_main_window = nullptr;
 vpi::VPI_IContext *g_graphics_context = nullptr;
 
-CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "Creator");
+CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "creator");
 
 creator::ApplicationState app_state = []() {
   creator::ApplicationState app_state{};
@@ -26,13 +26,9 @@ void main_args_parse(int argc, const char **argv)
   vektor::creator::main_args_handle(argc, argv);
 }
 
-const char *id = "creator";
-const char *file_name = "runtime.log";
-const char *var = "runtime";
-
 void initialize(vpi::VPI_ISystem *sys, vpi::VPI_IWindow *window)
 {
-  clog::clog_init(id, file_name, var);
+  clog::clog_init("creator", "runtime.log", "runtime");
 
   g_system = sys;
   g_main_window = window;

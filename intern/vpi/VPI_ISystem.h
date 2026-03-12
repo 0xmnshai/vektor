@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include <QObject>
 #include <QEvent>
+#include <QObject>
+#include <cstdint>
 
 #include "VPI_Types.h"
 #include "intern/VPI_Window.hh"

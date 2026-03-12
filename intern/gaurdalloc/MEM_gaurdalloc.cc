@@ -101,7 +101,7 @@ void FrameAllocator::init()
 {
   assert(buffer == nullptr && "FrameAllocator::init() called more than once");
   capacity = MEM_FRAME_BUFFER_SIZE;
-  buffer   = static_cast<uint8_t *>(malloc(capacity));
+  buffer = static_cast<uint8_t *>(malloc(capacity));
   if (!buffer) {
     CLOG_ERROR(LOG_MEM, "FrameAllocator: failed to allocate 16 MB frame slab!");
     std::abort();
@@ -124,7 +124,7 @@ void *FrameAllocator::alloc(size_t size, size_t alignment)
   do {
     /* Round up old_cursor to the requested alignment. */
     size_t aligned = (old_cursor + alignment - 1) & ~(alignment - 1);
-    new_cursor     = aligned + size;
+    new_cursor = aligned + size;
 
     if (new_cursor > capacity) {
       CLOG_ERROR(LOG_MEM,
@@ -162,7 +162,7 @@ size_t FrameAllocator::bytes_used() const
 void FrameAllocator::shutdown()
 {
   std::free(buffer);
-  buffer   = nullptr;
+  buffer = nullptr;
   capacity = 0;
   cursor.store(0, std::memory_order_relaxed);
 }
@@ -172,9 +172,7 @@ void *(*mem_frame_alloc)(size_t size) = [](size_t size) -> void * {
   return g_frame_allocator.alloc(size);
 };
 
-void (*mem_frame_end)() = []() {
-  g_frame_allocator.end_frame();
-};
+void (*mem_frame_end)() = []() { g_frame_allocator.end_frame(); };
 
 }  // namespace mem_guarded::internal
 
@@ -217,8 +215,8 @@ void *(*MEM_realloc_uninitialized_id)(void *vmemh, size_t len, const char * /*st
 
   /* Recover the original malloc pointer using the stored offset. */
   void *old_raw = (char *)old_head - old_head->raw_offset;
-  size_t total_size = old_head->raw_offset +
-                      sizeof(mem_guarded::internal::MemHead) + len + sizeof(uint32_t);
+  size_t total_size = old_head->raw_offset + sizeof(mem_guarded::internal::MemHead) + len +
+                      sizeof(uint32_t);
 
   void *raw = std::realloc(old_raw, total_size);
   if (!raw)
