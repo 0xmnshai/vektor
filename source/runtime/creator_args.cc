@@ -4,7 +4,7 @@
 #include "../../intern/clog/CLG_log.h"
 #include "creator_args.hh"
 #include "creator_global.h"
-#include "vektor_version.h"
+#include "kernel/intern/vektor.hh"
 
 namespace vektor::creator {
 
@@ -91,9 +91,11 @@ static int arg_handle_print_help(int, const char **, void *data)
 static int arg_handle_version(int, const char **, void *)
 {
   std::cout << "Vektor Engine Runtime \n";
-  std::cout << "Version: " << VEKTOR_VERSION << "\n";
   std::cout << "Build Date: " << __DATE__ << "\n";
   std::cout << "Build Time: " << __TIME__ << "\n";
+
+  std::cout << "Version: " << kernel::VKE_vektor_version_string() << "\n";
+
   exit(0);
   return 0;
 }

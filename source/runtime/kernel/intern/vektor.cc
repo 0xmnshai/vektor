@@ -1,9 +1,11 @@
+#include <cstdio>
+
 #include "vektor.hh"
 #include "vektor_version.h"
-#include <cstdio>
 
 static char vektor_version_string[64] = "";
 
+namespace vektor::kernel {
 const char *VKE_vektor_version_string()
 {
   snprintf(vektor_version_string,
@@ -17,3 +19,4 @@ const char *VKE_vektor_version_string()
 
   return vektor_version_string;
 }
+}  // namespace vektor

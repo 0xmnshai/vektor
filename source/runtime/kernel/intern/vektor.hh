@@ -1,5 +1,5 @@
 #pragma once
 
-namespace vektor {
+namespace vektor::kernel {
 const char *VKE_vektor_version_string();
 }

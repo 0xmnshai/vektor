@@ -1,57 +1,49 @@
-/* SPDX-FileCopyrightText: 2026 Vektor Engine. All rights reserved.
- *
- * SPDX-License-Identifier: GPL-2.0-or-later */
-
-/** \file
- * \ingroup dna
- * Implementation of the Vektor DNA system.
- */
-
 #include "DNA_genfile.h"
 #include <cstring>
 
 namespace vektor::dna {
 
-SDNA *DNA_sdna_from_data(const void *data, int32_t len, bool /*endian_swapped*/) {
-  if (!data || len < 8) return nullptr;
+SDNA *DNA_sdna_from_data(const void *data, int32_t len, bool /*endian_swapped*/)
+{
+  if (!data || len < 8)
+    return nullptr;
 
   const char *cp = (const char *)data;
-  if (strncmp(cp, "SDNA", 4) != 0) return nullptr;
+  if (strncmp(cp, "SDNA", 4) != 0)
+    return nullptr;
   cp += 4;
 
-  if (strncmp(cp, "NAME", 4) != 0) return nullptr;
+  if (strncmp(cp, "NAME", 4) != 0)
+    return nullptr;
   cp += 4;
 
   SDNA *sdna = new SDNA();
 
-  // This is a placeholder implementation.
-  // In a real scenario, we would parse the SDNA block byte-by-byte
-  // to extract the names, types, and structs vectors.
-  
-  // For now, let's just create a dummy "Transform" struct to show it works.
-  sdna->names.push_back("location");
+  sdna->names.emplace_back("location");
   sdna->types.push_back({"float", 4});
-  
+
   DNAStruct transform;
-  transform.type_index = 0; // index of "float" (obviously wrong, but for demo)
-  transform.members.push_back({0, 0}); // type 0, name 0
+  transform.type_index = 0;             // index of "float" (obviously wrong, but for demo)
+  transform.members.push_back({0, 0});  // type 0, name 0
   sdna->structs.push_back(transform);
 
   return sdna;
 }
 
-void DNA_sdna_free(SDNA *sdna) {
+void DNA_sdna_free(SDNA *sdna)
+{
   delete sdna;
 }
 
-void *DNA_struct_reconstruct(const SDNA * /*filesdna*/, 
-                             const SDNA * /*memsdna*/, 
-                             int32_t /*struct_index*/, 
-                             int32_t nr, 
-                             const void *data) {
+void *DNA_struct_reconstruct(const SDNA * /*filesdna*/,
+                             const SDNA * /*memsdna*/,
+                             int32_t /*struct_index*/,
+                             int32_t nr,
+                             const void *data)
+{
   // Simplified: binary copy if DNA matches.
   // In reality, this would perform field-by-field mapping.
-  int size = 16; // Dummy size
+  int size = 16;  // Dummy size
   void *new_data = malloc(size * nr);
   memcpy(new_data, data, size * nr);
   return new_data;

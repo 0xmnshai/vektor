@@ -6,6 +6,7 @@ namespace vpi {
 class VPI_QtEventConsumer : public VPI_IEventConsumer {
  public:
   VPI_TSuccess consume_event(VPI_Event *event) const noexcept override;
+
  protected:
   explicit VPI_QtEventConsumer() = default;
   ~VPI_QtEventConsumer() override = default;

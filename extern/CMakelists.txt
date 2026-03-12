@@ -121,6 +121,11 @@ set(SLANG_INCLUDE_TOOLS OFF CACHE BOOL "" FORCE)
 set(SLANG_INCLUDE_TESTS OFF CACHE BOOL "" FORCE)
 set(SLANG_INCLUDE_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SLANG_INCLUDE_DOCS OFF CACHE BOOL "" FORCE)
+# Disable Slang's internal test targets (SLANG_INCLUDE_TESTS only skips packaging,
+# SLANG_ENABLE_TESTS controls whether test targets like 'platform' are compiled)
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+# Provide GLM path so Slang can find it if tests/tools are ever re-enabled
+set(SLANG_OVERRIDE_GLM_PATH "${glm_SOURCE_DIR}" CACHE PATH "" FORCE)
 fetchcontent_makeavailable(slang)
 
 # fmt
