@@ -1,12 +1,16 @@
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "VPI_EventManager.hh"
-#include "VPI_IEvent.h"
 #include "VPI_IEventConsumer.h"
 #include "VPI_Types.h"
+
+#include "../../clog/CLG_log.h"
+
+CLG_LOGREF_DECLARE_GLOBAL(vpi_events, "vpi.events");
 
 namespace vpi {
 
@@ -31,14 +35,14 @@ uint32_t VPI_EventManager::get_num_events(VPI_EventType type) const noexcept
   return num_events;
 }
 
-VPI_TSuccess VPI_EventManager::push_event(std::unique_ptr<VPI_IEvent const> event)
+VPI_TSuccess VPI_EventManager::push_event(std::unique_ptr<VPI_Event const> event)
 {
   events_.push_back(std::move(event));
   num_events_++;
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_EventManager::pop_event(std::unique_ptr<VPI_IEvent const> &event)
+VPI_TSuccess VPI_EventManager::pop_event(std::unique_ptr<VPI_Event const> &event)
 {
   if (events_.empty()) {
     return VPI_kFailure;
@@ -49,12 +53,17 @@ VPI_TSuccess VPI_EventManager::pop_event(std::unique_ptr<VPI_IEvent const> &even
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_EventManager::dispatch_event(VPI_IEvent *event)
+VPI_TSuccess VPI_EventManager::dispatch_event(VPI_Event *event)
 {
-  std::vector<VPI_IEventConsumer const *>::iterator consumer_iter;
+  CLOG_INFO(vpi_events, "Dispatching event type: %d", (int)event->get_type());
 
-  for (consumer_iter = consumers_.begin(); consumer_iter != consumers_.end(); ++consumer_iter) {
-    (*consumer_iter)->consume_event(event);
+  for (auto const *consumer : consumers_) {
+    if (consumer->consume_event(event) == VPI_kSuccess) {
+      if (event->is_consumed() == VPI_kSuccess) {
+        CLOG_DEBUG(vpi_events, "Event consumed by: %p", (void *)consumer);
+        break;
+      }
+    }
   }
   return VPI_kSuccess;
 }
@@ -65,11 +74,11 @@ VPI_TSuccess VPI_EventManager::dispatch_event()
     return VPI_kFailure;
   }
 
-  std::unique_ptr<VPI_IEvent const> event = std::move(events_.back());
-  events_.pop_back();
+  std::unique_ptr<VPI_Event const> event = std::move(events_.front());
+  events_.pop_front();
 
-  VPI_IEvent const *event_ptr = event.get();
-  (void)dispatch_event(const_cast<VPI_IEvent *>(event_ptr));
+  VPI_Event const *event_ptr = event.get();
+  (void)dispatch_event(const_cast<VPI_Event *>(event_ptr));
   handled_events_.push_back(std::move(event));
   return VPI_kSuccess;
 }
@@ -87,16 +96,8 @@ VPI_TSuccess VPI_EventManager::dispatch_events()
 
 VPI_TSuccess VPI_EventManager::dispose_event()
 {
-  while (handled_events_.empty() == false) {
-    handled_events_[0].reset();
-    handled_events_.pop_front();
-  }
-
-  while (events_.empty() == false) {
-    events_[0].reset();
-    events_.pop_front();
-  }
-
+  handled_events_.clear();
+  events_.clear();
   return VPI_kSuccess;
 }
 

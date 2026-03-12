@@ -4,7 +4,7 @@
 #include <deque>
 #include <memory>
 
-#include "VPI_IEvent.h"
+#include "VPI_Event.hh"
 #include "VPI_IEventConsumer.h"
 #include "VPI_Types.h"
 
@@ -18,9 +18,9 @@ class VPI_EventManager {
 
   [[nodiscard]] uint32_t get_num_events(VPI_EventType type) const noexcept;
 
-  [[nodiscard]] VPI_TSuccess push_event(std::unique_ptr<VPI_IEvent const> event);
+  [[nodiscard]] VPI_TSuccess push_event(std::unique_ptr<VPI_Event const> event);
 
-  [[nodiscard]] VPI_TSuccess pop_event(std::unique_ptr<VPI_IEvent const> &event);
+  [[nodiscard]] VPI_TSuccess pop_event(std::unique_ptr<VPI_Event const> &event);
 
   [[nodiscard]] VPI_TSuccess dispatch_event();
 
@@ -28,7 +28,7 @@ class VPI_EventManager {
 
   [[nodiscard]] VPI_TSuccess dispose_event();
 
-  [[nodiscard]] VPI_TSuccess dispatch_event(VPI_IEvent *event);
+  [[nodiscard]] VPI_TSuccess dispatch_event(VPI_Event *event);
 
   [[nodiscard]] VPI_TSuccess add_consumer(VPI_IEventConsumer const *consumer);
 
@@ -37,8 +37,8 @@ class VPI_EventManager {
  private:
   uint32_t num_events_ = 0;
 
-  std::deque<std::unique_ptr<VPI_IEvent const>> events_;
-  std::deque<std::unique_ptr<VPI_IEvent const>> handled_events_;
+  std::deque<std::unique_ptr<VPI_Event const>> events_;
+  std::deque<std::unique_ptr<VPI_Event const>> handled_events_;
 
   std::vector<VPI_IEventConsumer const *> consumers_;
 };

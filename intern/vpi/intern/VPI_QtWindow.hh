@@ -8,13 +8,18 @@
 #include <QSize>
 #include <QSurfaceFormat>
 #include <QWidget>
+#include <new>
 
 #include "VPI_Window.hh"
 
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
+#include "intern/VPI_EventManager.hh"
+#include "intern/VPI_GLWidget.hh"
+#include "intern/VPI_WindowManager.hh"
 
 namespace vpi {
-class VPI_QtWindow : public VPI_Window, public QMainWindow {
+class VPI_QtWindow : public QMainWindow, public VPI_Window {
+  Q_OBJECT
  public:
   explicit VPI_QtWindow();
   ~VPI_QtWindow() override;
@@ -24,9 +29,32 @@ class VPI_QtWindow : public VPI_Window, public QMainWindow {
     return MEM_mallocN(size, "VPI_QtWindow");
   }
 
+  void *operator new(size_t size, std::align_val_t alignment)
+  {
+    return mem_guarded::internal::mem_mallocN_aligned_ex(
+        size,
+        static_cast<size_t>(alignment),
+        "VPI_QtWindow",
+        mem_guarded::internal::DestructorType::Trivial);
+  }
+
+  void *operator new(size_t /*size*/, void *ptr) noexcept
+  {
+    return ptr;
+  }
+
   void operator delete(void *ptr)
   {
     MEM_freeN(ptr);
+  }
+
+  void operator delete(void *ptr, std::align_val_t /*alignment*/)
+  {
+    MEM_freeN(ptr);
+  }
+
+  void operator delete(void * /*ptr*/, void * /*place*/) noexcept
+  {
   }
 
   void create_window(char const *title,
@@ -67,6 +95,23 @@ class VPI_QtWindow : public VPI_Window, public QMainWindow {
   void get_window_bounds(VPI_Rect &bounds) const override;
 
   void get_client_bounds(VPI_Rect &bounds) const override;
+
+  [[nodiscard]] inline VPI_WindowManager const &get_window_manager() const noexcept
+  {
+    return *window_manager_;
+  }
+
+  [[nodiscard]] inline VPI_EventManager const &get_event_manager() const noexcept
+  {
+    return *event_manager_;
+  }
+
+ protected:
+  VPI_GLWidget *gl_widget_;
+  VPI_WindowManager *window_manager_;
+  VPI_EventManager *event_manager_;
+
+  friend class VPI_System;
 };
 
 QString get_qt_style();

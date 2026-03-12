@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 enum VPI_TSuccess { VPI_kFailure = 0, VPI_kSuccess };
 
 enum VPI_EventType {
@@ -43,4 +44,35 @@ struct VPI_ContextParams {
   bool is_stereo_visual;
   bool is_debug;
   VPI_TVSyncModes vsync;
+};
+
+struct VPI_TEventCursorData {
+  int32_t x;
+  int32_t y;
+};
+
+struct VPI_TEventMouseButtonData {
+  int32_t x;
+  int32_t y;
+  uint32_t button;
+  uint32_t modifiers;
+};
+
+struct VPI_TEventMouseWheelData {
+  int32_t x;
+  int32_t y;
+  int32_t delta_x;
+  int32_t delta_y;
+  uint32_t modifiers;
+};
+
+struct VPI_TEventKeyData {
+  uint32_t key;
+  uint32_t modifiers;
+  bool is_repeat;
+};
+
+struct VPI_TEventCharData {
+  uint32_t character;
+  uint32_t modifiers;
 };

@@ -3,14 +3,14 @@
 
 namespace vpi {
 
-VPI_TSuccess VPI_WindowManager::add_window(VPI_IWindow *window)
+VPI_TSuccess VPI_WindowManager::add_window(VPI_Window *window)
 {
   windows_.push_back(window);
   active_window_ = window;
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_WindowManager::remove_window(VPI_IWindow const *window)
+VPI_TSuccess VPI_WindowManager::remove_window(VPI_Window const *window)
 {
   auto it = std::find(windows_.begin(), windows_.end(), window);
   if (it != windows_.end()) {
@@ -23,12 +23,12 @@ VPI_TSuccess VPI_WindowManager::remove_window(VPI_IWindow const *window)
   return VPI_kFailure;
 }
 
-std::vector<VPI_IWindow *> const &VPI_WindowManager::get_windows() const
+std::vector<VPI_Window *> const &VPI_WindowManager::get_windows() const
 {
   return windows_;
 }
 
-VPI_IWindow const *VPI_WindowManager::get_active_window() const
+VPI_Window const *VPI_WindowManager::get_active_window() const
 {
   return active_window_;
 }

@@ -1,10 +1,23 @@
 #include "VPI_QtWindow.hh"
+#include "intern/VPI_GLWidget.hh"
 
 namespace vpi {
 
-VPI_QtWindow::VPI_QtWindow() = default;
+VPI_QtWindow::VPI_QtWindow()
+{
+  gl_widget_ = new VPI_GLWidget();
+  window_manager_ = new VPI_WindowManager();
+  event_manager_ = new VPI_EventManager();
 
-VPI_QtWindow::~VPI_QtWindow() = default;
+  setCentralWidget(gl_widget_);
+}
+
+VPI_QtWindow::~VPI_QtWindow()
+{
+  delete gl_widget_;
+  delete window_manager_;
+  delete event_manager_;
+}
 
 void VPI_QtWindow::create_window(char const *title,
                                  int32_t left,
@@ -15,6 +28,7 @@ void VPI_QtWindow::create_window(char const *title,
 {
   setWindowTitle(title);
   setGeometry(left, top, static_cast<int>(width), static_cast<int>(height));
+  show();
 }
 
 VPI_TSuccess VPI_QtWindow::dispose() noexcept
@@ -95,9 +109,10 @@ VPI_TSuccess VPI_QtWindow::set_state(VPI_TWindowState state) noexcept
   return VPI_kSuccess;
 }
 
-bool VPI_QtWindow::process_events(bool wait_for_event) noexcept
+bool VPI_QtWindow::process_events(bool /*wait_for_event*/) noexcept
 {
   QCoreApplication::processEvents();
+  (void)event_manager_->dispatch_events();
   return isVisible();
 }
 
@@ -109,7 +124,7 @@ VPI_TSuccess VPI_QtWindow::get_native_handle(void const **handle) const noexcept
 
 VPI_TSuccess VPI_QtWindow::add_event_consumer(VPI_IEventConsumer *consumer) noexcept
 {
-  return VPI_kSuccess;
+  return event_manager_->add_consumer(consumer);
 }
 
 VPI_TSuccess VPI_QtWindow::get_cursor_position(int32_t *x, int32_t *y) const noexcept

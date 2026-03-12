@@ -11,7 +11,7 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGLWidgets)
 
 # Export compile commands for IDE/LSP (clangd) support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -49,6 +49,8 @@ endif()
 if(VEKTOR_BUILD_EDITOR)
     add_subdirectory(source/editor)
 endif()
+
+add_subdirectory(source/tests)
 
 set(COMPUTE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/compute")
 set(COMPUTE_TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/compute_target")
