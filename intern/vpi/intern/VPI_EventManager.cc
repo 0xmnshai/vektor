@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "VPI_EventManager.hh"
-#include "VPI_IEventConsumer.h"
 #include "VPI_Types.h"
 
 #include "../../clog/CLG_log.h"
@@ -109,13 +108,13 @@ VPI_TSuccess VPI_EventManager::dispose_event()
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_EventManager::add_consumer(VPI_IEventConsumer const *consumer)
+VPI_TSuccess VPI_EventManager::add_consumer(VPI_QtEventConsumer const *consumer)
 {
   consumers_.push_back(consumer);
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_EventManager::remove_consumer(VPI_IEventConsumer const *consumer)
+VPI_TSuccess VPI_EventManager::remove_consumer(VPI_QtEventConsumer const *consumer)
 {
   auto it = std::find(consumers_.begin(), consumers_.end(), consumer);
   if (it != consumers_.end()) {

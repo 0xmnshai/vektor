@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../VPI_IWindow.h"
+#include "VPI_QtEventConsumer.hh"
 
 namespace vpi {
 class VPI_Window : public VPI_IWindow {
@@ -38,7 +39,7 @@ class VPI_Window : public VPI_IWindow {
 
   [[nodiscard]] VPI_TSuccess get_native_handle(void const **handle) const noexcept override = 0;
 
-  VPI_TSuccess add_event_consumer(VPI_IEventConsumer *consumer) noexcept override = 0;
+  VPI_TSuccess add_event_consumer(VPI_QtEventConsumer *consumer) noexcept override = 0;
 
   [[nodiscard]] VPI_TSuccess get_cursor_position(int32_t *x,
                                                  int32_t *y) const noexcept override = 0;

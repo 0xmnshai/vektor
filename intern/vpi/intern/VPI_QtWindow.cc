@@ -122,7 +122,7 @@ VPI_TSuccess VPI_QtWindow::get_native_handle(void const **handle) const noexcept
   return VPI_kSuccess;
 }
 
-VPI_TSuccess VPI_QtWindow::add_event_consumer(VPI_IEventConsumer *consumer) noexcept
+VPI_TSuccess VPI_QtWindow::add_event_consumer(VPI_QtEventConsumer *consumer) noexcept
 {
   return event_manager_->add_consumer(consumer);
 }

@@ -6,7 +6,7 @@ namespace vpi {
 
 CLG_LOGREF_DECLARE_GLOBAL(QT_EventConsumer, "qt.event.consumer");
 
-VPI_TSuccess VPI_QtEventConsumer::consume_event(VPI_IEvent *event) const noexcept
+VPI_TSuccess VPI_QtEventConsumer::consume_event(VPI_Event *event) const noexcept
 {
   CLOG_INFO(QT_EventConsumer, "Consuming event of type: %d", event->get_type());
 

@@ -2,13 +2,13 @@
 #include <iostream>
 #include <thread>
 
-#include "VPI_IEventConsumer.h"
 #include "VPI_ISystem.h"
+#include "VPI_QtEventConsumer.hh"
 #include "intern/VPI_Event.hh"
 
-class TestEventConsumer : public vpi::VPI_IEventConsumer {
+class TestEventConsumer : public vpi::VPI_QtEventConsumer {
  public:
-  VPI_TSuccess consume_event(vpi::VPI_IEvent *event) const noexcept override
+  VPI_TSuccess consume_event(vpi::VPI_Event *event) const noexcept override
   {
     std::cout << "Received event of type: " << event->get_type() << std::endl;
 

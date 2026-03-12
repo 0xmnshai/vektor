@@ -15,6 +15,7 @@
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
 #include "intern/VPI_EventManager.hh"
 #include "intern/VPI_GLWidget.hh"
+#include "intern/VPI_QtEventConsumer.hh"
 #include "intern/VPI_WindowManager.hh"
 
 namespace vpi {
@@ -86,7 +87,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
 
   [[nodiscard]] VPI_TSuccess get_native_handle(void const **handle) const noexcept override;
 
-  VPI_TSuccess add_event_consumer(VPI_IEventConsumer *consumer) noexcept override;
+  VPI_TSuccess add_event_consumer(VPI_QtEventConsumer *consumer) noexcept override;
 
   [[nodiscard]] VPI_TSuccess get_cursor_position(int32_t *x, int32_t *y) const noexcept override;
 

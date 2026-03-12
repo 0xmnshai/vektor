@@ -1,7 +1,7 @@
 #pragma once
 
-#include "VPI_IEvent.h"
-#include "VPI_Types.h"
+#include "../VPI_IEvent.h"
+#include "../VPI_Types.h"
 
 namespace vpi {
 

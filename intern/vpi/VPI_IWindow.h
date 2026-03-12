@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include "VPI_IEventConsumer.h"
 #include "VPI_Rect.h"
 #include "VPI_Types.h"
+#include "intern/VPI_QtEventConsumer.hh"
 
 namespace vpi {
 class VPI_IWindow {
@@ -40,7 +40,7 @@ class VPI_IWindow {
 
   [[nodiscard]] virtual VPI_TSuccess get_native_handle(void const **handle) const noexcept = 0;
 
-  virtual VPI_TSuccess add_event_consumer(VPI_IEventConsumer *consumer) noexcept = 0;
+  virtual VPI_TSuccess add_event_consumer(VPI_QtEventConsumer *consumer) noexcept = 0;
 
   [[nodiscard]] virtual VPI_TSuccess get_cursor_position(int32_t *x,
                                                          int32_t *y) const noexcept = 0;

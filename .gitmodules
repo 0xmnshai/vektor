@@ -1,0 +1,79 @@
+[submodule "extern/deps/assimp-src"]
+	path = extern/deps/assimp-src
+	url = https://github.com/assimp/assimp.git
+
+[submodule "extern/deps/box2d-src"]
+	path = extern/deps/box2d-src
+	url = https://github.com/erincatto/box2d.git
+
+[submodule "extern/deps/cereal-src"]
+	path = extern/deps/cereal-src
+	url = https://github.com/USCiLab/cereal.git
+
+[submodule "extern/deps/draco-src"]
+	path = extern/deps/draco-src
+	url = https://github.com/google/draco.git
+
+[submodule "extern/deps/eigen-src"]
+	path = extern/deps/eigen-src
+	url = https://gitlab.com/libeigen/eigen.git
+
+[submodule "extern/deps/entt-src"]
+	path = extern/deps/entt-src
+	url = https://github.com/skypjack/entt.git
+
+[submodule "extern/deps/fmt-src"]
+	path = extern/deps/fmt-src
+	url = https://github.com/fmtlib/fmt.git
+
+[submodule "extern/deps/glfw-src"]
+	path = extern/deps/glfw-src
+	url = https://github.com/glfw/glfw.git
+
+[submodule "extern/deps/glm-src"]
+	path = extern/deps/glm-src
+	url = https://github.com/g-truc/glm.git
+
+[submodule "extern/deps/googletest-src"]
+	path = extern/deps/googletest-src
+	url = https://github.com/google/googletest.git
+
+[submodule "extern/deps/imgui-src"]
+	path = extern/deps/imgui-src
+	url = https://github.com/ocornut/imgui.git
+
+[submodule "extern/deps/jolt-src"]
+	path = extern/deps/jolt-src
+	url = https://github.com/jrouwe/JoltPhysics.git
+
+[submodule "extern/deps/nanosvg-src"]
+	path = extern/deps/nanosvg-src
+	url = https://github.com/memononen/nanosvg.git
+
+[submodule "extern/deps/openal-soft-src"]
+	path = extern/deps/openal-soft-src
+	url = https://github.com/kcat/openal-soft.git
+
+[submodule "extern/deps/pybind11-src"]
+	path = extern/deps/pybind11-src
+	url = https://github.com/pybind/pybind11.git
+
+[submodule "extern/deps/ser20-src"]
+	path = extern/deps/ser20-src
+	url = https://github.com/royjacobson/ser20.git
+
+[submodule "extern/deps/slang-src"]
+	path = extern/deps/slang-src
+	url = https://github.com/shader-slang/slang.git
+
+[submodule "extern/deps/stb-src"]
+	path = extern/deps/stb-src
+	url = https://github.com/nothings/stb.git
+
+[submodule "extern/deps/tinygltf-src"]
+	path = extern/deps/tinygltf-src
+	url = https://github.com/syoyo/tinygltf.git
+
+[submodule "extern/deps/tinyobjloader-src"]
+	path = extern/deps/tinyobjloader-src
+	url = https://github.com/tinyobjloader/tinyobjloader.git
