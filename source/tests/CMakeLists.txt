@@ -10,7 +10,7 @@ target_include_directories(tests_main PRIVATE
 target_link_libraries(tests_main PRIVATE
     vpi
 )
-
+ 
 if(APPLE)
     target_link_libraries(tests_main PUBLIC "-framework Cocoa")
 endif()

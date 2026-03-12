@@ -12,6 +12,7 @@ extern "C" int vpi_event_test_main(int argc, char **argv);
 struct TestDef {
   std::string name;
   int (*func)(int, char **);
+  bool needs_main_thread;
 };
 
 int main(int argc, char **argv)
@@ -24,22 +25,39 @@ int main(int argc, char **argv)
   }
 
   std::vector<TestDef> tests = {
-      {"VPI Event Test", reinterpret_cast<int (*)(int, char **)>(vpi_event_test_main)}};
+      {"VPI Event Test", reinterpret_cast<int (*)(int, char **)>(vpi_event_test_main), true}};
 
   std::cout << "Starting Vektor Parallel Test Runner..." << std::endl;
   if (!run_all) {
     std::cout << "Note: Running with default settings. Use --all to run all tests." << std::endl;
   }
-  std::cout << "Running " << tests.size() << " tests simultaneously." << std::endl;
+  std::cout << "Running " << tests.size() << " tests." << std::endl;
 
-  std::vector<std::thread> threads;
-  threads.reserve(tests.size());
+  std::vector<std::thread> parallel_threads;
   std::atomic<int> failed_count{0};
 
+  // 1. Start tests that can run in background threads
   for (const auto &test : tests) {
-    threads.emplace_back([&test, &failed_count]() {
-      std::cout << "[START] " << test.name << std::endl;
-      // We pass --tests to the sub-test to ensure it runs its logic
+    if (!test.needs_main_thread) {
+      parallel_threads.emplace_back([&test, &failed_count]() {
+        std::cout << "[START] " << test.name << " (Parallel Thread)" << std::endl;
+        const char *sub_argv[] = {test.name.c_str(), "--tests"};
+        int result = test.func(2, const_cast<char **>(sub_argv));
+        if (result != 0) {
+          std::cerr << "[FAIL] " << test.name << " returned " << result << std::endl;
+          failed_count++;
+        }
+        else {
+          std::cout << "[PASS] " << test.name << std::endl;
+        }
+      });
+    }
+  }
+
+  // 2. Run tests that MUST run on the main thread
+  for (const auto &test : tests) {
+    if (test.needs_main_thread) {
+      std::cout << "[START] " << test.name << " (Main Thread)" << std::endl;
       const char *sub_argv[] = {test.name.c_str(), "--tests"};
       int result = test.func(2, const_cast<char **>(sub_argv));
       if (result != 0) {
@@ -49,10 +67,11 @@ int main(int argc, char **argv)
       else {
         std::cout << "[PASS] " << test.name << std::endl;
       }
-    });
+    }
   }
 
-  for (auto &t : threads) {
+  // 3. Wait for all parallel tests to complete
+  for (auto &t : parallel_threads) {
     t.join();
   }
 
