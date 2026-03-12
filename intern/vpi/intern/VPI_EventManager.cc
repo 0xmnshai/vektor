@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -58,12 +59,15 @@ VPI_TSuccess VPI_EventManager::dispatch_event(VPI_Event *event)
   CLOG_INFO(vpi_events, "Dispatching event type: %d", (int)event->get_type());
 
   for (auto const *consumer : consumers_) {
+
+    std::cout << __FILE__ << __LINE__ << "Consumer Event : " << event->get_type();
+
     if (consumer->consume_event(event) == VPI_kSuccess) {
       if (event->is_consumed() == VPI_kSuccess) {
         CLOG_DEBUG(vpi_events, "Event consumed by: %p", (void *)consumer);
         // VPI_kWindowClose
         if (event->get_type() == VPI_kWindowClose) {
-          // we will use qt event consumer here and will close the system 
+          // we will use qt event consumer here and will close the system
         }
         break;
       }

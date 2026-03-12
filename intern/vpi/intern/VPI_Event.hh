@@ -22,11 +22,7 @@ class VPI_Event : public VPI_IEvent {
     return consumed_ ? VPI_kSuccess : VPI_kFailure;
   }
 
-  [[nodiscard]] VPI_TSuccess consume() const noexcept override
-  {
-    consumed_ = true;
-    return VPI_kSuccess;
-  }
+  [[nodiscard]] VPI_TSuccess consume() const noexcept override;
 
   [[nodiscard]] VPI_IWindow *get_window() const noexcept
   {
