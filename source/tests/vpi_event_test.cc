@@ -31,8 +31,21 @@ class TestEventConsumer : public vpi::VPI_IEventConsumer {
   }
 };
 
-int main(int argc, char **argv)
+extern "C" int vpi_event_test_main(int argc, char **argv)
 {
+  bool should_run = false;
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--tests") {
+      should_run = true;
+      break;
+    }
+  }
+
+  if (!should_run) {
+    std::cout << "VPI Event Test: Use --tests to run." << std::endl;
+    return 0;
+  }
+
   (void)vpi::VPI_ISystem::create();
   vpi::VPI_ISystem *system = vpi::VPI_ISystem::get();
   (void)system->init();

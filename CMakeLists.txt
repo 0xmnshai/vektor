@@ -37,6 +37,7 @@ include_directories("${PROJECT_BINARY_DIR}/generated")
 
 option(VEKTOR_BUILD_EDITOR "Build the Vektor editor" ON)
 option(VEKTOR_BUILD_RUNTIME "Build the Vektor runtime" ON)
+option(VEKTOR_BUILD_TESTS "Build the Vektor tests" ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -50,7 +51,9 @@ if(VEKTOR_BUILD_EDITOR)
     add_subdirectory(source/editor)
 endif()
 
-add_subdirectory(source/tests)
+if(VEKTOR_BUILD_TESTS)
+    add_subdirectory(source/tests)
+endif()
 
 set(COMPUTE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/compute")
 set(COMPUTE_TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/compute_target")

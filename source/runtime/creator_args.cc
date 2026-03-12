@@ -105,11 +105,20 @@ static int arg_handle_background_mode(int, const char **, void *)
   return 0;
 }
 
+static int arg_handle_tests(int, const char **, void *)
+{
+  std::cout << "To run tests, please execute the 'tests_main' binary in the build directory.\n";
+  std::cout << "Usage: ./bin/tests_main [--all]\n";
+  exit(0);
+  return 0;
+}
+
 void main_args_setup(Args &args)
 {
   args.add("-h", "--help", "Print this help text and exit", arg_handle_print_help, &args);
   args.add("-v", "--version", "Print Vektor version and exit", arg_handle_version);
   args.add("-b", "--background", "Run in background (headless) mode", arg_handle_background_mode);
+  args.add("", "--tests", "Show information on how to run tests", arg_handle_tests);
 }
 
 int main_args_handle(int argc, const char **argv)
