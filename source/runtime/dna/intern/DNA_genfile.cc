@@ -1,4 +1,4 @@
-#include "DNA_genfile.h"
+#include "../DNA_genfile.h"
 #include <cstring>
 
 namespace vektor::dna {
