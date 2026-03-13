@@ -1,5 +1,5 @@
 #[cxx::bridge]
-mod intern {
+mod intern_ffi {
     // Math Functions
     extern "Rust" {
         fn compute_matrices_rs(locals: &[f32], worlds: &mut [f32], count: usize);
