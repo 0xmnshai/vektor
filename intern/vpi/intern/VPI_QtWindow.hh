@@ -54,9 +54,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
     MEM_freeN(ptr);
   }
 
-  void operator delete(void * /*ptr*/, void * /*place*/) noexcept
-  {
-  }
+  void operator delete(void * /*ptr*/, void * /*place*/) noexcept {}
 
   void create_window(char const *title,
                      int32_t left,
@@ -106,6 +104,9 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
   {
     return *event_manager_;
   }
+
+  void setup_menus();
+  void setup_docks();
 
  protected:
   VPI_GLWidget *gl_widget_;

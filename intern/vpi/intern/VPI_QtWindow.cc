@@ -29,6 +29,8 @@ void VPI_QtWindow::create_window(char const *title,
   setWindowTitle(title);
   setGeometry(left, top, static_cast<int>(width), static_cast<int>(height));
   show();
+
+  setup_menus();
 }
 
 VPI_TSuccess VPI_QtWindow::dispose() noexcept
@@ -151,6 +153,15 @@ void VPI_QtWindow::get_client_bounds(VPI_Rect &bounds) const
 {
   QRect r = geometry();
   bounds.set(r.x(), r.y(), r.width(), r.height());
+}
+
+void VPI_QtWindow::setup_menus()
+{
+  
+}
+
+void VPI_QtWindow::setup_docks()
+{
 }
 
 QString get_qt_style()

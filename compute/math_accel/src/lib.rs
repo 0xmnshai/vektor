@@ -68,11 +68,7 @@ pub unsafe extern "C" fn vk_add_vectors(
             let a_chunk = &a_slice[i * 4..i * 4 + 4];
             let b_chunk = &b_slice[i * 4..i * 4 + 4];
             unsafe {
-                simd::add_vectors_simd(
-                    a_chunk.as_ptr(),
-                    b_chunk.as_ptr(),
-                    out_chunk.as_mut_ptr(),
-                );
+                simd::add_vectors_simd(a_chunk.as_ptr(), b_chunk.as_ptr(), out_chunk.as_mut_ptr());
             }
         });
 }
@@ -95,10 +91,7 @@ pub unsafe extern "C" fn vk_dot_products(
             let a_chunk = &a_slice[i * 4..i * 4 + 4];
             let b_chunk = &b_slice[i * 4..i * 4 + 4];
             unsafe {
-                *out_val = simd::dot_product_simd(
-                    a_chunk.as_ptr(),
-                    b_chunk.as_ptr(),
-                );
+                *out_val = simd::dot_product_simd(a_chunk.as_ptr(), b_chunk.as_ptr());
             }
         });
 }
