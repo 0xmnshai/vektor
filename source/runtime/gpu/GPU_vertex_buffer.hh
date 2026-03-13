@@ -51,7 +51,7 @@ class VertexBuffer {
   GPUVertFormat format;
 
   explicit VertexBuffer(uint32_t vertex_length, uint32_t vertex_data);
-  ~VertexBuffer();
+  ~VertexBuffer() = default;
 
   void allocate(uint32_t vert_len);
   void resize(uint32_t vert_len);

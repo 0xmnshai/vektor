@@ -16,8 +16,8 @@ class GPUSecondaryContext {
   GPUContext *gpu_context_;
 
  public:
-  GPUSecondaryContext();
-  ~GPUSecondaryContext();
+  GPUSecondaryContext() = default;
+  ~GPUSecondaryContext() = default;
 
   /** Must be called from a secondary thread. */
   void activate();

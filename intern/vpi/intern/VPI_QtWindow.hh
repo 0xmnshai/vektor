@@ -13,10 +13,11 @@
 #include "VPI_Window.hh"
 
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
-#include "intern/VPI_EventManager.hh"
-#include "intern/VPI_GLWidget.hh"
-#include "intern/VPI_QtEventConsumer.hh"
-#include "intern/VPI_WindowManager.hh"
+#include "../intern/VPI_EventManager.hh"
+#include "../intern/VPI_GLWidget.hh"
+#include "../intern/VPI_QtEventConsumer.hh"
+#include "../intern/VPI_WindowManager.hh"
+#include "../../intern/qt/ui/UI_style_manager.h"
 
 namespace vpi {
 class VPI_QtWindow : public QMainWindow, public VPI_Window {
@@ -112,10 +113,8 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
   VPI_GLWidget *gl_widget_;
   VPI_WindowManager *window_manager_;
   VPI_EventManager *event_manager_;
+  qt::ui::UI_style_manager *style_manager_;
 
   friend class VPI_System;
 };
-
-QString get_qt_style();
-
 }  // namespace vpi

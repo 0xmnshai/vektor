@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <queue>
 #include <thread>
 #include <vector>
 
-#include "gpu/GPU_context.h"
+#include "../gpu/GPU_context.h"
 
 namespace vektor::gpu {
 
@@ -29,8 +31,8 @@ class GPUWorker {
     High,
   };
 
-  GPUWorker(uint32_t threads_count, ContextType context_type, WorkCallback callback);
-  ~GPUWorker();
+  explicit GPUWorker(uint32_t threads_count, ContextType context_type, WorkCallback callback);
+  ~GPUWorker() = default;
 
   WorkID push_work(void *work, ThreadQueueWorkPriority priority);
   bool cancel_work(WorkID id);

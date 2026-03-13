@@ -1,12 +1,12 @@
 #include <qwidget.h>
 #include <vector>
 
+#include "../../intern/clog/CLG_log.h"
+#include "../../intern/qt/ui/UI_style_manager.h"
 #include "../../source/editor/windowmanager/wm_event_types.h"
 #include "VPI_System.hh"
 #include "intern/CLG_init.hh"
 #include "intern/VPI_QtWindow.hh"
-
-#include "../../intern/clog/CLG_log.h"
 
 namespace vpi {
 
@@ -103,7 +103,7 @@ VPI_TSuccess VPI_System::init()
   QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
   qt_app_ = new QApplication(argc, argv);
-  qt_app_->setStyleSheet(vpi::get_qt_style());
+  qt_app_->setStyleSheet(qt::ui::UI_style_manager::get_qt_style());
   qt_app_->installEventFilter(this);
 
   qt_window_ = new VPI_QtWindow();
