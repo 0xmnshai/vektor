@@ -4,8 +4,12 @@
 #include <QObject>
 #include <cstdint>
 
-#include "VPI_Types.h"
 #include "../vpi/intern/VPI_QtWindow.hh"
+#include "VPI_Types.h"
+
+#ifndef METAL
+#  define METAL
+#endif
 
 namespace vpi {
 class VPI_ISystem {
@@ -23,11 +27,11 @@ class VPI_ISystem {
   static VPI_ISystem *get_background();
 
   virtual VPI_QtWindow *create_window(char const *title,
-                                    int32_t left,
-                                    int32_t top,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    VPI_QtWindow const *parent_window) noexcept = 0;
+                                      int32_t left,
+                                      int32_t top,
+                                      uint32_t width,
+                                      uint32_t height,
+                                      VPI_QtWindow const *parent_window) noexcept = 0;
 
   virtual VPI_TSuccess init() = 0;
 
@@ -36,7 +40,7 @@ class VPI_ISystem {
   [[nodiscard]] virtual uint64_t get_milliseconds() const noexcept = 0;
 
   [[nodiscard]] virtual VPI_QtWindow *get_window_under_cursor(int32_t x,
-                                                            int32_t y) const noexcept = 0;
+                                                              int32_t y) const noexcept = 0;
 
  protected:
   virtual VPI_TSuccess process_events_impl(bool wait_for_event) = 0;

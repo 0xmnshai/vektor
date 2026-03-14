@@ -1,8 +1,8 @@
 #pragma once
 
-#include "VPI_Types.h"
-#include "intern/VPI_Context.hh"
-#include "intern/VPI_Window.hh"
+#include "../VPI_Types.h"
+#include "VPI_Context.hh"
+#include "VPI_Window.hh"
 
 #ifdef __OBJC__
 #  include <AppKit/AppKit.h>
@@ -11,6 +11,8 @@
 #  include <QuartzCore/QuartzCore.h>
 #else
 
+typedef struct objc_object MTLDevice;
+typedef struct objc_object MTLCommandQueue;
 typedef struct objc_object NSView;
 typedef struct objc_object CAMetalLayer;
 typedef struct objc_object MTLRenderPassDescriptor;
@@ -18,6 +20,8 @@ typedef struct objc_object MTLRenderPipelineState;
 typedef struct objc_object MTLTexture;
 typedef struct objc_object CAMetalDrawable;
 
+#  define MTLDeviceRef void *
+#  define MTLCommandQueueRef void *
 #  define MTLRenderPipelineStateRef void *
 #  define MTLTextureRef void *
 #  define CAMetalDrawableRef void *
@@ -25,19 +29,20 @@ typedef struct objc_object CAMetalDrawable;
 
 namespace vpi {
 class VPI_ContextMTL : public VPI_Context {
+ public:
   explicit VPI_ContextMTL(const VPI_ContextParams &context_params,
-                          NSView *metalView,
-                          CAMetalLayer *metalLayer);
+                          void *metalView,
+                          void *metalLayer);
 
   ~VPI_ContextMTL() override;
 
-  [[nodiscard]] VPI_TSuccess activate_context() const override = 0;
+  [[nodiscard]] VPI_TSuccess init_context() const override;
 
-  [[nodiscard]] VPI_TSuccess release_context() const override = 0;
+  [[nodiscard]] VPI_TSuccess release_context() const override;
 
-  [[nodiscard]] virtual VPI_TSuccess initialise_context() const override = 0;
+  [[nodiscard]] VPI_TSuccess release_native_handles() const override;
 
-  virtual VPI_TSuccess release_native_handles() override = 0;
+  void resize_context(uint32_t width, uint32_t height) const override;
 
 #ifdef __OBJC__
   void metal_register_present_callbacks(void (*callback)(
@@ -52,10 +57,15 @@ class VPI_ContextMTL : public VPI_Context {
   static int s_shared_count_;
 
   NSView *metal_view_;
+  NSView *metal_subview_;
   CAMetalLayer *metal_layer_;
 #ifdef __OBJC__
+  id<MTLDevice> metal_device_;
+  id<MTLCommandQueue> metal_command_queue_;
   id<MTLRenderPipelineState> metal_render_pipeline_;
 #else
+  MTLDeviceRef metal_device_;
+  MTLCommandQueueRef metal_command_queue_;
   MTLRenderPipelineStateRef metal_render_pipeline_;
 #endif
   bool owns_metal_device_;

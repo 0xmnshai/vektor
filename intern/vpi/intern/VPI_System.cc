@@ -202,7 +202,6 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
 
   if (obj->isWidgetType()) {
     QWidget *widget = qobject_cast<QWidget *>(obj);
-    printf("Filter hit for widget: %p, event: %d\n", (void *)obj, event->type());
     while (widget) {
       window = qobject_cast<VPI_QtWindow *>(widget);
       if (window) {
@@ -259,7 +258,7 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       VPI_TEventCursorData data = {};
       data.x = static_cast<int32_t>(me->position().x());
       data.y = static_cast<int32_t>(me->position().y());
-      CLOG_INFO(SYS_LOG, "Mouse move: %d, %d", data.x, data.y);
+      // CLOG_INFO(SYS_LOG, "Mouse move: %d, %d", data.x, data.y);
       (void)window->event_manager_->push_event(std::make_unique<VPI_MouseMoveEvent>(window, data));
       break;
     }
@@ -271,8 +270,8 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       data.delta_x = we->angleDelta().x();
       data.delta_y = we->angleDelta().y();
       data.modifiers = we->modifiers();
-      CLOG_INFO(
-          SYS_LOG, "Mouse Wheel: %d, %d at %d, %d", data.delta_x, data.delta_y, data.x, data.y);
+      // CLOG_INFO(
+      //     SYS_LOG, "Mouse Wheel: %d, %d at %d, %d", data.delta_x, data.delta_y, data.x, data.y);
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_MouseWheelEvent>(window, data));
       break;

@@ -175,10 +175,11 @@ void VPI_QtWindow::setup_menus() {}
 
 void VPI_QtWindow::setup_docks()
 {
-  setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks);
+  setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AnimatedDocks);
 
   auto *scene_dock = new QDockWidget("Scene", this);
   scene_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  scene_dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
 
   auto *view_port_widget = new qt::dock::ViewportWidget();
   scene_dock->setWidget(view_port_widget);

@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstdint>
-#include <iostream>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -55,11 +54,11 @@ VPI_TSuccess VPI_EventManager::pop_event(std::unique_ptr<VPI_Event const> &event
 
 VPI_TSuccess VPI_EventManager::dispatch_event(VPI_Event *event)
 {
-  CLOG_INFO(vpi_events, "Dispatching event type: %d", (int)event->get_type());
+  // CLOG_INFO(vpi_events, "Dispatching event type: %d", (int)event->get_type());
 
   for (auto const *consumer : consumers_) {
 
-    std::cout << __FILE__ << __LINE__ << "Consumer Event : " << event->get_type();
+    // std::cout << __FILE__ << __LINE__ << "Consumer Event : " << event->get_type();
 
     if (consumer->consume_event(event) == VPI_kSuccess) {
       if (event->is_consumed() == VPI_kSuccess) {

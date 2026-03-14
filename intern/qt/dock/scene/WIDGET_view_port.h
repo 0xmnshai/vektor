@@ -2,7 +2,7 @@
 
 #include <QWidget>
 
-#include "../../../vpi/intern/VPI_GLWidget.hh"
+#include "../../../../intern/vpi/intern/VPI_GLWidget.hh"
 
 namespace qt::dock {
 class ViewportWidget : public vpi::VPI_GLWidget {
@@ -10,7 +10,7 @@ class ViewportWidget : public vpi::VPI_GLWidget {
   explicit ViewportWidget(QWidget *parent = nullptr) : vpi::VPI_GLWidget(parent) {}
   ~ViewportWidget() override = default;
 
-
-  
+  void init() override;
 };
+
 }  // namespace qt::dock

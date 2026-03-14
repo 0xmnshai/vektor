@@ -56,7 +56,7 @@ void tick()
       char const *title = nullptr;
       (void)win_under_cursor->get_title(&title);
       if (title) {
-        CLOG_INFO(CREATOR_LOG, "Window under cursor: %s", title);
+        // CLOG_INFO(CREATOR_LOG, "Window under cursor: %s", title);
       }
     }
   }
