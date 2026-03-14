@@ -129,6 +129,17 @@ GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_
   return shader;
 };
 
+void print_compute_results()
+{
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+  auto *result = (float *)glMapBufferRange(
+      GL_SHADER_STORAGE_BUFFER, 0, 1024 * sizeof(float), GL_MAP_READ_BIT);
+  for (size_t i = 0; i < 1024; i++) {
+    CLOG_INFO(LOG_SHADER, "[GPU_shader] Compute result: %f", result[i]);
+  }
+  glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+}
+
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader)
 {
   return shader ? shader->program : nullptr;

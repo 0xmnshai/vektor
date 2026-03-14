@@ -9,12 +9,6 @@ QOpenGLShaderProgram *SlangLoader::load(const QString &vert_path,
                                         const QString &frag_path,
                                         QObject *parent)
 {
-  //   auto *shader = new QOpenGLShaderProgram(parent);
-  //   shader->addShaderFromSourceFile(QOpenGLShader::Vertex, vert_path);
-  //   shader->addShaderFromSourceFile(QOpenGLShader::Fragment, frag_path);
-  //   shader->link();
-  //   return shader;
-
   GPUShader *shader = GPU_shader_create_from_slang(vert_path.toUtf8().constData(),
                                                    frag_path.toUtf8().constData());
 
@@ -29,7 +23,6 @@ QOpenGLShaderProgram *SlangLoader::load(const QString &vert_path,
     prog->setParent(parent);
   }
 
-  // NOTE: In a full Blender-style refactor, we would return GPUShader* and manage its lifetime.
   // For now, we return the program and leak the thin GPUShader wrapper (or we'd need to free it).
   // Actually, let's just make SlangLoader return the program and handle the GPUShader cleanup
   // locally but keep the program alive. This is tricky because GPU_shader_free deletes the

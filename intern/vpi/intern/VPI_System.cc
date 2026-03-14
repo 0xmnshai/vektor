@@ -74,12 +74,12 @@ VPI_System::VPI_System() : qt_window_(nullptr), qt_app_(nullptr)
 
 VPI_System::~VPI_System() = default;
 
-VPI_Window *VPI_System::create_window(char const *title,
-                                      int32_t left,
-                                      int32_t top,
-                                      uint32_t width,
-                                      uint32_t height,
-                                      VPI_Window const *parent_window) noexcept
+VPI_QtWindow *VPI_System::create_window(char const *title,
+                                        int32_t left,
+                                        int32_t top,
+                                        uint32_t width,
+                                        uint32_t height,
+                                        VPI_QtWindow const *parent_window) noexcept
 {
   qt_window_->create_window(title, left, top, width, height, parent_window);
   qt_window_->window_manager_->add_window(qt_window_);
@@ -129,18 +129,39 @@ uint64_t VPI_System::get_milliseconds() const noexcept
   return (uint64_t)timer_.elapsed();
 }
 
-VPI_TSuccess VPI_System::register_window(VPI_Window *window) noexcept
+VPI_TSuccess VPI_System::register_window(VPI_QtWindow *window) noexcept
 {
   return qt_window_->window_manager_->add_window(window);
 }
 
-VPI_Window *VPI_System::get_window_under_cursor(int32_t x, int32_t y) const noexcept
+VPI_QtWindow *VPI_System::wrap_widget(QWidget *widget)
 {
-  std::vector<VPI_Window *> windows = qt_window_->window_manager_->get_windows();
-  std::vector<VPI_Window *>::reverse_iterator iwindow_iter;
+  if (widget == nullptr) {
+    CLOG_ERROR(SYS_LOG, "Widget is null");
+    return nullptr;
+  }
+
+  for (auto *win : qt_window_->window_manager_->get_windows()) {
+    if (win->get_widget() == widget) {
+      return win;
+    }
+  }
+
+  auto *new_window = new VPI_QtWindow();
+  auto *gl_widget = (VPI_GLWidget *)widget;
+  (void)register_window(new_window);
+  new_window->set_widget(gl_widget);
+
+  return new_window;
+}
+
+VPI_QtWindow *VPI_System::get_window_under_cursor(int32_t x, int32_t y) const noexcept
+{
+  std::vector<VPI_QtWindow *> windows = qt_window_->window_manager_->get_windows();
+  std::vector<VPI_QtWindow *>::reverse_iterator iwindow_iter;
 
   for (iwindow_iter = windows.rbegin(); iwindow_iter != windows.rend(); ++iwindow_iter) {
-    VPI_Window *win = *iwindow_iter;
+    VPI_QtWindow *win = *iwindow_iter;
 
     if (win->get_state() == VPI_kWindowStateMinimized) {
       continue;

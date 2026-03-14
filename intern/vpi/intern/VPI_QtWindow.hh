@@ -10,14 +10,15 @@
 #include <QWidget>
 #include <new>
 
-#include "VPI_Window.hh"
-
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
+#include "../../intern/qt/ui/UI_style_manager.h"
 #include "../intern/VPI_EventManager.hh"
 #include "../intern/VPI_GLWidget.hh"
 #include "../intern/VPI_QtEventConsumer.hh"
-#include "../intern/VPI_WindowManager.hh"
-#include "../../intern/qt/ui/UI_style_manager.h"
+#include "VPI_Window.hh"
+#include "VPI_Window.hh"
+#include "VPI_WindowManager.hh"
+#include "VPI_EventManager.hh"
 
 namespace vpi {
 class VPI_QtWindow : public QMainWindow, public VPI_Window {
@@ -96,14 +97,18 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
 
   void get_client_bounds(VPI_Rect &bounds) const override;
 
-  [[nodiscard]] inline VPI_WindowManager const &get_window_manager() const noexcept
+  [[nodiscard]] VPI_WindowManager const &get_window_manager() const noexcept;
+
+  [[nodiscard]] VPI_EventManager const &get_event_manager() const noexcept;
+
+  [[nodiscard]] inline QWidget *get_widget() const noexcept
   {
-    return *window_manager_;
+    return widget_;
   }
 
-  [[nodiscard]] inline VPI_EventManager const &get_event_manager() const noexcept
+  inline void set_widget(QWidget *widget)
   {
-    return *event_manager_;
+    widget_ = widget;
   }
 
   void setup_menus();
@@ -114,6 +119,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
   VPI_WindowManager *window_manager_;
   VPI_EventManager *event_manager_;
   qt::ui::UI_style_manager *style_manager_;
+  QWidget *widget_;
 
   friend class VPI_System;
 };

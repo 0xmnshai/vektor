@@ -4,9 +4,9 @@
 #include <deque>
 #include <memory>
 
+#include "../VPI_Types.h"
 #include "VPI_Event.hh"
-#include "VPI_Types.h"
-#include "intern/VPI_QtEventConsumer.hh"
+#include "VPI_QtEventConsumer.hh"
 
 namespace vpi {
 class VPI_EventManager {

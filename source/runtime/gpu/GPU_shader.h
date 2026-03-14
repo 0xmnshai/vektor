@@ -4,14 +4,18 @@
 
 namespace vektor::gpu {
 
+#define GL_SHADER_STORAGE_BUFFER 0x90D2
+
 typedef struct GPUShader {
   QOpenGLShaderProgram *program;
-  // We could store names etc. here if needed for debugging
+
 } GPUShader;
 
 GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_path);
 
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
+
+static void print_compute_results();
 
 void GPU_shader_bind(GPUShader *shader);
 

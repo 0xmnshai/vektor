@@ -1,15 +1,17 @@
 #include "VPI_QtWindow.hh"
+#include "VPI_EventManager.hh"
+#include "VPI_WindowManager.hh"
 #include "intern/VPI_GLWidget.hh"
 
 namespace vpi {
 
 VPI_QtWindow::VPI_QtWindow()
+    : gl_widget_(new VPI_GLWidget()),
+      window_manager_(new VPI_WindowManager()),
+      event_manager_(new VPI_EventManager()),
+      style_manager_(new qt::ui::UI_style_manager()),
+      widget_(nullptr)
 {
-  gl_widget_ = new VPI_GLWidget();
-  window_manager_ = new VPI_WindowManager();
-  event_manager_ = new VPI_EventManager();
-  style_manager_ = new qt::ui::UI_style_manager();
-
   setCentralWidget(gl_widget_);
 }
 
@@ -154,6 +156,16 @@ void VPI_QtWindow::get_client_bounds(VPI_Rect &bounds) const
 {
   QRect r = geometry();
   bounds.set(r.x(), r.y(), r.width(), r.height());
+}
+
+VPI_WindowManager const &VPI_QtWindow::get_window_manager() const noexcept
+{
+  return *window_manager_;
+}
+
+VPI_EventManager const &VPI_QtWindow::get_event_manager() const noexcept
+{
+  return *event_manager_;
 }
 
 void VPI_QtWindow::setup_menus() {}

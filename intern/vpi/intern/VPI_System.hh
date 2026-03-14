@@ -5,7 +5,7 @@
 
 #include "VPI_ISystem.h"
 #include "VPI_Types.h"
-#include "intern/VPI_QtWindow.hh"
+#include "../intern/VPI_QtWindow.hh"
 
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
 
@@ -50,12 +50,12 @@ class VPI_System : public QObject, public VPI_ISystem {
     MEM_freeN(ptr);
   }
 
-  [[nodiscard]] VPI_Window *create_window(char const *title,
+  [[nodiscard]] VPI_QtWindow *create_window(char const *title,
                                           int32_t left,
                                           int32_t top,
                                           uint32_t width,
                                           uint32_t height,
-                                          VPI_Window const *parent_window) noexcept override;
+                                          VPI_QtWindow const *parent_window) noexcept override;
 
   VPI_TSuccess init() override;
 
@@ -63,9 +63,11 @@ class VPI_System : public QObject, public VPI_ISystem {
 
   [[nodiscard]] uint64_t get_milliseconds() const noexcept override;
 
-  [[nodiscard]] VPI_Window *get_window_under_cursor(int32_t x, int32_t y) const noexcept override;
+  [[nodiscard]] VPI_QtWindow *get_window_under_cursor(int32_t x, int32_t y) const noexcept override;
 
-  [[nodiscard]] VPI_TSuccess register_window(VPI_Window *window) noexcept;
+  [[nodiscard]] VPI_TSuccess register_window(VPI_QtWindow *window) noexcept;
+
+  [[nodiscard]] VPI_QtWindow *wrap_widget(QWidget *widget);
 
  protected:
   VPI_TSuccess process_events_impl(bool wait_for_event) override;
