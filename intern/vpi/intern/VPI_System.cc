@@ -1,5 +1,4 @@
 #include <qwidget.h>
-#include <vector>
 
 #include "../../intern/clog/CLG_log.h"
 #include "../../intern/qt/ui/UI_style_manager.h"
@@ -148,32 +147,38 @@ VPI_QtWindow *VPI_System::wrap_widget(QWidget *widget)
   }
 
   auto *new_window = new VPI_QtWindow();
-  auto *gl_widget = (VPI_GLWidget *)widget;
-  (void)register_window(new_window);
-  new_window->set_widget(gl_widget);
+  (void)this->register_window(new_window);
+  new_window->set_widget(widget);
+
+  if (auto *dock = qobject_cast<QDockWidget *>(widget)) {
+    (void)new_window->set_title(dock->windowTitle().toStdString().c_str());
+  }
 
   return new_window;
 }
 
-VPI_QtWindow *VPI_System::get_window_under_cursor(int32_t x, int32_t y) const noexcept
+VPI_QtWindow *VPI_System::get_window_under_cursor(int32_t /*x*/, int32_t /*y*/) const noexcept
 {
-  std::vector<VPI_QtWindow *> windows = qt_window_->window_manager_->get_windows();
-  std::vector<VPI_QtWindow *>::reverse_iterator iwindow_iter;
+  QWidget *widget = QApplication::widgetAt(QCursor::pos());
+  if (!widget) {
+    return nullptr;
+  }
 
-  for (iwindow_iter = windows.rbegin(); iwindow_iter != windows.rend(); ++iwindow_iter) {
-    VPI_QtWindow *win = *iwindow_iter;
-
-    if (win->get_state() == VPI_kWindowStateMinimized) {
-      continue;
+  while (widget) {
+    // Check if it's a VPI_QtWindow (Main Window or already wrapped window)
+    if (auto *vpi_win = qobject_cast<VPI_QtWindow *>(widget)) {
+      return vpi_win;
     }
 
-    VPI_Rect bounds;
-
-    win->get_client_bounds(bounds);
-
-    if (bounds.is_inside(x, y)) {
-      return win;
+    // Check if it's a floating dock widget (Panel)
+    if (auto *dock = qobject_cast<QDockWidget *>(widget)) {
+      if (dock->isFloating()) {
+        // We found a floating panel, wrap it if not already wrapped
+        return const_cast<VPI_System *>(this)->wrap_widget(dock);
+      }
     }
+
+    widget = widget->parentWidget();
   }
 
   return nullptr;

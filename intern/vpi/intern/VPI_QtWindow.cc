@@ -3,6 +3,8 @@
 #include "VPI_WindowManager.hh"
 #include "intern/VPI_GLWidget.hh"
 
+#include "../../intern/qt/dock/scene/WIDGET_view_port.h"
+
 namespace vpi {
 
 VPI_QtWindow::VPI_QtWindow()
@@ -34,6 +36,7 @@ void VPI_QtWindow::create_window(char const *title,
   show();
 
   setup_menus();
+  setup_docks();
 }
 
 VPI_TSuccess VPI_QtWindow::dispose() noexcept
@@ -149,13 +152,13 @@ VPI_TSuccess VPI_QtWindow::set_cursor_position(int32_t x, int32_t y) noexcept
 void VPI_QtWindow::get_window_bounds(VPI_Rect &bounds) const
 {
   QRect r = frameGeometry();
-  bounds.set(r.x(), r.y(), r.width(), r.height());
+  bounds.set(r.x(), r.y(), r.x() + r.width(), r.y() + r.height());
 }
 
 void VPI_QtWindow::get_client_bounds(VPI_Rect &bounds) const
 {
   QRect r = geometry();
-  bounds.set(r.x(), r.y(), r.width(), r.height());
+  bounds.set(r.x(), r.y(), r.x() + r.width(), r.y() + r.height());
 }
 
 VPI_WindowManager const &VPI_QtWindow::get_window_manager() const noexcept
@@ -170,5 +173,15 @@ VPI_EventManager const &VPI_QtWindow::get_event_manager() const noexcept
 
 void VPI_QtWindow::setup_menus() {}
 
-void VPI_QtWindow::setup_docks() {}
+void VPI_QtWindow::setup_docks()
+{
+  setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks);
+
+  auto *scene_dock = new QDockWidget("Scene", this);
+  scene_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+
+  auto *view_port_widget = new qt::dock::ViewportWidget();
+  scene_dock->setWidget(view_port_widget);
+  addDockWidget(Qt::RightDockWidgetArea, scene_dock);
+}
 }  // namespace vpi
