@@ -11,7 +11,7 @@ vpi::VPI_ISystem *g_system = nullptr;
 vpi::VPI_IWindow *g_main_window = nullptr;
 vpi::VPI_IContext *g_graphics_context = nullptr;
 
-CLG_LOGREF_DECLARE_GLOBAL(V_LOG, "creator");
+CLG_LOGREF_DECLARE_GLOBAL(CREATOR_LOG, "creator");
 
 creator::ApplicationState app_state = []() {
   creator::ApplicationState app_state{};
@@ -56,7 +56,7 @@ void tick()
       char const *title = nullptr;
       (void)win_under_cursor->get_title(&title);
       if (title) {
-        CLOG_INFO(V_LOG, "Window under cursor: %s", title);
+        CLOG_INFO(CREATOR_LOG, "Window under cursor: %s", title);
       }
     }
   }
