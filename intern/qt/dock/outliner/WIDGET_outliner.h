@@ -1,4 +1,5 @@
 #pragma once
+#include <QMouseEvent>
 #include <QTimer>
 #include <QWidget>
 
@@ -17,14 +18,16 @@ class OutlinerWidget : public QWidget {
   void refresh_entities();
   void on_search_text_changed(const QString &text);
   void apply_filter();
-  void on_item_clicked(const QModelIndex &index);
+ 
+ protected:
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
  private:
   QTreeView *tree_view_;
   QStandardItemModel *model_;
   QSortFilterProxyModel *proxy_model_;
   QLineEdit *search_bar_;
-  QTimer *timer_;
   QTimer *filter_timer_;
+  bool is_refreshing_ = false;
 };
 }  // namespace qt::dock

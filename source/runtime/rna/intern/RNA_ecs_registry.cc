@@ -1,3 +1,4 @@
+#include "entt/entity/fwd.hpp"
 #include "entt/entt.hpp"
 
 #include "../../dna/DNA_object_type.h"

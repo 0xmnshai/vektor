@@ -48,9 +48,25 @@ void ViewportWidget::init()
                                 "Cylinder",
                                 vektor::dna::DNA_ENTITY_CYLINDER,
                                 vektor::dna::DNA_MESH,
+                                0.0f,
+                                0.0f,
+                                0.0f,
                                 1.0f,
                                 0.5f,
                                 0.2f);
+
+  // Test: Create a cylinder entity
+  vektor::kernel::create_entity(nullptr,
+                                nullptr,
+                                "Cylinder_2",
+                                vektor::dna::DNA_ENTITY_CYLINDER,
+                                vektor::dna::DNA_MESH,
+                                10.0f,
+                                0.0f,
+                                10.0f,
+                                0.6f,
+                                0.8f,
+                                0.4f);
 }
 
 void ViewportWidget::paintGL()

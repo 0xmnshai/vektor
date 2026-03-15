@@ -12,15 +12,22 @@
 #include "../../lib/intern/appdir.h"
 #include <string>
 
+extern "C" {
+void outliner_notify_scene_changed();
+}
+
 namespace vektor::kernel {
 void create_entity(rna::VektorRNA *v_rna,
                    rna::RNAStruct *object_type,
                    const char *name,
                    int type,
                    int object_type_dna,
-                   float r,
-                   float g,
-                   float b)
+                   float x = 0.0f,
+                   float y = 0.0f,
+                   float z = 0.0f,
+                   float r = 1.0f,
+                   float g = 1.0f,
+                   float b = 1.0f)
 {
   auto *registry = (ECSRegistry *)rna::RNA_ecs_get_registry();
   auto entity = (entt::entity)rna::RNA_ecs_create_entity();
@@ -33,13 +40,12 @@ void create_entity(rna::VektorRNA *v_rna,
 
   object->object_type = (dna::ObjectTypeDNA)object_type_dna;
 
-  object->transform.location = glm::vec3(0.0f, 0.0f, 0.0f);
+  object->transform.location = glm::vec3(x, y, z);
   object->transform.scale = glm::vec3(1.0f, 1.0f, 1.0f);
   object->transform.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
   object->material.color = glm::vec4(r, g, b, 1.0f);
 
-  // Automatic shader attachment for cylinders
   if (object->type == dna::DNA_ENTITY_CYLINDER) {
     std::string base_path = vektor::lib::get_application_dir_path();
     std::string vert_path = base_path +
@@ -55,5 +61,7 @@ void create_entity(rna::VektorRNA *v_rna,
 
   rna::PointerRNA object_ptr = rna::RNA_pointer_from_entity<dna::Object>(
       registry->registry(), entity, object_type);
+
+  outliner_notify_scene_changed();
 }
 }  // namespace vektor::kernel

@@ -6,9 +6,9 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <iostream>
 
 #include "../WIDGET_outliner.h"
+#include "../scene/SCN_notifier.h"
 
 #include "../../../../../source/runtime/dna/DNA_object_type.h"
 #include "../../../../../source/runtime/rna/RNA_ecs_registry.h"
@@ -55,15 +55,16 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
       "QTreeView { background-color: #212121; alternate-background-color: "
       "#2b2b2b; "
       "border: none; color: #bbb; outline: none; }"
-      "QTreeView::item:selected { background-color: #3e5f8a; color: white; }"
+      "QTreeView::item:selected { background-color: rgba(214, 184, 131, 255); color: black; }"
       "QHeaderView::section { background-color: #333; color: #888; border: "
       "1px solid #222; padding: 4px; }");
 
   layout->addWidget(tree_view_);
 
-  timer_ = new QTimer(this);
-  connect(timer_, &QTimer::timeout, this, &OutlinerWidget::refresh_entities);
-  timer_->start(1000);
+  connect(qt::scene::SCN_notifier::instance(),
+          &qt::scene::SCN_notifier::sceneChanged,
+          this,
+          &OutlinerWidget::refresh_entities);
 
   filter_timer_ = new QTimer(this);
   filter_timer_->setSingleShot(true);
@@ -71,22 +72,50 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
   connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerWidget::on_search_text_changed);
 
-  connect(tree_view_, &QTreeView::clicked, this, &OutlinerWidget::on_item_clicked);
+  connect(tree_view_->selectionModel(),
+          &QItemSelectionModel::selectionChanged,
+          [this](const QItemSelection &selected, const QItemSelection &deselected) {
+            if (is_refreshing_) {
+              return;
+            }
+            auto &registry = vektor::kernel::ECSRegistry::instance();
+
+            for (const auto &index : deselected.indexes()) {
+              if (index.column() != 0)
+                continue;
+              QModelIndex source_index = proxy_model_->mapToSource(index);
+              QStandardItem *item = model_->itemFromIndex(source_index);
+              if (item && item->data(Qt::UserRole).isValid()) {
+                auto entity = (entt::entity)item->data(Qt::UserRole).toUInt();
+                vektor::rna::RNA_ecs_set_selected(&registry, entity, false);
+              }
+            }
+
+            for (const auto &index : selected.indexes()) {
+              if (index.column() != 0)
+                continue;
+              QModelIndex source_index = proxy_model_->mapToSource(index);
+              QStandardItem *item = model_->itemFromIndex(source_index);
+              if (item && item->data(Qt::UserRole).isValid()) {
+                auto entity = (entt::entity)item->data(Qt::UserRole).toUInt();
+                vektor::rna::RNA_ecs_set_selected(&registry, entity, true);
+                vektor::rna::RNA_ecs_set_active(&registry, entity, true);
+              }
+            }
+          });
+
+  tree_view_->viewport()->installEventFilter(this);
 }
 
-void OutlinerWidget::on_item_clicked(const QModelIndex &index)
+bool OutlinerWidget::eventFilter(QObject *watched, QEvent *event)
 {
-  QModelIndex source_index = proxy_model_->mapToSource(index);
-  QStandardItem *item = model_->itemFromIndex(source_index);
-
-  if (item && item->data(Qt::UserRole).isValid()) {
-    auto entity = item->data(Qt::UserRole).toUInt();
-
-    vektor::rna::RNA_ecs_set_selected(
-        &vektor::kernel::ECSRegistry::instance(), (entt::entity)entity, true);
-    vektor::rna::RNA_ecs_set_active(
-        &vektor::kernel::ECSRegistry::instance(), (entt::entity)entity, true);
+  if (watched == tree_view_->viewport() && event->type() == QEvent::MouseButtonPress) {
+    auto *mouse_event = dynamic_cast<QMouseEvent *>(event);
+    if (!tree_view_->indexAt(mouse_event->pos()).isValid()) {
+      tree_view_->selectionModel()->clearSelection();
+    }
   }
+  return QWidget::eventFilter(watched, event);
 }
 
 void OutlinerWidget::on_search_text_changed(const QString &)
@@ -101,6 +130,7 @@ void OutlinerWidget::apply_filter()
 
 void OutlinerWidget::refresh_entities()
 {
+  is_refreshing_ = true;
   model_->removeRows(0, model_->rowCount());
 
   auto *root_item = new QStandardItem("Scene Collection");
@@ -126,9 +156,20 @@ void OutlinerWidget::refresh_entities()
     extra_item->setData((unsigned int)entity, Qt::UserRole);
 
     collection_item->appendRow({name_item, type_item, extra_item});
+
+    // Restore selection state from ECS
+    if (vektor::rna::RNA_ecs_is_selected(&vektor::kernel::ECSRegistry::instance(),
+                                         (entt::entity)entity))
+    {
+      QModelIndex source_index = model_->indexFromItem(name_item);
+      QModelIndex proxy_index = proxy_model_->mapFromSource(source_index);
+      tree_view_->selectionModel()->select(
+          proxy_index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    }
   }
 
   tree_view_->expandAll();
+  is_refreshing_ = false;
 }
 
 }  // namespace qt::dock
