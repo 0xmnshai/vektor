@@ -25,6 +25,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
   Q_OBJECT
  public:
   explicit VPI_QtWindow();
+  explicit VPI_QtWindow(QWidget *widget);
   ~VPI_QtWindow() override;
 
   void *operator new(size_t size)

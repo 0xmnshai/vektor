@@ -1,3 +1,6 @@
+#include <qapplication.h>
+#include <qcursor.h>
+#include <qdockwidget.h>
 #include <qwidget.h>
 
 #include "../../intern/clog/CLG_log.h"
@@ -146,9 +149,8 @@ VPI_QtWindow *VPI_System::wrap_widget(QWidget *widget)
     }
   }
 
-  auto *new_window = new VPI_QtWindow();
+  auto *new_window = new VPI_QtWindow(widget);
   (void)this->register_window(new_window);
-  new_window->set_widget(widget);
 
   if (auto *dock = qobject_cast<QDockWidget *>(widget)) {
     (void)new_window->set_title(dock->windowTitle().toStdString().c_str());
@@ -173,8 +175,12 @@ VPI_QtWindow *VPI_System::get_window_under_cursor(int32_t /*x*/, int32_t /*y*/) 
     // Check if it's a floating dock widget (Panel)
     if (auto *dock = qobject_cast<QDockWidget *>(widget)) {
       if (dock->isFloating()) {
-        // We found a floating panel, wrap it if not already wrapped
-        return const_cast<VPI_System *>(this)->wrap_widget(dock);
+        // We only return it if it's already wrapped. We don't wrap it here.
+        for (auto *win : qt_window_->window_manager_->get_windows()) {
+          if (win->get_widget() == static_cast<QWidget *>(dock)) {
+            return win;
+          }
+        }
       }
     }
 
@@ -270,8 +276,8 @@ bool VPI_System::event_filter(QObject *obj, QEvent *event)
       data.delta_x = we->angleDelta().x();
       data.delta_y = we->angleDelta().y();
       data.modifiers = we->modifiers();
-      // CLOG_INFO(
-      //     SYS_LOG, "Mouse Wheel: %d, %d at %d, %d", data.delta_x, data.delta_y, data.x, data.y);
+      CLOG_INFO(
+          SYS_LOG, "Mouse Wheel: %d, %d at %d, %d", data.delta_x, data.delta_y, data.x, data.y);
       (void)window->event_manager_->push_event(
           std::make_unique<VPI_MouseWheelEvent>(window, data));
       break;

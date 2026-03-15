@@ -115,12 +115,33 @@ static int arg_handle_tests(int, const char **, void *)
   return 0;
 }
 
+static int arg_handle_opengl(int, const char **, void *)
+{
+  G.gpu_backend = GPU_BACKEND_OPENGL;
+  return 0;
+}
+
+static int arg_handle_metal(int, const char **, void *)
+{
+  G.gpu_backend = GPU_BACKEND_METAL;
+  return 0;
+}
+
 void main_args_setup(Args &args)
 {
   args.add("-h", "--help", "Print this help text and exit", arg_handle_print_help, &args);
   args.add("-v", "--version", "Print Vektor version and exit", arg_handle_version);
   args.add("-b", "--background", "Run in background (headless) mode", arg_handle_background_mode);
   args.add("", "--tests", "Show information on how to run tests", arg_handle_tests);
+
+  args.add("", "--opengl", "Force OpenGL graphics backend", arg_handle_opengl);
+  args.add("", "--metal", "Force Metal graphics backend", arg_handle_metal);
+
+#ifdef __APPLE__
+  G.gpu_backend = GPU_BACKEND_METAL;
+#else
+  G.gpu_backend = GPU_BACKEND_OPENGL;
+#endif
 }
 
 int main_args_handle(int argc, const char **argv)

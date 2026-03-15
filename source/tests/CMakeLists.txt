@@ -9,6 +9,7 @@ target_include_directories(tests_main PRIVATE
 
 target_link_libraries(tests_main PRIVATE
     vpi
+    runtime
 )
  
 if(APPLE)

@@ -1,4 +1,4 @@
-file(GLOB SRC "*.h" "*.hh" "*.cc" "intern/*.hh" "intern/*.cc")
+file(GLOB SRC "*.h" "*.hh" "*.cc" "*.mm" "intern/*.hh" "intern/*.cc" "intern/*.mm")
 
 add_library(gpu STATIC ${SRC})
 
@@ -9,6 +9,5 @@ target_include_directories(gpu PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_link_libraries(gpu PUBLIC Qt6::Core Qt6::Widgets Qt6::OpenGLWidgets clog slang)
 
 # Subdirectories for backend implementations
-# add_subdirectory(opengl)
-# add_subdirectory(metal)
-# add_subdirectory(intern)
+add_subdirectory(shaders)
+target_link_libraries(gpu PUBLIC shaders)

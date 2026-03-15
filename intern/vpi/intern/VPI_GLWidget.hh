@@ -1,38 +1,37 @@
 #pragma once
 
 #include <QEvent>
+#include <QResizeEvent>
+#include <QShowEvent>
 #include <QWidget>
-#include <QtOpenGLWidgets/QtOpenGLWidgets>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include "VPI_Context.hh"
+#include "../../../source/runtime/creator_global.h"
 
 namespace vpi {
-#if defined(__APPLE__) || defined(METAL)
-class VPI_GLWidget : public QWidget {
-#else
+// On macOS, if we are using OpenGL, we MUST inherit from QOpenGLWidget.
+// If we are using Metal, we use QWidget as a container for CAMetalLayer.
+inline bool is_metal_backend() {
+    return vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL;
+}
+
 class VPI_GLWidget : public QOpenGLWidget {
-#endif
   Q_OBJECT
  public:
-#if defined(__APPLE__) || defined(METAL)
-  explicit VPI_GLWidget(QWidget *parent = nullptr) : QWidget(parent) {}
-#else
-  explicit VPI_GLWidget(QWidget *parent = nullptr) : QOpenGLWidget(parent) {}
-#endif
+  explicit VPI_GLWidget(QWidget *parent = nullptr);
 
   ~VPI_GLWidget() override = default;
 
   virtual void init();
 
-#if !defined(__APPLE__) && !defined(METAL)
-  // from QT: QOpenGLWidget
   void initializeGL() override;
   void paintGL() override;
   void resizeGL(int width, int height) override;
-#else
-  void resizeGL(int width, int height);
-#endif
+
+  void paintEvent(QPaintEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
+  void showEvent(QShowEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
@@ -44,5 +43,6 @@ class VPI_GLWidget : public QOpenGLWidget {
   // graphics context ...
   void init_vpi_context();
   VPI_Context *context_ = nullptr;  // we will use this for metal_context or opengl_context
+  bool initialized_ = false;
 };
 }  // namespace vpi

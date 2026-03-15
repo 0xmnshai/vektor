@@ -1,3 +1,10 @@
+#include "../SHDR_slang.h"
+
+namespace vektor::gpu {
+    
+}
+
+/*
 #include "../GPU_slang.h"
 #include "../../GPU_shader.h"
 #include "../../intern/clog/CLG_log.h"
@@ -35,3 +42,5 @@ QOpenGLShaderProgram *SlangLoader::load(const QString &vert_path,
   return prog;
 }
 }  // namespace vektor::gpu
+
+*/

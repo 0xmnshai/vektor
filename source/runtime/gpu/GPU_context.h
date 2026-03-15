@@ -1,6 +1,6 @@
 #pragma once
 
-#include "intern/VPI_Context.hh"
+#include "../../intern/vpi/intern/VPI_Context.hh"
 
 namespace vektor::gpu {
 

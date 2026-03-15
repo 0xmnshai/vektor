@@ -20,12 +20,13 @@ typedef struct objc_object MTLRenderPipelineState;
 typedef struct objc_object MTLTexture;
 typedef struct objc_object CAMetalDrawable;
 
-#  define MTLDeviceRef void *
-#  define MTLCommandQueueRef void *
-#  define MTLRenderPipelineStateRef void *
-#  define MTLTextureRef void *
-#  define CAMetalDrawableRef void *
 #endif /* __OBJC__ */
+
+#define MTLDeviceRef void *
+#define MTLCommandQueueRef void *
+#define MTLRenderPipelineStateRef void *
+#define MTLTextureRef void *
+#define CAMetalDrawableRef void *
 
 namespace vpi {
 class VPI_ContextMTL : public VPI_Context {
@@ -44,12 +45,44 @@ class VPI_ContextMTL : public VPI_Context {
 
   void resize_context(uint32_t width, uint32_t height) const override;
 
+  static MTLDeviceRef get_current_device();
+
+  [[nodiscard]] void *get_current_command_encoder() const
+  {
+    return current_encoder_;
+  }
+  [[nodiscard]] void *get_current_render_pass_descriptor() const
+  {
+    return current_pass_desc_;
+  }
+
+  void begin_render_pass();
+  void end_render_pass();
+
 #ifdef __OBJC__
   void metal_register_present_callbacks(void (*callback)(
       MTLRenderPassDescriptor *, id<MTLRenderPipelineState>, id<MTLTexture>, id<CAMetalDrawable>));
+
+  id<MTLDevice> get_metal_device() const
+  {
+    return metal_device_;
+  }
+  id<MTLCommandQueue> get_metal_command_queue() const
+  {
+    return metal_command_queue_;
+  }
 #else
   void metal_register_present_callbacks(void (*callback)(
       MTLRenderPassDescriptor *, MTLRenderPipelineStateRef, MTLTextureRef, CAMetalDrawableRef));
+
+  [[nodiscard]] MTLDeviceRef get_metal_device() const
+  {
+    return metal_device_;
+  }
+  [[nodiscard]] MTLCommandQueueRef get_metal_command_queue() const
+  {
+    return metal_command_queue_;
+  }
 #endif
 
  protected:
@@ -70,7 +103,7 @@ class VPI_ContextMTL : public VPI_Context {
 #endif
   bool owns_metal_device_;
 
-  static const int METAL_SWAPCHAIN_SIZE = 3;
+  static const int METAL_SWAPCHAIN_SIZE = 2;
   struct MTLSwapchainTexture {
 #ifdef __OBJC__
     id<MTLTexture> texture;
@@ -87,11 +120,13 @@ class VPI_ContextMTL : public VPI_Context {
                                  id<MTLRenderPipelineState>,
                                  id<MTLTexture>,
                                  id<CAMetalDrawable>);
+  dispatch_semaphore_t frame_semaphore_;
 #else
   void (*contextPresentCallback)(MTLRenderPassDescriptor *,
                                  MTLRenderPipelineStateRef,
                                  MTLTextureRef,
                                  CAMetalDrawableRef);
+  void *frame_semaphore_;
 #endif
 
   int mtl_SwapInterval;
@@ -102,5 +137,9 @@ class VPI_ContextMTL : public VPI_Context {
   void metal_init_framebuffers();
   void metal_update_Framebuffer();
   void metal_init_clear() {};
+
+  void *current_command_buffer_ = nullptr;
+  void *current_encoder_ = nullptr;
+  void *current_pass_desc_ = nullptr;
 };
 }  // namespace vpi

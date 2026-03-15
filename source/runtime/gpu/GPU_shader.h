@@ -2,25 +2,36 @@
 
 #include <QOpenGLShaderProgram>
 
+#include "../../intern/clog/CLG_log.h"
+
 namespace vektor::gpu {
+
+CLG_LOGREF_DECLARE_EXTERN(LOG_SHADER);
 
 #define GL_SHADER_STORAGE_BUFFER 0x90D2
 
 typedef struct GPUShader {
-  QOpenGLShaderProgram *program;
+  enum {
+    GPU_BACKEND_OPENGL,
+    GPU_BACKEND_METAL,
+  } backend;
 
+  // for opengl
+  QOpenGLShaderProgram *program;
+  // for metal (MTL::RenderPipelineState*, etc. using void* to avoid header mess)
+  void *metal_pipeline;
 } GPUShader;
 
 GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_path);
+GPUShader *GPU_shader_create_from_source(const char *vert_path, const char *frag_path);
 
+// for opengl
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
-
+// for metal ?
 static void print_compute_results();
 
 void GPU_shader_bind(GPUShader *shader);
-
 void GPU_shader_unbind(GPUShader *shader);
-
 void GPU_shader_free(GPUShader *shader);
 
 void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val);

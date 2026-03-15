@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mutex>
-#include <sys/types.h>
-#include <cstdio>
-#include <pthread.h>
 #include <cstdint>
+#include <cstdio>
+#include <mutex>
+#include <pthread.h>
+#include <sys/types.h>
 
 #define CLOG_BUF_LEN_INIT 512
 
@@ -225,6 +225,8 @@ inline CLG_LogRef::CLG_LogRef(const char *identifier)
 #define CLG_LOGREF_DECLARE_GLOBAL(var, id) \
   static clog::CLG_LogRef _static_##var(id); \
   clog::CLG_LogRef *(var) = &_static_##var
+
+#define CLG_LOGREF_DECLARE_EXTERN(var) extern clog::CLG_LogRef(*(var))
 
 #define CLOG_ENSURE(clg_ref) \
   (((clg_ref))->type ? ((clg_ref))->type : (clog::CLG_logref_init(clg_ref), ((clg_ref))->type))
