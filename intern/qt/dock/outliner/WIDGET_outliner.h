@@ -17,6 +17,7 @@ class OutlinerWidget : public QWidget {
   void refresh_entities();
   void on_search_text_changed(const QString &text);
   void apply_filter();
+  void on_item_clicked(const QModelIndex &index);
 
  private:
   QTreeView *tree_view_;

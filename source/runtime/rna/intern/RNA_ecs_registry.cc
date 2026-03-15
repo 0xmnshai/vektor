@@ -24,5 +24,23 @@ dna::Object *RNA_ecs_get_object(ECSRegistry *registry, entt::entity entity)
 {
   return &registry->add_component<dna::Object>(entity);
 }
+
+bool RNA_ecs_is_selected(ECSRegistry *registry, entt::entity entity)
+{
+  if (registry->registry().any_of<dna::Selected>(entity)) {
+    return registry->registry().get<dna::Selected>(entity).selected;
+  }
+  return false;
+}
+
+void RNA_ecs_set_selected(ECSRegistry *registry, entt::entity entity, bool selected)
+{
+  registry->emplace_or_replace<dna::Selected>(entity, selected);
+}
+
+void RNA_ecs_set_active(ECSRegistry *registry, entt::entity entity, bool active)
+{
+  registry->emplace_or_replace<dna::Active>(entity, active);
+}
 }
 }  // namespace vektor::rna

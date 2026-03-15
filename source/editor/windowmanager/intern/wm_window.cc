@@ -20,15 +20,12 @@ namespace vektor {
 
 struct WindowRuntime {
   void *glfw_win;
-  // ... other runtime state
 };
 
 struct wmWindow {
   int winid;
   wmWindow *parent;
   WindowRuntime *runtime;
-  struct bScreen *screen;
-  struct WorkSpace *workspace;
   const char *title;
   int posx, posy, sizex, sizey;
 };
@@ -91,7 +88,7 @@ wmWindow *wm_window_new(const Main * /*vkmain*/,
                         bool dialog)
 {
   auto *win = mem::MEM_new<wmWindow>("window");
-  
+
   wm->windows.push_back(win);
   win->winid = find_free_winid(wm);
 
@@ -101,17 +98,14 @@ wmWindow *wm_window_new(const Main * /*vkmain*/,
   return win;
 }
 
-wmWindow *WM_window_open(vkContext * /*C*/,
+wmWindow *WM_window_open(lib::vkContext * /*C*/,
                          const char *title,
-                         const rcti * /*rect_unscaled*/,
                          int /*space_type*/,
                          bool /*toplevel*/,
                          bool dialog,
                          bool /*temp*/,
                          eWindowAlignment /*alignment*/,
-                         void (* /*area_setup_fn*/)(bScreen *screen,
-                                                    ScrArea *area,
-                                                    void *user_data),
+                         void (* /*area_setup_fn*/)(void *user_data),
                          void * /*area_setup_user_data*/)
 {
   // This would normally come from a global or context
@@ -130,10 +124,4 @@ bool WM_window_is_temp_screen(const wmWindow * /*win*/)
 {
   return false;
 }
-
-bScreen *WM_window_get_active_screen(const wmWindow *win)
-{
-  return win->screen;
-}
-
 }  // namespace vektor

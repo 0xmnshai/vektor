@@ -4,6 +4,14 @@
 
 namespace vektor::dna {
 
+struct Selected {
+  bool selected;
+};
+
+struct Active {
+  bool active;
+};
+
 // we can add more as needed
 typedef enum EntityTypeDNA {
   DNA_ENTITY_CUBE = 0,

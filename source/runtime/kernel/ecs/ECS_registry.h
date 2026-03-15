@@ -28,6 +28,11 @@ class ECSRegistry {
     return registry_.emplace<T>(entity, std::forward<Args>(args)...);
   }
 
+  template<typename T, typename... Args> T &emplace_or_replace(entt::entity entity, Args &&...args)
+  {
+    return registry_.emplace_or_replace<T>(entity, std::forward<Args>(args)...);
+  }
+
   template<typename T> T &get_component(entt::entity entity)
   {
     return registry_.get<T>(entity);

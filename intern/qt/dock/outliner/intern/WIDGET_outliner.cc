@@ -1,16 +1,19 @@
 #include <QAbstractItemView>
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QTreeView>
-#include <QSortFilterProxyModel>
 #include <QVBoxLayout>
+#include <iostream>
 
 #include "../WIDGET_outliner.h"
 
 #include "../../../../../source/runtime/dna/DNA_object_type.h"
+#include "../../../../../source/runtime/rna/RNA_ecs_registry.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
+
 #include "RNA_define.h"
 
 namespace qt::dock {
@@ -64,9 +67,26 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
 
   filter_timer_ = new QTimer(this);
   filter_timer_->setSingleShot(true);
-  connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
 
+  connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
   connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerWidget::on_search_text_changed);
+
+  connect(tree_view_, &QTreeView::clicked, this, &OutlinerWidget::on_item_clicked);
+}
+
+void OutlinerWidget::on_item_clicked(const QModelIndex &index)
+{
+  QModelIndex source_index = proxy_model_->mapToSource(index);
+  QStandardItem *item = model_->itemFromIndex(source_index);
+
+  if (item && item->data(Qt::UserRole).isValid()) {
+    auto entity = item->data(Qt::UserRole).toUInt();
+
+    vektor::rna::RNA_ecs_set_selected(
+        &vektor::kernel::ECSRegistry::instance(), (entt::entity)entity, true);
+    vektor::rna::RNA_ecs_set_active(
+        &vektor::kernel::ECSRegistry::instance(), (entt::entity)entity, true);
+  }
 }
 
 void OutlinerWidget::on_search_text_changed(const QString &)
@@ -100,6 +120,10 @@ void OutlinerWidget::refresh_entities()
     auto *type_item = new QStandardItem(
         QString::fromUtf8(vektor::rna::rna_enum_object_type_to_string(obj.object_type)));
     auto *extra_item = new QStandardItem("");
+
+    name_item->setData((unsigned int)entity, Qt::UserRole);
+    type_item->setData((unsigned int)entity, Qt::UserRole);
+    extra_item->setData((unsigned int)entity, Qt::UserRole);
 
     collection_item->appendRow({name_item, type_item, extra_item});
   }
