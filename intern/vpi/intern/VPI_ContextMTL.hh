@@ -103,7 +103,7 @@ class VPI_ContextMTL : public VPI_Context {
 #endif
   bool owns_metal_device_;
 
-  static const int METAL_SWAPCHAIN_SIZE = 2;
+  static const int METAL_SWAPCHAIN_SIZE = 3;
   struct MTLSwapchainTexture {
 #ifdef __OBJC__
     id<MTLTexture> texture;

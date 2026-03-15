@@ -85,7 +85,7 @@ void VPI_ContextMTL::metal_init()
       metal_layer_.framebufferOnly = YES;
       metal_layer_.contentsScale = [NSScreen mainScreen].backingScaleFactor;
       metal_layer_.presentsWithTransaction = NO;
-      metal_layer_.maximumDrawableCount = 2;
+      metal_layer_.maximumDrawableCount = 3;
       metal_layer_.opaque = YES;
       metal_layer_.displaySyncEnabled = YES;
 

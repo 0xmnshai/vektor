@@ -34,7 +34,6 @@ void VPI_GLWidget::init()
 
   if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
     setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_PaintOnScreen);
   }
 
   initialized_ = true;
