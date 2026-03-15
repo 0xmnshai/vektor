@@ -1,4 +1,4 @@
-file(GLOB SRC "*.h" "*.cc" "intern/*.hh" "intern/*.cc")
+file(GLOB SRC "*.h" "*.cc" "*.mm" "intern/*.hh" "intern/*.cc")
 
 add_library(loader STATIC ${SRC})
 set_target_properties(loader PROPERTIES AUTOMOC ON)
