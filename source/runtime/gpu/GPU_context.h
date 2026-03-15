@@ -12,7 +12,7 @@ class GPUContext {
 
 class GPUSecondaryContext {
  private:
-  vpi::VPI_Context *ghost_context_;
+  vpi::VPI_Context *vpi_context_;
   GPUContext *gpu_context_;
 
  public:

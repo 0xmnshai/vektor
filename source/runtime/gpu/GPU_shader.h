@@ -25,9 +25,7 @@ typedef struct GPUShader {
 GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_path);
 GPUShader *GPU_shader_create_from_source(const char *vert_path, const char *frag_path);
 
-// for opengl
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
-// for metal ?
 static void print_compute_results();
 
 void GPU_shader_bind(GPUShader *shader);

@@ -1,13 +1,6 @@
 #include "../SHDR_slang.h"
-
-namespace vektor::gpu {
-    
-}
-
-/*
-#include "../GPU_slang.h"
-#include "../../GPU_shader.h"
 #include "../../intern/clog/CLG_log.h"
+#include "../../GPU_shader.h"
 
 namespace vektor::gpu {
 CLG_LOGREF_DECLARE_GLOBAL(LOG_GPU, "gpu_slang");
@@ -35,12 +28,7 @@ QOpenGLShaderProgram *SlangLoader::load(const QString &vert_path,
   // locally but keep the program alive. This is tricky because GPU_shader_free deletes the
   // program.
 
-  // Better: keep the GPUShader wrap but let the user manage it?
-  // No, user wants SlangLoader::load to return QOpenGLShaderProgram*.
-
   // We'll modify GPU_shader_free to have an option or just do a custom return here.
   return prog;
 }
 }  // namespace vektor::gpu
-
-*/

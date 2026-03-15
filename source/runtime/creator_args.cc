@@ -137,11 +137,12 @@ void main_args_setup(Args &args)
   args.add("", "--opengl", "Force OpenGL graphics backend", arg_handle_opengl);
   args.add("", "--metal", "Force Metal graphics backend", arg_handle_metal);
 
-#ifdef __APPLE__
-  G.gpu_backend = GPU_BACKEND_METAL;
-#else
+  // using opengl in default for now ...
+// #ifdef __APPLE__
+//   G.gpu_backend = GPU_BACKEND_METAL;
+// #else
   G.gpu_backend = GPU_BACKEND_OPENGL;
-#endif
+// #endif
 }
 
 int main_args_handle(int argc, const char **argv)
