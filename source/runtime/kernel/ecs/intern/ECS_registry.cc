@@ -13,10 +13,11 @@
 #include <string>
 
 namespace vektor::kernel {
-void create_entity(rna::VektorRNA *b_rna,
+void create_entity(rna::VektorRNA *v_rna,
                    rna::RNAStruct *object_type,
                    const char *name,
                    int type,
+                   int object_type_dna,
                    float r,
                    float g,
                    float b)
@@ -29,6 +30,8 @@ void create_entity(rna::VektorRNA *b_rna,
   object->type = (dna::EntityTypeDNA)type;
   strncpy(object->id_name, name, sizeof(object->id_name) - 1);
   object->id_name[sizeof(object->id_name) - 1] = '\0';
+
+  object->object_type = (dna::ObjectTypeDNA)object_type_dna;
 
   object->transform.location = glm::vec3(0.0f, 0.0f, 0.0f);
   object->transform.scale = glm::vec3(1.0f, 1.0f, 1.0f);

@@ -43,8 +43,14 @@ void ViewportWidget::init()
   timer_.start(16);
 
   // Test: Create a cylinder entity
-  vektor::kernel::create_entity(
-      nullptr, nullptr, "TestCylinder", vektor::dna::DNA_ENTITY_CYLINDER, 1.0f, 0.5f, 0.2f);
+  vektor::kernel::create_entity(nullptr,
+                                nullptr,
+                                "Cylinder",
+                                vektor::dna::DNA_ENTITY_CYLINDER,
+                                vektor::dna::DNA_MESH,
+                                1.0f,
+                                0.5f,
+                                0.2f);
 }
 
 void ViewportWidget::paintGL()
@@ -90,11 +96,6 @@ void ViewportWidget::paintGL()
   // Render ECS objects
   auto &registry = vektor::kernel::ECSRegistry::instance().registry();
   auto objects_view = registry.view<vektor::dna::Object>();
-
-  // static int frame_count = 0;
-  // if (frame_count++ % 60 == 0) {
-  //     std::cout << "Rendering entities: " << objects_view.size() << std::endl;
-  // }
 
   for (auto entity : objects_view) {
     auto &obj = objects_view.get<vektor::dna::Object>(entity);

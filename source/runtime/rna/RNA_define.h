@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DNA_object_type.h"
 #include "RNA_internal.h"
 #include "RNA_types.h"
 
@@ -11,6 +12,7 @@ RNAProperty *RNA_def_property(RNAStruct *srna, const char *name, int type, int s
 
 void RNA_def_property_float_sdna(RNAProperty *prop, const char *ignore, const char *name);
 void RNA_def_property_ui_text(RNAProperty *prop, const char *name, const char *description);
-}
 
+const char *rna_enum_object_type_to_string(dna::ObjectTypeDNA type);
+}
 }  // namespace vektor::rna

@@ -205,6 +205,7 @@ void VPI_QtWindow::setup_docks()
   auto *outliner_dock = new QDockWidget("Outliner", this);
   outliner_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
   outliner_dock->setFeatures(features);
+  outliner_dock->setMinimumWidth(200);
   auto *outliner_widget = new qt::dock::OutlinerWidget(this);
   outliner_dock->setWidget(outliner_widget);
   addDockWidget(Qt::LeftDockWidgetArea, outliner_dock);
@@ -213,6 +214,7 @@ void VPI_QtWindow::setup_docks()
   auto *properties_dock = new QDockWidget("Properties", this);
   properties_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
   properties_dock->setFeatures(features);
+  properties_dock->setMinimumWidth(200);
   auto *properties_widget = new qt::dock::PropertiesWidget(this);
   properties_dock->setWidget(properties_widget);
   addDockWidget(Qt::RightDockWidgetArea, properties_dock);
