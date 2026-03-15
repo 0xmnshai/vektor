@@ -14,6 +14,11 @@
 #include "../../intern/vpi/VPI_Types.h"
 #include "../WIDGET_viewport.h"
 
+#ifdef __APPLE__
+#  import <Metal/Metal.h>
+#  import <QuartzCore/QuartzCore.h>
+#endif
+
 namespace qt::dock {
 
 ViewportWidget::ViewportWidget(QWidget *parent) : vpi::VPI_GLWidget(parent)
@@ -87,7 +92,55 @@ void ViewportWidget::paintGL()
         grid_shader_->draw(projection, view);
       }
 
-      // TODO: Metal rendering for ECS objects
+      // Metal rendering for ECS objects
+      auto &registry = vektor::kernel::ECSRegistry::instance().registry();
+      auto objects_view = registry.view<vektor::dna::Object>();
+
+      auto encoder = (id<MTLRenderCommandEncoder>)mtl_context->get_current_command_encoder();
+
+      for (auto entity : objects_view) {
+        auto &obj = objects_view.get<vektor::dna::Object>(entity);
+
+        if (obj.type == vektor::dna::DNA_ENTITY_CYLINDER && obj.shader_program) {
+          auto *gpu_shader = (vektor::gpu::GPUShader *)obj.shader_program;
+          auto pipeline = (id<MTLRenderPipelineState>)gpu_shader->metal_pipeline;
+
+          if (pipeline && cylinder_metal_vbo_) {
+            [encoder setRenderPipelineState:pipeline];
+            [encoder setVertexBuffer:(id<MTLBuffer>)cylinder_metal_vbo_ offset:0 atIndex:0];
+
+            struct Uniforms {
+              glm::mat4 model;
+              glm::mat4 view;
+              glm::mat4 projection;
+            };
+
+            Uniforms uniforms = {};
+            auto model = glm::mat4(1.0f);
+            model = glm::translate(model, obj.transform.location);
+            model = glm::scale(model, obj.transform.scale);
+
+            uniforms.model = model;
+            uniforms.view = camera_->view_matrix();
+            uniforms.projection = camera_->projection_matrix((float)width() / (float)height());
+
+            [encoder setVertexBytes:&uniforms length:sizeof(uniforms) atIndex:1];
+
+            // Material and light params
+            glm::vec4 color = obj.material.color;
+            glm::vec4 lightPos(10.0f, 10.0f, 10.0f, 1.0f);
+            glm::vec4 viewPos(camera_->eye_position(), 1.0f);
+
+            [encoder setFragmentBytes:&color length:sizeof(color) atIndex:0];
+            [encoder setFragmentBytes:&lightPos length:sizeof(lightPos) atIndex:2];
+            [encoder setFragmentBytes:&viewPos length:sizeof(viewPos) atIndex:3];
+
+            [encoder drawPrimitives:MTLPrimitiveTypeTriangle
+                        vertexStart:0
+                        vertexCount:cylinder_vertex_count_];
+          }
+        }
+      }
 
       mtl_context->end_render_pass();
     }
@@ -161,7 +214,22 @@ void ViewportWidget::paintGL()
 
 void ViewportWidget::init_cylinder_mesh()
 {
-  if (vektor::creator::G.gpu_backend != vektor::creator::GPU_BACKEND_OPENGL) {
+  if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
+#ifdef __APPLE__
+    auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
+    if (device) {
+      std::vector<vektor::kernel::Vertex> vertices;
+      vektor::kernel::create_cylinder_mesh(vertices, 1.0f, 2.0f, 32);
+      cylinder_vertex_count_ = (int)vertices.size();
+
+      id<MTLBuffer> buffer = [device
+          newBufferWithBytes:vertices.data()
+                      length:vertices.size() * sizeof(vektor::kernel::Vertex)
+                     options:MTLResourceStorageModeShared];
+      cylinder_metal_vbo_ = (void *)buffer;
+      mesh_initialized_ = true;
+    }
+#endif
     return;
   }
 

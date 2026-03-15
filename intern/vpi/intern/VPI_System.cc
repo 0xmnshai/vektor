@@ -117,9 +117,17 @@ VPI_TSuccess VPI_System::init()
 
 VPI_TSuccess VPI_System::exit(bool &is_running)
 {
-  qt_app_->removeEventFilter(this);
-  delete qt_window_;
-  delete qt_app_;
+  if (qt_app_) {
+    qt_app_->removeEventFilter(this);
+  }
+  if (qt_window_) {
+    delete qt_window_;
+    qt_window_ = nullptr;
+  }
+  if (qt_app_) {
+    delete qt_app_;
+    qt_app_ = nullptr;
+  }
   timer_.restart();
   is_running = false;
 

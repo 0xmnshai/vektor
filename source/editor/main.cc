@@ -21,6 +21,8 @@ int main(int argc, const char **argv)
   
   vektor::editor::WM_init(&vkC, argc, argv);
 
+  vektor::editor::WM_exit();
+
   clog::clg_exit();
 
   return EXIT_SUCCESS;

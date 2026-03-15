@@ -22,8 +22,6 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
 
   if (!vektor::creator::G.background) {
     editor_window = system->create_window("Vektor Editor", 0, 0, 1280, 720, nullptr);
-
-    // we will add a event consumer for this editor in editor window 
   }
 
   vektor::runtime::initialize(system, editor_window);
@@ -40,5 +38,11 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
 
   // vektor::runtime::shutdown();
   system->exit(is_running);
+}
+
+void WM_exit()
+{
+  bool is_running = false;
+  vpi::VPI_ISystem::get()->exit(is_running);
 }
 }  // namespace vektor::editor

@@ -1,4 +1,4 @@
-file(GLOB SRC "*.h" "*.cc" "intern/*.hh" "intern/*.cc")
+file(GLOB SRC "*.h" "*.cc" "*.mm" "intern/*.hh" "intern/*.cc" "intern/*.mm")
 
 add_library(vektor_qt_dock_scene STATIC ${SRC})
 
