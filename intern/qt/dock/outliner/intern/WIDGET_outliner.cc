@@ -4,6 +4,7 @@
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QTreeView>
+#include <QSortFilterProxyModel>
 #include <QVBoxLayout>
 
 #include "../WIDGET_outliner.h"
@@ -21,18 +22,24 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
-  auto *search_bar = new QLineEdit();
-  search_bar->setPlaceholderText("Search ...");
-  search_bar->setStyleSheet(
-      "QLineEdit { background-color: #2a2a2a; border: 1px solid #3a3a3a; "
-      "border-radius: 0px; padding: 4px; color: #ccc; margin: 4px; }");
-  layout->addWidget(search_bar);
+  search_bar_ = new QLineEdit();
+  // search_bar_->setPlaceholderText("Search ...");
+  // search_bar_->setStyleSheet(
+  //     "QLineEdit { background-color: #2a2a2a; border: 1px solid #3a3a3a; "
+  //     "border-radius: 0px; padding: 4px; color: #ccc; margin: 4px; }");
+
+  // layout->addWidget(search_bar_);
 
   tree_view_ = new QTreeView(this);
   model_ = new QStandardItemModel(this);
   model_->setHorizontalHeaderLabels({"Label", "Type", ""});
 
-  tree_view_->setModel(model_);
+  proxy_model_ = new QSortFilterProxyModel(this);
+  proxy_model_->setSourceModel(model_);
+  proxy_model_->setFilterCaseSensitivity(Qt::CaseInsensitive);
+  proxy_model_->setFilterKeyColumn(0);  // Filter by Label
+
+  tree_view_->setModel(proxy_model_);
   tree_view_->setAlternatingRowColors(true);
   tree_view_->setColumnWidth(0, 200);
   tree_view_->setColumnWidth(1, 60);
@@ -55,7 +62,21 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   connect(timer_, &QTimer::timeout, this, &OutlinerWidget::refresh_entities);
   timer_->start(1000);
 
-  refresh_entities();
+  filter_timer_ = new QTimer(this);
+  filter_timer_->setSingleShot(true);
+  connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
+
+  connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerWidget::on_search_text_changed);
+}
+
+void OutlinerWidget::on_search_text_changed(const QString &)
+{
+  filter_timer_->start(200);  // 200ms debounce
+}
+
+void OutlinerWidget::apply_filter()
+{
+  proxy_model_->setFilterFixedString(search_bar_->text());
 }
 
 void OutlinerWidget::refresh_entities()

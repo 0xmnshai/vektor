@@ -51,6 +51,15 @@ void ViewportWidget::init()
                                 1.0f,
                                 0.5f,
                                 0.2f);
+
+  vektor::kernel::create_entity(nullptr,
+                                nullptr,
+                                "Cylinder_2",
+                                vektor::dna::DNA_ENTITY_CYLINDER,
+                                vektor::dna::DNA_MESH,
+                                0.7f,
+                                1.5f,
+                                0.2f);
 }
 
 void ViewportWidget::paintGL()
