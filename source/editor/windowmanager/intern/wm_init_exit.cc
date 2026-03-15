@@ -1,11 +1,12 @@
-#include "wm_init_exit.hh"
+#include <cstdio>
+
 #include "../../../../intern/clog/CLG_log.h"
 #include "../../../../intern/vpi/VPI_ISystem.h"
 #include "../../../runtime/creator.h"
 #include "../../../runtime/creator_global.h"
 #include "../../../runtime/loader/versioning.h"
 #include "../../intern/vpi/VPI_IWindow.h"
-#include <cstdio>
+#include "wm_init_exit.hh"
 
 namespace vektor::editor {
 CLG_LOGREF_DECLARE_GLOBAL(EDITOR_LOG, "editor");
