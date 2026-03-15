@@ -7,6 +7,7 @@
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
 #include "../../intern/vpi/VPI_Types.h"
 #include "../WIDGET_viewport.h"
+#include "DNA_camera.h"
 
 namespace qt::dock {
 

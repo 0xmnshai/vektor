@@ -27,8 +27,8 @@ void Camera::orbit(float dx, float dy)
     sensitivity = 0.1f;
   if (sensitivity > 2.0f)
     sensitivity = 2.0f;
-  camera_dna_.rotation_y += dx * 0.5f * sensitivity;
-  camera_dna_.rotation_x += dy * 0.5f * sensitivity;
+  camera_dna_.rotation_y += (/*0.5 * */ sensitivity) * dx;
+  camera_dna_.rotation_x += (/*0.5 * */ sensitivity) * dy;
 }
 
 void Camera::pan(float dx, float dy)
