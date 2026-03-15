@@ -49,6 +49,7 @@ struct VPI_ContextParams {
 struct VPI_TEventCursorData {
   int32_t x;
   int32_t y;
+  VPI_EventType type;
 };
 
 struct VPI_TEventMouseButtonData {
@@ -56,6 +57,7 @@ struct VPI_TEventMouseButtonData {
   int32_t y;
   uint32_t button;
   uint32_t modifiers;
+  VPI_EventType type;
 };
 
 struct VPI_TEventMouseWheelData {

@@ -2,6 +2,7 @@
 #include "../../../source/runtime/creator_global.h"
 #include "VPI_ContextGL.hh"
 #include "VPI_ContextMTL.hh"
+#include "VPI_QtWindow.hh"
 
 namespace vpi {
 VPI_GLWidget::VPI_GLWidget(QWidget *parent) : QOpenGLWidget(parent) {}
@@ -44,13 +45,23 @@ void VPI_GLWidget::init()
 
 void VPI_GLWidget::init_vpi_context()
 {
+  VPI_Window *window = nullptr;
+  QWidget *parent = parentWidget();
+  while (parent) {
+    if (auto *vpi_win = qobject_cast<VPI_QtWindow *>(parent)) {
+      window = vpi_win;
+      break;
+    }
+    parent = parent->parentWidget();
+  }
+
   const VPI_ContextParams params = {false, false, VPI_kVSyncModeAuto};  // Default params
   if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
     // For Metal, we might need the native view
-    context_ = new VPI_ContextMTL(params, (void *)winId(), nullptr);
+    context_ = new VPI_ContextMTL(params, window, (void *)winId(), nullptr);
   }
   else {
-    context_ = new VPI_ContextGL(params, nullptr);  // window_ is nullptr for now
+    context_ = new VPI_ContextGL(params, window);
   }
 }
 

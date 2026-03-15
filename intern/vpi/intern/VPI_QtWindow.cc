@@ -4,7 +4,7 @@
 #include "VPI_QtWindow.hh"
 #include "VPI_WindowManager.hh"
 
-#include "../../intern/qt/dock/scene/WIDGET_view_port.h"
+#include "../../intern/qt/dock/scene/WIDGET_viewport.h"
 #include "../../intern/qt/dock/outliner/WIDGET_outliner.h"
 #include "../../intern/qt/dock/properties/WIDGET_properties.h"
 #include "../../intern/qt/dock/console/WIDGET_console.h"

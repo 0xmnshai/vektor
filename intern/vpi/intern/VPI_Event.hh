@@ -47,8 +47,9 @@ class VPI_KeyEvent : public VPI_Event {
 class VPI_MouseEvent : public VPI_Event {
  public:
   VPI_MouseEvent(VPI_QtWindow *window, VPI_TEventMouseButtonData data)
-      : VPI_Event(VPI_kMouseButton, window), data(data)
+      : VPI_Event(data.type, window), data(data)
   {
+    
   }
   VPI_TEventMouseButtonData data;
 };

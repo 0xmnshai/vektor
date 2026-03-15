@@ -16,5 +16,7 @@ class VPI_IContext {
   [[nodiscard]] virtual VPI_TSuccess release_native_handles() const = 0;
 
   virtual void resize_context(uint32_t width, uint32_t height) const = 0;
+  
+  [[nodiscard]] virtual class VPI_Window *get_window() const = 0;
 };
 }  // namespace vpi

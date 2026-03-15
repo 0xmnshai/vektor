@@ -18,7 +18,6 @@ class VPI_ContextGL : public VPI_Context {
   [[nodiscard]] VPI_TSuccess release_native_handles() const override;
 
  protected:
-  VPI_Window *window_;
   static int s_shared_count_;
 };
 }  // namespace vpi

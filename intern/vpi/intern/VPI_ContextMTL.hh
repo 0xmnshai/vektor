@@ -32,6 +32,7 @@ namespace vpi {
 class VPI_ContextMTL : public VPI_Context {
  public:
   explicit VPI_ContextMTL(const VPI_ContextParams &context_params,
+                          VPI_Window *window,
                           void *metalView,
                           void *metalLayer);
 
@@ -86,7 +87,6 @@ class VPI_ContextMTL : public VPI_Context {
 #endif
 
  protected:
-  VPI_Window *window_;
   static int s_shared_count_;
 
   NSView *metal_view_;

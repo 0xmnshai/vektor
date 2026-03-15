@@ -14,10 +14,10 @@ static id<MTLDevice> g_current_metal_device = nil;
 namespace vpi {
 
 VPI_ContextMTL::VPI_ContextMTL(const VPI_ContextParams &context_params,
+                               vpi::VPI_Window *window,
                                void *metalView,
                                void *metalLayer)
-    : VPI_Context(context_params),
-      window_(nullptr),
+    : VPI_Context(context_params, window),
       metal_view_((NSView *)metalView),
       metal_subview_(nullptr),
       metal_layer_((CAMetalLayer *)metalLayer),
