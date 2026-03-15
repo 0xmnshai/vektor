@@ -9,7 +9,7 @@ const char *rna_enum_object_type_to_string(dna::ObjectTypeDNA type)
     case dna::DNA_COLLECTION:
       return "collection";
     case dna::DNA_MESH:
-      return "mesg";
+      return "mesh";
     case dna::DNA_CAMERA:
       return "camera";
     case dna::DNA_LIGHT:
