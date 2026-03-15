@@ -2,12 +2,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../../../../../source/editor/windowmanager/wm_event_types.h"
+#include "../../../../../source/runtime/dna/DNA_camera.h"
+#include "../../../../../source/runtime/dna/DNA_object_type.h"
 #include "../../../../../source/runtime/gpu/shaders/SHDR_grid.h"
+#include "../../../../../source/runtime/lib/intern/appdir.h"
+#include "../../../../source/runtime/gpu/GPU_shader.h"
+#include "../../../../source/runtime/kernel/ecs/ECS_mesh_primitives.h"
+#include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
 #include "../../intern/vpi/VPI_Types.h"
 #include "../WIDGET_viewport.h"
-#include "DNA_camera.h"
 
 namespace qt::dock {
 
@@ -27,8 +32,8 @@ void ViewportWidget::init()
   grabGesture(Qt::PinchGesture);
 
   grid_shader_ = new vektor::gpu::GridShader();
-  QString shader_path = QCoreApplication::applicationDirPath() +
-                        "/../../source/runtime/gpu/shaders";
+  QString shader_path = QString(vektor::lib::get_application_dir_path()) +
+                        "/../../source/runtime/gpu/shaders/file/grid";
   grid_shader_->init(shader_path);
 
   connect(&timer_, &QTimer::timeout, this, [this] {
@@ -36,10 +41,18 @@ void ViewportWidget::init()
     update();
   });
   timer_.start(16);
+
+  // Test: Create a cylinder entity
+  vektor::kernel::create_entity(
+      nullptr, nullptr, "TestCylinder", vektor::dna::DNA_ENTITY_CYLINDER, 1.0f, 0.5f, 0.2f);
 }
 
 void ViewportWidget::paintGL()
 {
+  if (!mesh_initialized_) {
+    init_cylinder_mesh();
+  }
+
   if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
     if (context_) {
       auto *mtl_context = dynamic_cast<vpi::VPI_ContextMTL *>(context_);
@@ -52,24 +65,117 @@ void ViewportWidget::paintGL()
         grid_shader_->draw(projection, view);
       }
 
+      // TODO: Metal rendering for ECS objects
+
       mtl_context->end_render_pass();
     }
     return;
   }
 
+  initializeOpenGLFunctions();
   glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
 
   vpi::VPI_GLWidget::paintGL();
 
+  float aspect = (float)width() / (float)height();
+  glm::mat4 projection = camera_->projection_matrix(aspect);
+  glm::mat4 view = camera_->view_matrix();
+
   if (grid_shader_) {
-    float aspect = (float)width() / (float)height();
-
-    glm::mat4 projection = camera_->projection_matrix(aspect);
-    glm::mat4 view = camera_->view_matrix();
-
     grid_shader_->draw(projection, view);
   }
+
+  // Render ECS objects
+  auto &registry = vektor::kernel::ECSRegistry::instance().registry();
+  auto objects_view = registry.view<vektor::dna::Object>();
+
+  // static int frame_count = 0;
+  // if (frame_count++ % 60 == 0) {
+  //     std::cout << "Rendering entities: " << objects_view.size() << std::endl;
+  // }
+
+  for (auto entity : objects_view) {
+    auto &obj = objects_view.get<vektor::dna::Object>(entity);
+
+    if (obj.type == vektor::dna::DNA_ENTITY_CYLINDER && obj.shader_program) {
+      auto *gpu_shader = (vektor::gpu::GPUShader *)obj.shader_program;
+      vektor::gpu::GPU_shader_bind(gpu_shader);
+
+      // Model matrix
+      auto model = glm::mat4(1.0f);
+      model = glm::translate(model, obj.transform.location);
+      // rotation here ... scale here ...
+      model = glm::scale(model, obj.transform.scale);
+
+      vektor::gpu::GPU_shader_uniform_matrix4(gpu_shader, "model", glm::value_ptr(model));
+      vektor::gpu::GPU_shader_uniform_matrix4(gpu_shader, "view", glm::value_ptr(view));
+      vektor::gpu::GPU_shader_uniform_matrix4(
+          gpu_shader, "projection", glm::value_ptr(projection));
+
+      vektor::gpu::GPU_shader_uniform_float(
+          gpu_shader, "color", obj.material.color.r);  // Simplified, original used vec4
+      // Correctly set color vector
+      auto *program = vektor::gpu::GPU_shader_get_program(gpu_shader);
+      if (program) {
+        program->setUniformValue("color",
+                                 obj.material.color.r,
+                                 obj.material.color.g,
+                                 obj.material.color.b,
+                                 obj.material.color.a);
+        program->setUniformValue("lightPos", 10.0f, 10.0f, 10.0f);
+        program->setUniformValue("viewPos",
+                                 camera_->eye_position().x,
+                                 camera_->eye_position().y,
+                                 camera_->eye_position().z);
+      }
+
+      glBindVertexArray(cylinder_vao_);
+      glDrawArrays(GL_TRIANGLES, 0, cylinder_vertex_count_);
+      glBindVertexArray(0);
+
+      vektor::gpu::GPU_shader_unbind(gpu_shader);
+    }
+  }
+
+  glDisable(GL_DEPTH_TEST);
+}
+
+void ViewportWidget::init_cylinder_mesh()
+{
+  if (vektor::creator::G.gpu_backend != vektor::creator::GPU_BACKEND_OPENGL) {
+    return;
+  }
+
+  initializeOpenGLFunctions();
+  std::vector<vektor::kernel::Vertex> vertices;
+  vektor::kernel::create_cylinder_mesh(vertices, 1.0f, 2.0f, 32);
+  cylinder_vertex_count_ = (int)vertices.size();
+
+  glGenVertexArrays(1, &cylinder_vao_);
+  glGenBuffers(1, &cylinder_vbo_);
+
+  glBindVertexArray(cylinder_vao_);
+  glBindBuffer(GL_ARRAY_BUFFER, cylinder_vbo_);
+  glBufferData(GL_ARRAY_BUFFER,
+               (GLsizeiptr)(vertices.size() * sizeof(vektor::kernel::Vertex)),
+               vertices.data(),
+               GL_STATIC_DRAW);
+
+  // Position
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vektor::kernel::Vertex), (void *)0);
+
+  // Normal
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(
+      1, 3, GL_FLOAT, GL_FALSE, sizeof(vektor::kernel::Vertex), (void *)(sizeof(glm::vec3)));
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  mesh_initialized_ = true;
 }
 
 void ViewportWidget::mouseReleaseEvent(QMouseEvent *event)

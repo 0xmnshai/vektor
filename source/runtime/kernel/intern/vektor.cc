@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "vektor.hh"
+#include "vektor.h"
 #include "vektor_version.h"
 
 static char vektor_version_string[64] = "";

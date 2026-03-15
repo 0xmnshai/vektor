@@ -2,19 +2,27 @@
 
 namespace vektor::dna {
 
+struct ID {
+  void *next = nullptr;
+  void *prev = nullptr;
+  struct ID *newid = nullptr;
+
+  char name[/*MAX_ID_NAME*/ 258] = "";
+};
+
 struct IDPropertyUIData {
-  char *description = nullptr;
+  const char *description = nullptr;
   int rna_subtype = 0;
-  char _pad[4] = {};
+  const char _pad[4] = {};
 };
 
 struct IDPropertyUIDataEnumItem {
   /* Unique identifier, used for string lookup. */
-  char *identifier = nullptr;
+  const char *identifier = nullptr;
   /* UI name of the item. */
-  char *name = nullptr;
+  const char *name = nullptr;
   /*  description. */
-  char *description = nullptr;
+  const char *description = nullptr;
   /* Unique integer value, should never change. */
   int value = 0;
   /* Optional icon. */

@@ -346,7 +346,7 @@ void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float
 {
   if (shader && shader->program) {
     QMatrix4x4 mat(val);
-    shader->program->setUniformValue(name, mat);
+    shader->program->setUniformValue(name, mat.transposed());
   }
 }
 }  // namespace vektor::gpu

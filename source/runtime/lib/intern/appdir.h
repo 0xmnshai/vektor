@@ -12,4 +12,6 @@ const char *get_temp_dir();
 
 const char *get_executable_dir();
 
+const char *get_application_dir_path();
+
 }  // namespace vektor::lib

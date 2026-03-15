@@ -96,7 +96,7 @@ VPI_TSuccess VPI_System::init()
   clog::clog_init("system", "editor.log", "editor");
 
   QSurfaceFormat format;
-  format.setVersion(6, 1);
+  format.setVersion(4, 1);
   format.setProfile(QSurfaceFormat::CoreProfile);
   format.setDepthBufferSize(24);
   format.setStencilBufferSize(8);

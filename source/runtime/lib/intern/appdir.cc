@@ -14,6 +14,7 @@
 namespace vektor::lib {
 
 static char g_executable_dir[PATH_MAX] = "";
+static char g_application_dir_path[PATH_MAX] = "";
 
 void init(const char *argv0)
 {
@@ -90,6 +91,25 @@ const char *get_temp_dir()
 const char *get_executable_dir()
 {
   return g_executable_dir;
+}
+
+const char *get_application_dir_path()
+{
+  if (g_application_dir_path[0] != '\0') {
+    return g_application_dir_path;
+  }
+
+  const char *executable_dir = get_executable_dir();
+  if (executable_dir[0] == '\0') {
+    return "";
+  }
+
+#ifdef __APPLE__
+  snprintf(g_application_dir_path, sizeof(g_application_dir_path), "%s", executable_dir);
+#else
+  snprintf(g_application_dir_path, sizeof(g_application_dir_path), "%s", executable_dir);
+#endif
+  return g_application_dir_path;
 }
 
 }  // namespace vektor::lib

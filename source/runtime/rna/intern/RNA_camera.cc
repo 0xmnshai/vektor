@@ -14,6 +14,13 @@ glm::mat4 Camera::view_matrix() const
   return view;
 }
 
+glm::vec3 Camera::eye_position() const
+{
+  glm::mat4 view = view_matrix();
+  glm::mat4 inv_view = glm::inverse(view);
+  return inv_view[3];
+}
+
 glm::mat4 Camera::projection_matrix(float aspect) const
 {
   return glm::perspective(

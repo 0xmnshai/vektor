@@ -7,12 +7,15 @@
 #include <QTimer>
 #include <map>
 
-#include "../../../../intern/vpi/intern/VPI_GLWidget.hh" 
+#include <QOpenGLFunctions_4_1_Core>
+
+#include "../../../../intern/vpi/intern/VPI_GLWidget.hh"
 #include "../../../../source/runtime/gpu/shaders/SHDR_grid.h"
 #include "../../../../source/runtime/rna/RNA_camera.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace qt::dock {
-class ViewportWidget : public vpi::VPI_GLWidget {
+class ViewportWidget : public vpi::VPI_GLWidget, protected QOpenGLFunctions_4_1_Core {
  public:
   explicit ViewportWidget(QWidget *parent = nullptr);
   ~ViewportWidget() override = default;
@@ -42,5 +45,12 @@ class ViewportWidget : public vpi::VPI_GLWidget {
   vektor::rna::Camera *camera_ = nullptr;
   std::map<int, bool> keys_;
   QTimer timer_;
+
+  // Cylinder rendering cache
+  GLuint cylinder_vao_ = 0;
+  GLuint cylinder_vbo_ = 0;
+  int cylinder_vertex_count_ = 0;
+  bool mesh_initialized_ = false;
+  void init_cylinder_mesh();
 };
 }  // namespace qt::dock

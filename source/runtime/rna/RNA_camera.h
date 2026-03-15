@@ -37,6 +37,8 @@ class Camera {
     camera_dna_.pivot = p;
   }
 
+  [[nodiscard]] glm::vec3 eye_position() const;
+
   [[nodiscard]] inline float distance() const
   {
     return camera_dna_.distance;

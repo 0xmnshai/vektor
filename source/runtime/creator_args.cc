@@ -4,7 +4,7 @@
 #include "../../intern/clog/CLG_log.h"
 #include "creator_args.hh"
 #include "creator_global.h"
-#include "kernel/intern/vektor.hh"
+#include "kernel/vektor.h"
 
 namespace vektor::creator {
 

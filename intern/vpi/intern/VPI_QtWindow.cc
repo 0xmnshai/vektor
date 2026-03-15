@@ -4,11 +4,11 @@
 #include "VPI_QtWindow.hh"
 #include "VPI_WindowManager.hh"
 
-#include "../../intern/qt/dock/scene/WIDGET_viewport.h"
+#include "../../intern/qt/dock/assets_browser/WIDGET_assets_browser.h"
+#include "../../intern/qt/dock/console/WIDGET_console.h"
 #include "../../intern/qt/dock/outliner/WIDGET_outliner.h"
 #include "../../intern/qt/dock/properties/WIDGET_properties.h"
-#include "../../intern/qt/dock/console/WIDGET_console.h"
-#include "../../intern/qt/dock/assets_browser/WIDGET_assets_browser.h"
+#include "../../intern/qt/dock/scene/WIDGET_viewport.h"
 
 namespace vpi {
 
@@ -46,10 +46,11 @@ void VPI_QtWindow::create_window(char const *title,
 {
   setWindowTitle(title);
   setGeometry(left, top, static_cast<int>(width), static_cast<int>(height));
-  show();
 
   setup_menus();
   setup_docks();
+
+  show();
 }
 
 VPI_TSuccess VPI_QtWindow::dispose() noexcept
@@ -189,16 +190,21 @@ void VPI_QtWindow::setup_menus() {}
 void VPI_QtWindow::setup_docks()
 {
   setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks |
-                 QMainWindow::AnimatedDocks);
+                 QMainWindow::AnimatedDocks | QMainWindow::GroupedDragging);
 
-  // The Viewport (Scene) is the central widget. This eliminates the empty black area.
-  auto *view_port_widget = new qt::dock::ViewportWidget();
-  setCentralWidget(view_port_widget);
+  // Configure corners to match the layout in the screenshot (Bottom area spans width)
+  setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
+  setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
 
+  // Default features for all docks
+  QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetMovable |
+                                             QDockWidget::DockWidgetFloatable |
+                                             QDockWidget::DockWidgetClosable;
 
   // --- OUTLINER DOCK ---
   auto *outliner_dock = new QDockWidget("Outliner", this);
   outliner_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  outliner_dock->setFeatures(features);
   auto *outliner_widget = new qt::dock::OutlinerWidget(this);
   outliner_dock->setWidget(outliner_widget);
   addDockWidget(Qt::LeftDockWidgetArea, outliner_dock);
@@ -206,28 +212,43 @@ void VPI_QtWindow::setup_docks()
   // --- PROPERTIES DOCK ---
   auto *properties_dock = new QDockWidget("Properties", this);
   properties_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  properties_dock->setFeatures(features);
   auto *properties_widget = new qt::dock::PropertiesWidget(this);
   properties_dock->setWidget(properties_widget);
   addDockWidget(Qt::RightDockWidgetArea, properties_dock);
 
-
   // --- ASSETS BROWSER DOCK ---
-  auto *assets_dock = new QDockWidget("Assets Browser", this);
-  assets_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-  auto *assets_widget = new qt::dock::AssetsBrowserWidget(this);
-  assets_dock->setWidget(assets_widget);
-  addDockWidget(Qt::BottomDockWidgetArea, assets_dock);
+  // auto *assets_dock = new QDockWidget("Assets Browser", this);
+  // assets_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  // assets_dock->setFeatures(features);
+  // auto *assets_widget = new qt::dock::AssetsBrowserWidget(this);
+  // assets_dock->setWidget(assets_widget);
+  // addDockWidget(Qt::BottomDockWidgetArea, assets_dock);
 
-  // --- CONSOLE DOCK ---
-  auto *console_dock = new QDockWidget("Console", this);
-  console_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-  auto *console_widget = new qt::dock::ConsoleWidget(this);
-  console_dock->setWidget(console_widget);
-  addDockWidget(Qt::BottomDockWidgetArea, console_dock);
+  // // --- CONSOLE DOCK ---
+  // auto *console_dock = new QDockWidget("Console", this);
+  // console_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  // console_dock->setFeatures(features);
+  // auto *console_widget = new qt::dock::ConsoleWidget(this);
+  // console_dock->setWidget(console_widget);
+  // addDockWidget(Qt::BottomDockWidgetArea, console_dock);
 
-  // Tab Console with Assets Browser
-  tabifyDockWidget(assets_dock, console_dock);
+  // // Tab Console with Assets Browser
+  // tabifyDockWidget(assets_dock, console_dock);
 
-  // Final docking layout adjustments can be made here if needed.
+  // --- SCENE DOCK (The Viewport) ---
+  // We add it to the Left area and then split it to place it in the center.
+  auto *scene_dock = new QDockWidget("Scene", this);
+  scene_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  scene_dock->setFeatures(features);
+  auto *view_port_widget = new qt::dock::ViewportWidget(this);
+  scene_dock->setWidget(view_port_widget);
+  addDockWidget(Qt::LeftDockWidgetArea, scene_dock);
+
+  // Split outliner and scene horizontally so scene is in the middle.
+  splitDockWidget(outliner_dock, scene_dock, Qt::Horizontal);
+
+  // Set a central widget to provide a stable reference for docking
+  // setCentralWidget(new QWidget(this));
 }
 }  // namespace vpi
