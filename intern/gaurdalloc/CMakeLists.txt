@@ -1,4 +1,4 @@
-file(GLOB SRC "*.h" "*.cc")
+file(GLOB SRC "*.h" "*.cc" "intern/*.cc" "intern/*.hh")
 
 add_library(gaurdalloc STATIC ${SRC})
 

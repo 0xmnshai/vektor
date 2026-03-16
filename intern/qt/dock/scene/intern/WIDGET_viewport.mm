@@ -44,8 +44,6 @@ void ViewportWidget::init()
     update();
   });
   timer_.start(16);
-
-  timer_.start(16);
 }
 
 void ViewportWidget::paintGL()
@@ -294,17 +292,19 @@ void ViewportWidget::mouseMoveEvent(QMouseEvent *event)
   float dx = (float)event->position().x() - (float)last_mouse_pos.x();
   float dy = (float)event->position().y() - (float)last_mouse_pos.y();
 
-  if (event->buttons() & Qt::RightButton) {
+  if (event->modifiers() & Qt::ShiftModifier) {
+    if (event->buttons() & (Qt::MiddleButton | Qt::LeftButton | Qt::RightButton)) {
+      camera_->pan(dx, dy);
+      update();
+    }
+  }
+  else if (event->buttons() & Qt::RightButton) {
     // Fly mode look
     camera_->fly(dx, dy);
     update();
   }
   else if (event->buttons() & Qt::MiddleButton) {
-    if (event->modifiers() & Qt::ShiftModifier) {
-      // Pan (Move pivot)
-      camera_->pan(dx, dy);
-    }
-    else if (event->modifiers() & Qt::ControlModifier) {
+    if (event->modifiers() & Qt::ControlModifier) {
       // Zoom (Smooth)
       camera_->zoom(dy);
     }
@@ -363,11 +363,9 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
   else if (event->button() == Qt::RightButton) {
     right_mouse_down_ = true;
     setCursor(Qt::BlankCursor);
-    last_mouse_pos = event->pos();
   }
-  else if (event->button() == Qt::MiddleButton) {
-    last_mouse_pos = event->pos();
-  }
+
+  last_mouse_pos = event->pos();
 
   setFocus();
 
