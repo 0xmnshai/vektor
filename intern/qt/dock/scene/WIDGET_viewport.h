@@ -40,6 +40,7 @@ class ViewportWidget : public vpi::VPI_GLWidget, protected QOpenGLFunctions_4_1_
   vektor::gpu::GridShader *grid_shader_ = nullptr;
 
   bool right_mouse_down_ = false;
+  bool right_shift_down_ = false;
   QPoint last_mouse_pos;
 
   vektor::rna::Camera *camera_ = nullptr;

@@ -292,6 +292,7 @@ void ViewportWidget::mouseMoveEvent(QMouseEvent *event)
   float dx = (float)event->position().x() - (float)last_mouse_pos.x();
   float dy = (float)event->position().y() - (float)last_mouse_pos.y();
 
+  // fix here
   if (event->modifiers() & Qt::ShiftModifier) {
     if (event->buttons() & (Qt::MiddleButton | Qt::LeftButton | Qt::RightButton)) {
       camera_->pan(dx, dy);
@@ -337,7 +338,13 @@ void ViewportWidget::wheelEvent(QWheelEvent *event)
   }
   else {
     // Continuous scroll (Trackpad)
-    camera_->fly((float)event->pixelDelta().x() * 0.2f, (float)event->pixelDelta().y() * 0.2f);
+    if (right_shift_down_) {
+      camera_->move(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), false, false,
+                    false, false, false, false, (float)event->pixelDelta().y() * 0.2f);
+    }
+    else {
+      camera_->fly((float)event->pixelDelta().x() * 0.2f, (float)event->pixelDelta().y() * 0.2f);
+    }
   }
 
   VPI_TEventMouseWheelData mouse_wheel_event_data = {
@@ -385,11 +392,17 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
 void ViewportWidget::keyPressEvent(QKeyEvent *event)
 {
   keys_[event->key()] = true;
+  if (event->key() == Qt::Key_Shift && event->nativeVirtualKey() == 0x3C) {
+    right_shift_down_ = true;
+  }
 }
 
 void ViewportWidget::keyReleaseEvent(QKeyEvent *event)
 {
   keys_[event->key()] = false;
+  if (event->key() == Qt::Key_Shift && event->nativeVirtualKey() == 0x3C) {
+    right_shift_down_ = false;
+  }
 }
 
 void ViewportWidget::update_camera()
