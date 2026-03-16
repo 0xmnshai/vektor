@@ -1,6 +1,6 @@
-#include "MEM_gaurdalloc.h"
+#include "../MEM_gaurdalloc.h"
 #include "../clog/CLG_log.h"
-#include "MEM_function_pointers.h"
+#include "../MEM_function_pointers.h"
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
