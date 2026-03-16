@@ -23,7 +23,7 @@ void MENU_file_register(void *window)
   QAction *quit_action = menu->addAction("Quit");
   quit_action->setShortcut(QKeySequence::Quit);
   quit_action->setMenuRole(QAction::NoRole);
-
+  
   QObject::connect(quit_action, &QAction::triggered, [vpi_window]() { qApp->quit(); });
 }
 
