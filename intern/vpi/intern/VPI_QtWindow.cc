@@ -1,9 +1,10 @@
 #include <QDockWidget>
 
+#include "../../qt/dock/common/WIDGET_area.h"
+#include "../../qt/menu/MENU_setup.h"
 #include "VPI_EventManager.hh"
 #include "VPI_QtWindow.hh"
 #include "VPI_WindowManager.hh"
-#include "../../qt/dock/common/WIDGET_area.h"
 
 namespace vpi {
 
@@ -180,12 +181,15 @@ VPI_EventManager const &VPI_QtWindow::get_event_manager() const noexcept
   return *event_manager_;
 }
 
-void VPI_QtWindow::setup_menus() {}
+void VPI_QtWindow::setup_menus()
+{
+  qt::menu::window_menu_setup(this);
+}
 
 void VPI_QtWindow::setup_docks()
 {
   setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks |
-                 QMainWindow::AnimatedDocks | QMainWindow::GroupedDragging);
+                 QMainWindow::AnimatedDocks);
 
   // Configure corners to match the layout in the screenshot (Bottom area spans width)
   setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
@@ -226,6 +230,7 @@ void VPI_QtWindow::setup_docks()
   splitDockWidget(outliner_dock, properties_dock, Qt::Vertical);
 
   // Set a central widget to provide a stable reference for docking
+  // TODO: this is causing a blank space in window, we have to fix this
   // setCentralWidget(new QWidget(this));
 }
 }  // namespace vpi

@@ -15,10 +15,9 @@
 #include "../intern/VPI_EventManager.hh"
 #include "../intern/VPI_GLWidget.hh"
 #include "../intern/VPI_QtEventConsumer.hh"
-#include "VPI_Window.hh"
+#include "VPI_EventManager.hh"
 #include "VPI_Window.hh"
 #include "VPI_WindowManager.hh"
-#include "VPI_EventManager.hh"
 
 namespace vpi {
 class VPI_QtWindow : public QMainWindow, public VPI_Window {

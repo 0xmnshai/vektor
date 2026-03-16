@@ -12,6 +12,8 @@ void SCN_init_default_scene()
   }
   initialized = true;
 
+  // we will use this for creating default scene and then a scene ( Mesh )  editor to manage scene entities ...
+
   // Create test entities only once
   vektor::kernel::create_entity(nullptr,
                                 nullptr,
