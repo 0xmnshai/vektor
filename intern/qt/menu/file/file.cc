@@ -9,7 +9,8 @@ namespace qt::menu {
 
 void MENU_file_register(void *window)
 {
-  QMenuBar *menu_bar = static_cast<vpi::VPI_QtWindow *>(window)->menuBar();
+  auto *vpi_window = static_cast<vpi::VPI_QtWindow *>(window);
+  QMenuBar *menu_bar = vpi_window->menuBar();
 
   QMenu *menu = menu_bar->addMenu("File");
   menu->addAction("New");
@@ -21,11 +22,9 @@ void MENU_file_register(void *window)
 
   QAction *quit_action = menu->addAction("Quit");
   quit_action->setShortcut(QKeySequence::Quit);
-  quit_action->setMenuRole(QAction::QuitRole);
+  quit_action->setMenuRole(QAction::NoRole);
 
-  QObject::connect(quit_action, &QAction::triggered, []() {
-    qApp->quit();
-  });
+  QObject::connect(quit_action, &QAction::triggered, [vpi_window]() { qApp->quit(); });
 }
 
 }  // namespace qt::menu

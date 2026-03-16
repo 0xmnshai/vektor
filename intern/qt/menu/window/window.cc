@@ -16,6 +16,7 @@ void MENU_window_register(void *window)
 
   menu->addAction("New Window");
   menu->addSeparator();
+  
   QAction *fullscreen_action = menu->addAction("Toggle Window Fullscreen");
   fullscreen_action->setCheckable(true);
   fullscreen_action->setChecked(false);
