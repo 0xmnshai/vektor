@@ -1,8 +1,10 @@
 #pragma once
 
+#include <QLabel>
 #include <QPushButton>
 #include <QString>
 #include <QWidget>
+#include <vector>
 
 namespace qt::dock {
 
@@ -21,6 +23,8 @@ struct EditorInfo {
   QString icon;
 };
 
+extern const std::vector<EditorInfo> g_editors;
+
 class WidgetHeader : public QWidget {
   Q_OBJECT
  public:
@@ -33,6 +37,7 @@ class WidgetHeader : public QWidget {
 
  private:
   QPushButton *type_button_;
+  QLabel *title_label_;
   EditorType current_type_;
   
   void show_type_menu();

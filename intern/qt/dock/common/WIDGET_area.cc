@@ -1,3 +1,4 @@
+#include <QDockWidget>
 #include <QObject>
 #include <QWidget>
 #include <QVBoxLayout>
@@ -35,6 +36,8 @@ void AreaWidget::handle_editor_switch(EditorType new_type)
 {
   if (content_) {
     layout()->removeWidget(content_);
+    content_->hide();
+    content_->setParent(nullptr);
     content_->deleteLater();
     content_ = nullptr;
   }
@@ -42,6 +45,23 @@ void AreaWidget::handle_editor_switch(EditorType new_type)
   content_ = create_editor(new_type);
   if (content_) {
     layout()->addWidget(content_);
+    content_->show();
+
+    // Update parent dock widget title if it exists
+    QWidget *pw = parentWidget();
+    while (pw) {
+      if (auto *dock = qobject_cast<QDockWidget *>(pw)) {
+        for (const auto &info : g_editors) {
+          if (info.type == new_type) {
+            dock->setWindowTitle(info.name);
+            break;
+          }
+        }
+        break;
+      }
+      pw = pw->parentWidget();
+      if (!pw) break;
+    }
   }
 }
 

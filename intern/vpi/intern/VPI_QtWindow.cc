@@ -3,9 +3,7 @@
 #include "VPI_EventManager.hh"
 #include "VPI_QtWindow.hh"
 #include "VPI_WindowManager.hh"
-
-#include "../../intern/qt/dock/common/WIDGET_area.h"
-#include "../../intern/qt/dock/scene/SCN_setup.h"
+#include "../../qt/dock/common/WIDGET_area.h"
 
 namespace vpi {
 
@@ -46,8 +44,6 @@ void VPI_QtWindow::create_window(char const *title,
 
   setup_menus();
   setup_docks();
-
-  qt::scene::SCN_init_default_scene();
 
   show();
 }

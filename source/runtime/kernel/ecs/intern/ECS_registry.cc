@@ -29,10 +29,10 @@ void create_entity(rna::VektorRNA *v_rna,
                    float g = 1.0f,
                    float b = 1.0f)
 {
-  auto *registry = (ECSRegistry *)rna::RNA_ecs_get_registry();
+  auto &registry = ECSRegistry::instance();
   auto entity = (entt::entity)rna::RNA_ecs_create_entity();
 
-  auto object = (dna::Object *)rna::RNA_ecs_get_object(registry, entity);
+  auto object = (dna::Object *)rna::RNA_ecs_get_object(&registry, entity);
 
   object->type = (dna::EntityTypeDNA)type;
   strncpy(object->id_name, name, sizeof(object->id_name) - 1);
@@ -60,7 +60,7 @@ void create_entity(rna::VektorRNA *v_rna,
   }
 
   rna::PointerRNA object_ptr = rna::RNA_pointer_from_entity<dna::Object>(
-      registry->registry(), entity, object_type);
+      registry.registry(), entity, object_type);
 
   outliner_notify_scene_changed();
 }

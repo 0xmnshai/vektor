@@ -4,8 +4,8 @@
 #include "../../../../intern/vpi/VPI_ISystem.h"
 #include "../../../runtime/creator.h"
 #include "../../../runtime/creator_global.h"
-#include "../../../runtime/loader/versioning.h"
 #include "../../intern/vpi/VPI_IWindow.h"
+#include "vektor_version.h"
 #include "wm_init_exit.hh"
 
 namespace vektor::editor {
@@ -27,14 +27,14 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
     const char *title = "Vektor Editor";
     if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_OPENGL) {
       char title_buf[256];
-      const char *version = VKT_version_opengl_get();
-      snprintf(title_buf, sizeof(title_buf), "Vektor Editor - OpenGL ( version : %s )", version);
+      const char *version = VEKTOR_VERSION;  // VKT_version_opengl_get();
+      snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - OpenGL", version);
       editor_window = system->create_window(title_buf, 0, 0, 1280, 720, nullptr);
     }
     else if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_METAL) {
       char title_buf[256];
-      const char *version = VKT_version_metal_get();
-      snprintf(title_buf, sizeof(title_buf), "Vektor Editor - Metal ( version : %s )", version);
+      const char *version = VEKTOR_VERSION;  // VKT_version_metal_get();
+      snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - Metal", version);
       editor_window = system->create_window(title_buf, 0, 0, 1280, 720, nullptr);
     }
   }

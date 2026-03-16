@@ -1,3 +1,4 @@
+#include <QLabel>
 #include <QMenu>
 #include <QPushButton>
 #include <QWidget>
@@ -8,7 +9,7 @@
 
 namespace qt::dock {
 
-static const std::vector<EditorInfo> g_editors = {
+const std::vector<EditorInfo> g_editors = {
     {EditorType::VIEWPORT_3D, "3D Viewport", "🎥"},
     {EditorType::OUTLINER, "Outliner", "📐"},
     {EditorType::PROPERTIES, "Properties", "📦"},
@@ -33,6 +34,11 @@ WidgetHeader::WidgetHeader(EditorType initial_type, QWidget *parent)
                               "QPushButton:hover { background: #444; border-radius: 2px; }");
 
   layout->addWidget(type_button_);
+  
+  title_label_ = new QLabel(this);
+  title_label_->setStyleSheet("color: #aaa; font-weight: bold; font-size: 11px; margin-left: 2px;");
+  layout->addWidget(title_label_);
+
   layout->addStretch();
 
   set_editor_type(initial_type);
@@ -50,6 +56,7 @@ void WidgetHeader::set_editor_type(EditorType type)
     if (info.type == type) {
       type_button_->setText(info.icon);
       type_button_->setToolTip(info.name);
+      title_label_->setText(info.name);
       break;
     }
   }

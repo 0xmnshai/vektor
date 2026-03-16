@@ -11,10 +11,13 @@
 #include "../scene/SCN_notifier.h"
 
 #include "../../../../../source/runtime/dna/DNA_object_type.h"
-#include "../../../../../source/runtime/rna/RNA_ecs_registry.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
+#include "../../../../../intern/clog/CLG_log.h"
+#include "../../../../source/runtime/rna/RNA_ecs_registry.h"
 
 namespace qt::dock {
+CLG_LOGREF_DECLARE_GLOBAL(LOG_OUTLINER, "outliner");
+
 using namespace vektor::dna;
 
 OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
@@ -105,6 +108,7 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
           });
 
   tree_view_->viewport()->installEventFilter(this);
+  refresh_entities();
 }
 
 bool OutlinerWidget::eventFilter(QObject *watched, QEvent *event)
@@ -130,18 +134,19 @@ void OutlinerWidget::apply_filter()
 
 void OutlinerWidget::refresh_entities()
 {
+  CLOG_INFO(LOG_OUTLINER, "Refreshing entities...");
   is_refreshing_ = true;
   model_->removeRows(0, model_->rowCount());
 
   // Level 1: Scene Collection
   auto *root_item = new QStandardItem("Scene Collection");
   // root_item->setData(QIcon(":/icons/outliner_scene.png"),
-                    //  Qt::DecorationRole);  // Placeholder if icons exist
+  //  Qt::DecorationRole);  // Placeholder if icons exist
   model_->appendRow({root_item, new QStandardItem("")});
 
   // Level 2: Collection
   auto *collection_item = new QStandardItem("Collection");
-  collection_item->setData(QString("📦"), Qt::DecorationRole); // Box icon for collection
+  collection_item->setData(QString("📦"), Qt::DecorationRole);  // Box icon for collection
   root_item->appendRow({collection_item, new QStandardItem("")});
 
   auto &registry = vektor::kernel::ECSRegistry::instance().registry();
@@ -153,7 +158,7 @@ void OutlinerWidget::refresh_entities()
     QString name = QString::fromUtf8(obj.id_name);
 
     auto *name_item = new QStandardItem(name);
-    
+
     // Set icons based on object type
     QString icon_str = "❓";
     switch (obj.object_type) {
@@ -189,6 +194,8 @@ void OutlinerWidget::refresh_entities()
           proxy_index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
     }
   }
+
+  CLOG_INFO(LOG_OUTLINER, "Refresh complete, row count: %d", model_->rowCount());
 
   tree_view_->expandAll();
   is_refreshing_ = false;

@@ -12,6 +12,7 @@
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
 #include "../../intern/vpi/VPI_Types.h"
+#include "../SCN_setup.h"
 #include "../WIDGET_viewport.h"
 
 #ifdef __APPLE__
@@ -37,9 +38,6 @@ void ViewportWidget::init()
   grabGesture(Qt::PinchGesture);
 
   grid_shader_ = new vektor::gpu::GridShader();
-  QString shader_path = QString(vektor::lib::get_application_dir_path()) +
-                        "/../../source/runtime/gpu/shaders/file/grid";
-  grid_shader_->init(shader_path);
 
   connect(&timer_, &QTimer::timeout, this, [this] {
     update_camera();
@@ -47,15 +45,20 @@ void ViewportWidget::init()
   });
   timer_.start(16);
 
-  connect(&timer_, &QTimer::timeout, this, [this] {
-    update_camera();
-    update();
-  });
   timer_.start(16);
 }
 
 void ViewportWidget::paintGL()
 {
+  qt::scene::SCN_init_default_scene();
+
+  if (!grid_initialized_ && grid_shader_) {
+    QString shader_path = QString(vektor::lib::get_application_dir_path()) +
+                          "/../../source/runtime/gpu/shaders/file/grid";
+    grid_shader_->init(shader_path);
+    grid_initialized_ = true;
+  }
+
   if (!mesh_initialized_) {
     init_cylinder_mesh();
   }

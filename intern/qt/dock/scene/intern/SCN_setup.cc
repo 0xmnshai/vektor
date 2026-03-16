@@ -6,6 +6,12 @@ namespace qt::scene {
 
 void SCN_init_default_scene()
 {
+  static bool initialized = false;
+  if (initialized) {
+    return;
+  }
+  initialized = true;
+
   // Create test entities only once
   vektor::kernel::create_entity(nullptr,
                                 nullptr,

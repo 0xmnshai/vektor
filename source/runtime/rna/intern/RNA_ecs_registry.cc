@@ -13,7 +13,7 @@ extern "C" {
 
 void *RNA_ecs_get_registry(void)
 {
-  return (void *)&ECSRegistry::instance().registry();
+  return (void *)&ECSRegistry::instance();
 }
 
 unsigned int RNA_ecs_create_entity(void)
