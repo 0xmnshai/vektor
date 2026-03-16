@@ -1,9 +1,10 @@
-#include "versioning.h"
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtOpenGL/QOpenGLFunctions_4_1_Core>
 
 #import <Metal/Metal.h>
+
+#include "versioning.h"
 
 const char *VKT_version_opengl_get(void)
 {

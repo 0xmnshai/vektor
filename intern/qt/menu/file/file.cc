@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QMenu>
 #include <QMenuBar>
 
@@ -18,7 +19,13 @@ void MENU_file_register(void *window)
 
   menu->addSeparator();
 
-  menu->addAction("Exit");
+  QAction *quit_action = menu->addAction("Quit");
+  quit_action->setShortcut(QKeySequence::Quit);
+  quit_action->setMenuRole(QAction::QuitRole);
+
+  QObject::connect(quit_action, &QAction::triggered, []() {
+    qApp->quit();
+  });
 }
 
 }  // namespace qt::menu
