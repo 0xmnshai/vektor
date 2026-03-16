@@ -1,3 +1,6 @@
+.DS_Store
+/extern/.DS_Store
+code.txt
 /build/
 logs/
 # Ignore everything in extern/deps
