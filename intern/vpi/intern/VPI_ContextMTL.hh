@@ -60,6 +60,16 @@ class VPI_ContextMTL : public VPI_Context {
   void begin_render_pass();
   void end_render_pass();
 
+  void set_depth_write_enabled(bool enabled);
+
+#ifdef __OBJC__
+  static id<MTLDevice> get_shared_device();
+  static id<MTLCommandQueue> get_shared_command_queue();
+#else
+  static void *get_shared_device();
+  static void *get_shared_command_queue();
+#endif
+
 #ifdef __OBJC__
   void metal_register_present_callbacks(void (*callback)(
       MTLRenderPassDescriptor *, id<MTLRenderPipelineState>, id<MTLTexture>, id<CAMetalDrawable>));
@@ -88,6 +98,13 @@ class VPI_ContextMTL : public VPI_Context {
 
  protected:
   static int s_shared_count_;
+#ifdef __OBJC__
+  static id<MTLDevice> s_shared_device_;
+  static id<MTLCommandQueue> s_shared_queue_;
+#else
+  static void *s_shared_device_;
+  static void *s_shared_queue_;
+#endif
 
   NSView *metal_view_;
   NSView *metal_subview_;
@@ -114,6 +131,19 @@ class VPI_ContextMTL : public VPI_Context {
   };
   MTLSwapchainTexture default_framebuffer_metal_texture_[METAL_SWAPCHAIN_SIZE];
   unsigned int current_swapchain_index = 0;
+
+  unsigned int last_width_ = 0;
+  unsigned int last_height_ = 0;
+
+#ifdef __OBJC__
+  id<MTLTexture> depth_texture_;
+  id<MTLDepthStencilState> depth_state_read_write_;
+  id<MTLDepthStencilState> depth_state_read_only_;
+#else
+  MTLTextureRef depth_texture_;
+  void *depth_state_read_write_;
+  void *depth_state_read_only_;
+#endif
 
 #ifdef __OBJC__
   void (*contextPresentCallback)(MTLRenderPassDescriptor *,

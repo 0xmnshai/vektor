@@ -70,7 +70,9 @@ void ViewportWidget::paintGL()
         glm::mat4 projection = camera_->projection_matrix((float)width() / (float)height());
         glm::mat4 view = camera_->view_matrix();
 
+        mtl_context->set_depth_write_enabled(false);
         grid_shader_->draw(projection, view);
+        mtl_context->set_depth_write_enabled(true);
       }
 
       // Metal rendering for ECS objects
@@ -78,11 +80,13 @@ void ViewportWidget::paintGL()
       auto objects_view = registry.view<vektor::dna::Object>();
 
       auto encoder = (id<MTLRenderCommandEncoder>)mtl_context->get_current_command_encoder();
+      int draw_count = 0;
 
       for (auto entity : objects_view) {
         auto &obj = objects_view.get<vektor::dna::Object>(entity);
 
         if (obj.type == vektor::dna::DNA_ENTITY_CYLINDER && obj.shader_program) {
+          draw_count++;
           auto *gpu_shader = (vektor::gpu::GPUShader *)obj.shader_program;
           auto pipeline = (id<MTLRenderPipelineState>)gpu_shader->metal_pipeline;
 
@@ -121,6 +125,11 @@ void ViewportWidget::paintGL()
                         vertexCount:cylinder_vertex_count_];
           }
         }
+      }
+      
+      if (draw_count > 0) {
+        // static int frame = 0;
+        // if (frame++ % 60 == 0) NSLog(@"[Metal] Drawing %d cylinders", draw_count);
       }
 
       mtl_context->end_render_pass();

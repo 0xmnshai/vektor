@@ -18,7 +18,6 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
 
   NSError *error = nil;
 
-  // Slang SLANG_METAL_LIB produces a metallib binary
   dispatch_data_t vert_dispatch = dispatch_data_create(
       vert_code.constData(), vert_code.size(), nil, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
   id<MTLLibrary> vert_lib = [device newLibraryWithData:vert_dispatch error:&error];
@@ -44,8 +43,6 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
 
   if (!vert_func || !frag_func) {
     CLOG_ERROR(LOG_SHADER, "[GPU_shader_metal] Failed to find entry points ('main') in library");
-    [vert_lib release];
-    [frag_lib release];
     return nullptr;
   }
 
@@ -53,31 +50,31 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
   desc.vertexFunction = vert_func;
   desc.fragmentFunction = frag_func;
   desc.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+  desc.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+  desc.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
 
-  // Grid specific: Blending
+  // Editor defaults: Enable blending
   desc.colorAttachments[0].blendingEnabled = YES;
   desc.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
   desc.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+  desc.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
+  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
-                                                                               error:&error];
-  if (error) {
-    CLOG_ERROR(LOG_SHADER,
-               "[GPU_shader_metal] Pipeline error: %s",
-               [[error localizedDescription] UTF8String]);
-    [vert_func release];
-    [frag_func release];
-    [vert_lib release];
-    [frag_lib release];
-    [desc release];
-    return nullptr;
-  }
-
+                                                                                error:&error];
+  
   [vert_func release];
   [frag_func release];
   [vert_lib release];
   [frag_lib release];
   [desc release];
+
+  if (error) {
+    CLOG_ERROR(LOG_SHADER,
+               "[GPU_shader_metal] Pipeline error: %s",
+               [[error localizedDescription] UTF8String]);
+    return nullptr;
+  }
 
   return (void *)pipeline;
 }
@@ -110,7 +107,6 @@ void *GPU_metal_pipeline_create_from_source(const char *source)
   id<MTLFunction> frag_func = [library newFunctionWithName:@"fragment_main"];
 
   if (!vert_func || !frag_func) {
-    // Try "main" as fallback
     if (!vert_func)
       vert_func = [library newFunctionWithName:@"main"];
     if (!frag_func)
@@ -129,14 +125,18 @@ void *GPU_metal_pipeline_create_from_source(const char *source)
   desc.vertexFunction = vert_func;
   desc.fragmentFunction = frag_func;
   desc.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
+  desc.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
+  desc.stencilAttachmentPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
 
-  // Grid specific: Blending
+  // Editor defaults: Enable blending
   desc.colorAttachments[0].blendingEnabled = YES;
   desc.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
   desc.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
+  desc.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
+  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
-                                                                               error:&error];
+                                                                                error:&error];
   [vert_func release];
   [frag_func release];
   [library release];
