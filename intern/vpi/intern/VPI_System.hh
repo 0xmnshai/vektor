@@ -61,6 +61,11 @@ class VPI_System : public QObject, public VPI_ISystem {
 
   static VPI_System *get();
 
+  QApplication *get_qt_app() const noexcept
+  {
+    return qt_app_;
+  }
+
   VPI_TSuccess exit(bool &is_running) override;
 
   [[nodiscard]] uint64_t get_milliseconds() const noexcept override;
@@ -81,8 +86,8 @@ class VPI_System : public QObject, public VPI_ISystem {
   }
 
  private:
-  VPI_QtWindow *qt_window_;
   QApplication *qt_app_;
+  VPI_QtWindow *qt_window_;
   QElapsedTimer timer_;
 
   uint64_t start_time_;

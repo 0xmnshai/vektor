@@ -3,8 +3,8 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
-#include "WIDGET_area.h"
-#include "WIDGET_header.h"
+#include "../WIDGET_area.h"
+#include "../WIDGET_header.h"
 
 #include "../assets_browser/WIDGET_assets_browser.h"
 #include "../console/WIDGET_console.h"

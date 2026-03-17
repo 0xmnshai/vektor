@@ -28,8 +28,8 @@ void MENU_window_register(void *window)
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
       QRect screen_geometry = screen->geometry();
-      int width = 1024;
-      int height = 768;
+      int width = 540;
+      int height = 440;
       int x = screen_geometry.left() + (screen_geometry.width() - width) / 2;
       int y = screen_geometry.top() + (screen_geometry.height() - height) / 2;
       new_window->setGeometry(x, y, width, height);

@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <cstdio>
 
 #include "../../../../intern/clog/CLG_log.h"
@@ -23,19 +24,21 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
   vpi::VPI_ISystem *system = vpi::VPI_ISystem::get();
   system->init();
 
+  auto screen_size = QApplication::screens()[0]->size();
+
   if (!vektor::creator::G.background) {
     const char *title = "Vektor Editor";
     if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_OPENGL) {
       char title_buf[256];
       const char *version = VEKTOR_VERSION;  // VKT_version_opengl_get();
       snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - OpenGL", version);
-      editor_window = system->create_window(title_buf, 0, 0, 1280, 720, nullptr);
+      editor_window = system->create_window(title_buf, 0, 0, screen_size.width(), screen_size.height(), nullptr);
     }
     else if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_METAL) {
       char title_buf[256];
       const char *version = VEKTOR_VERSION;
       snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - Metal", version);
-      editor_window = system->create_window(title_buf, 0, 0, 1280, 720, nullptr);
+      editor_window = system->create_window(title_buf, 0, 0, screen_size.width(), screen_size.height(), nullptr);
     }
   }
 

@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <vector>
 
-#include "WIDGET_header.h"
+#include "../WIDGET_header.h"
 
 namespace qt::dock {
 
