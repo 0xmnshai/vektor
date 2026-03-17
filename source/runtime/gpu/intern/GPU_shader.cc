@@ -17,7 +17,8 @@ namespace vektor::gpu {
 CLG_LOGREF_DECLARE_GLOBAL(LOG_SHADER, "gpu_shader");
 
 extern void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &frag_code);
-extern void *GPU_metal_pipeline_create_from_source(const char *source);
+extern void *GPU_metal_pipeline_create_from_source(const char *source,
+                                                   const GPUShaderSourceParameters *params);
 
 static Slang::ComPtr<slang::IGlobalSession> g_slang_session;
 
@@ -204,7 +205,9 @@ GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_
   return shader;
 };
 
-GPUShader *GPU_shader_create_from_source(const char *vert_path, const char *frag_path)
+GPUShader *GPU_shader_create_from_source(const char *vert_path,
+                                         const char *frag_path,
+                                         const GPUShaderSourceParameters *params)
 {
   const bool is_metal = (creator::G.gpu_backend == creator::GPU_BACKEND_METAL);
 
@@ -227,7 +230,7 @@ GPUShader *GPU_shader_create_from_source(const char *vert_path, const char *frag
     auto *shader = (GPUShader *)MEM_mallocN(sizeof(GPUShader), "GPU_shader");
     shader->backend = GPUShader::GPU_BACKEND_METAL;
     shader->program = nullptr;
-    shader->metal_pipeline = GPU_metal_pipeline_create_from_source(source.constData());
+    shader->metal_pipeline = GPU_metal_pipeline_create_from_source(source.constData(), params);
 
     if (!shader->metal_pipeline) {
       MEM_freeN(shader);

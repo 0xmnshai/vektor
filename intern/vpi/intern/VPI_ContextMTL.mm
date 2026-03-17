@@ -111,7 +111,7 @@ void VPI_ContextMTL::metal_init()
   depthDesc.depthCompareFunction = MTLCompareFunctionLess;
   depthDesc.depthWriteEnabled = YES;
   depth_state_read_write_ = [metal_device_ newDepthStencilStateWithDescriptor:depthDesc];
-  
+
   depthDesc.depthWriteEnabled = NO;
   depth_state_read_only_ = [metal_device_ newDepthStencilStateWithDescriptor:depthDesc];
   [depthDesc release];
@@ -134,12 +134,12 @@ void VPI_ContextMTL::metal_free()
     [metal_subview_ release];
     metal_subview_ = nil;
   }
-  
+
   if (depth_texture_) {
     [depth_texture_ release];
     depth_texture_ = nil;
   }
-  
+
   if (depth_state_read_write_) {
     [depth_state_read_write_ release];
     depth_state_read_write_ = nil;
@@ -156,9 +156,7 @@ void VPI_ContextMTL::metal_free()
   metal_view_ = nil;
 }
 
-void VPI_ContextMTL::metal_init_framebuffers()
-{
-}
+void VPI_ContextMTL::metal_init_framebuffers() {}
 
 void VPI_ContextMTL::metal_update_Framebuffer()
 {
@@ -168,8 +166,10 @@ void VPI_ContextMTL::metal_update_Framebuffer()
     uint32_t width = (uint32_t)(size.width * scale);
     uint32_t height = (uint32_t)(size.height * scale);
 
-    if (width == 0 || height == 0) return;
-    if (width == last_width_ && height == last_height_ && depth_texture_) return;
+    if (width == 0 || height == 0)
+      return;
+    if (width == last_width_ && height == last_height_ && depth_texture_)
+      return;
 
     metal_layer_.drawableSize = CGSizeMake(width, height);
     if (metal_layer_.contentsScale != scale) {
@@ -188,7 +188,7 @@ void VPI_ContextMTL::metal_update_Framebuffer()
     depthTexDesc.usage = MTLTextureUsageRenderTarget;
     depthTexDesc.storageMode = MTLStorageModePrivate;
     depth_texture_ = [metal_device_ newTextureWithDescriptor:depthTexDesc];
-    
+
     last_width_ = width;
     last_height_ = height;
   }
@@ -201,11 +201,14 @@ void VPI_ContextMTL::begin_render_pass()
     return;
   }
 
-  // Ensure framebuffer and scale are up to date before grabbing a drawable (fixes startup/resize blur)
+  // Ensure framebuffer and scale are up to date before grabbing a drawable (fixes startup/resize
+  // blur)
   metal_update_Framebuffer();
 
   // Use a very short timeout to skip frames if GPU is saturated, avoiding UI lockup
-  if (dispatch_semaphore_wait(frame_semaphore_, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_MSEC)) != 0) {
+  if (dispatch_semaphore_wait(frame_semaphore_,
+                              dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_MSEC)) != 0)
+  {
     return;
   }
 
@@ -217,7 +220,7 @@ void VPI_ContextMTL::begin_render_pass()
 
   id<MTLCommandBuffer> commandBuffer = [metal_command_queue_ commandBuffer];
   MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
-  
+
   passDescriptor.colorAttachments[0].texture = drawable.texture;
   passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
   passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
@@ -239,7 +242,8 @@ void VPI_ContextMTL::begin_render_pass()
   MTLViewport viewport = {
       0.0, 0.0, (double)drawable.texture.width, (double)drawable.texture.height, 0.0, 1.0};
   [encoder setViewport:viewport];
-  MTLScissorRect scissor = {0, 0, (NSUInteger)drawable.texture.width, (NSUInteger)drawable.texture.height};
+  MTLScissorRect scissor = {
+      0, 0, (NSUInteger)drawable.texture.width, (NSUInteger)drawable.texture.height};
   [encoder setScissorRect:scissor];
 
   current_command_buffer_ = (void *)commandBuffer;
@@ -282,8 +286,14 @@ void VPI_ContextMTL::set_depth_write_enabled(bool enabled)
   [encoder setDepthStencilState:enabled ? depth_state_read_write_ : depth_state_read_only_];
 }
 
-id<MTLDevice> VPI_ContextMTL::get_shared_device() { return s_shared_device_; }
-id<MTLCommandQueue> VPI_ContextMTL::get_shared_command_queue() { return s_shared_queue_; }
+id<MTLDevice> VPI_ContextMTL::get_shared_device()
+{
+  return s_shared_device_;
+}
+id<MTLCommandQueue> VPI_ContextMTL::get_shared_command_queue()
+{
+  return s_shared_queue_;
+}
 
 }  // namespace vpi
 

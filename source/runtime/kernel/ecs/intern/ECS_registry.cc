@@ -10,6 +10,7 @@
 
 #include "../../gpu/GPU_shader.h"
 #include "../../lib/intern/appdir.h"
+#include "../../creator_global.h"
 #include <string>
 
 extern "C" {
@@ -48,12 +49,22 @@ void create_entity(rna::VektorRNA *v_rna,
 
   if (object->type == dna::DNA_ENTITY_CYLINDER) {
     std::string base_path = vektor::lib::get_application_dir_path();
-    std::string vert_path = base_path +
-                            "/../../source/runtime/gpu/shaders/file/mesh/cylinder/cylinder.vert";
-    std::string frag_path = base_path +
-                            "/../../source/runtime/gpu/shaders/file/mesh/cylinder/cylinder.frag";
+    std::string vert_path =
+        base_path + "/../../source/runtime/gpu/shaders/file/mesh/cylinder/cylinder.vert";
+    std::string frag_path =
+        base_path + "/../../source/runtime/gpu/shaders/file/mesh/cylinder/cylinder.frag";
+
+    vektor::gpu::GPUShaderSourceParameters params = {nullptr};
+    if (creator::G.gpu_backend == creator::GPU_BACKEND_METAL) {
+      vert_path = base_path + "/../../source/runtime/gpu/shaders/file/mesh/cylinder/cylinder.metal";
+      frag_path = vert_path;
+      params.vert_entry = "vertex_main";
+      params.frag_entry = "fragment_main";
+    }
+
     object->shader_program = gpu::GPU_shader_create_from_source(vert_path.c_str(),
-                                                                frag_path.c_str());
+                                                                frag_path.c_str(),
+                                                                &params);
   }
   else {
     object->shader_program = nullptr;

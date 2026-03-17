@@ -79,7 +79,8 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
   return (void *)pipeline;
 }
 
-void *GPU_metal_pipeline_create_from_source(const char *source)
+void *GPU_metal_pipeline_create_from_source(const char *source,
+                                           const GPUShaderSourceParameters *params)
 {
   auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
   if (!device) {
@@ -103,19 +104,24 @@ void *GPU_metal_pipeline_create_from_source(const char *source)
     return nullptr;
   }
 
-  id<MTLFunction> vert_func = [library newFunctionWithName:@"vertex_main"];
-  id<MTLFunction> frag_func = [library newFunctionWithName:@"fragment_main"];
+  const char *v_entry = (params && params->vert_entry) ? params->vert_entry : "vertex_main";
+  const char *f_entry = (params && params->frag_entry) ? params->frag_entry : "fragment_main";
+
+  id<MTLFunction> vert_func = [library newFunctionWithName:[NSString stringWithUTF8String:v_entry]];
+  id<MTLFunction> frag_func = [library newFunctionWithName:[NSString stringWithUTF8String:f_entry]];
 
   if (!vert_func || !frag_func) {
+    // If customized fails, or if using defaults, try "main" fallback
     if (!vert_func)
       vert_func = [library newFunctionWithName:@"main"];
     if (!frag_func)
       frag_func = [library newFunctionWithName:@"main"];
 
     if (!vert_func || !frag_func) {
-      CLOG_ERROR(
-          LOG_SHADER,
-          "[GPU_shader_metal] Failed to find entry points vertex_main/fragment_main or main");
+      CLOG_ERROR(LOG_SHADER,
+                 "[GPU_shader_metal] Failed to find entry points %s/%s or main",
+                 v_entry,
+                 f_entry);
       [library release];
       return nullptr;
     }

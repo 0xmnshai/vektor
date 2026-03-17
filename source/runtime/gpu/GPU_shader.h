@@ -22,8 +22,15 @@ typedef struct GPUShader {
   void *metal_pipeline;
 } GPUShader;
 
+typedef struct GPUShaderSourceParameters {
+  const char *vert_entry; /* Optional: for Metal (defaults to main) */
+  const char *frag_entry; /* Optional: for Metal (defaults to main) */
+} GPUShaderSourceParameters;
+
 GPUShader *GPU_shader_create_from_slang(const char *vert_path, const char *frag_path);
-GPUShader *GPU_shader_create_from_source(const char *vert_path, const char *frag_path);
+GPUShader *GPU_shader_create_from_source(const char *vert_path,
+                                         const char *frag_path,
+                                         const GPUShaderSourceParameters *params = nullptr);
 
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
 static void print_compute_results();
