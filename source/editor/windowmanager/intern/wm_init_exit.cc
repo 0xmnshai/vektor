@@ -33,7 +33,7 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
     }
     else if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_METAL) {
       char title_buf[256];
-      const char *version = VEKTOR_VERSION;  // VKT_version_metal_get();
+      const char *version = VEKTOR_VERSION;
       snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - Metal", version);
       editor_window = system->create_window(title_buf, 0, 0, 1280, 720, nullptr);
     }
