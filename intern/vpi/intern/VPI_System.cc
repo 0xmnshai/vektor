@@ -14,7 +14,7 @@ namespace vpi {
 
 CLG_LOGREF_DECLARE_GLOBAL(SYS_LOG, "system");
 
-static VPI_ISystem *g_vpi_system = nullptr;
+static VPI_System *g_vpi_system = nullptr;
 static VPI_ISystem *g_vpi_system_background = nullptr;
 
 VPI_TSuccess VPI_ISystem::create(bool /*verbose*/, bool background)
@@ -132,6 +132,11 @@ VPI_TSuccess VPI_System::exit(bool &is_running)
   is_running = false;
 
   return VPI_kSuccess;
+}
+
+static VPI_System *get()
+{
+  return g_vpi_system;
 }
 
 uint64_t VPI_System::get_milliseconds() const noexcept

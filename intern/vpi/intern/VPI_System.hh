@@ -3,8 +3,8 @@
 #include <QElapsedTimer>
 #include <new>
 
-#include "VPI_ISystem.h"
-#include "VPI_Types.h"
+#include "../VPI_ISystem.h"
+#include "../VPI_Types.h"
 #include "../intern/VPI_QtWindow.hh"
 
 #include "../../intern/gaurdalloc/MEM_gaurdalloc.h"
@@ -51,19 +51,22 @@ class VPI_System : public QObject, public VPI_ISystem {
   }
 
   [[nodiscard]] VPI_QtWindow *create_window(char const *title,
-                                          int32_t left,
-                                          int32_t top,
-                                          uint32_t width,
-                                          uint32_t height,
-                                          VPI_QtWindow const *parent_window) noexcept override;
+                                            int32_t left,
+                                            int32_t top,
+                                            uint32_t width,
+                                            uint32_t height,
+                                            VPI_QtWindow const *parent_window) noexcept override;
 
   VPI_TSuccess init() override;
+
+  static VPI_System *get();
 
   VPI_TSuccess exit(bool &is_running) override;
 
   [[nodiscard]] uint64_t get_milliseconds() const noexcept override;
 
-  [[nodiscard]] VPI_QtWindow *get_window_under_cursor(int32_t x, int32_t y) const noexcept override;
+  [[nodiscard]] VPI_QtWindow *get_window_under_cursor(int32_t x,
+                                                      int32_t y) const noexcept override;
 
   [[nodiscard]] VPI_TSuccess register_window(VPI_QtWindow *window) noexcept;
 

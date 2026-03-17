@@ -176,6 +176,11 @@ VPI_WindowManager const &VPI_QtWindow::get_window_manager() const noexcept
   return *window_manager_;
 }
 
+VPI_WindowManager &VPI_QtWindow::get_window_manager() noexcept
+{
+  return *window_manager_;
+}
+
 VPI_EventManager const &VPI_QtWindow::get_event_manager() const noexcept
 {
   return *event_manager_;
@@ -232,5 +237,23 @@ void VPI_QtWindow::setup_docks()
   // Set a central widget to provide a stable reference for docking
   // TODO: this is causing a blank space in window, we have to fix this
   // setCentralWidget(new QWidget(this));
+}
+
+QDockWidget *VPI_QtWindow::setup_viewport_only()
+{
+  setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks |
+                 QMainWindow::AnimatedDocks);
+
+  QDockWidget::DockWidgetFeatures features = QDockWidget::DockWidgetMovable |
+                                             QDockWidget::DockWidgetFloatable |
+                                             QDockWidget::DockWidgetClosable;
+
+  auto *scene_dock = new QDockWidget("Scene", this);
+  scene_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  scene_dock->setFeatures(features);
+  auto *view_port_area = new qt::dock::AreaWidget(qt::dock::EditorType::VIEWPORT_3D, this);
+  scene_dock->setWidget(view_port_area);
+  addDockWidget(Qt::LeftDockWidgetArea, scene_dock);
+  return scene_dock;
 }
 }  // namespace vpi

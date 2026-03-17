@@ -15,7 +15,6 @@
 #include "../intern/VPI_EventManager.hh"
 #include "../intern/VPI_GLWidget.hh"
 #include "../intern/VPI_QtEventConsumer.hh"
-#include "VPI_EventManager.hh"
 #include "VPI_Window.hh"
 #include "VPI_WindowManager.hh"
 
@@ -98,6 +97,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
   void get_client_bounds(VPI_Rect &bounds) const override;
 
   [[nodiscard]] VPI_WindowManager const &get_window_manager() const noexcept;
+  [[nodiscard]] VPI_WindowManager &get_window_manager() noexcept;
 
   [[nodiscard]] VPI_EventManager const &get_event_manager() const noexcept;
 
@@ -113,6 +113,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
 
   void setup_menus();
   void setup_docks();
+  QDockWidget *setup_viewport_only();
 
  protected:
   VPI_GLWidget *gl_widget_;

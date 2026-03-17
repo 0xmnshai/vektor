@@ -4,8 +4,8 @@
 #include <QObject>
 #include <cstdint>
 
-#include "../vpi/intern/VPI_QtWindow.hh"
 #include "VPI_Types.h"
+#include "../../intern/vpi/intern/VPI_QtWindow.hh"
 
 #ifndef METAL
 #  define METAL

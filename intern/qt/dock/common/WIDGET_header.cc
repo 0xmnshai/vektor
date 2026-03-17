@@ -1,21 +1,20 @@
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
 #include <QPushButton>
 #include <QWidget>
-#include "WIDGET_header.h"
-#include <QHBoxLayout>
-#include <QMenu>
 #include <vector>
+
+#include "WIDGET_header.h"
 
 namespace qt::dock {
 
-const std::vector<EditorInfo> g_editors = {
-    {EditorType::VIEWPORT_3D, "3D Viewport", "🎥"},
-    {EditorType::OUTLINER, "Outliner", "📐"},
-    {EditorType::PROPERTIES, "Properties", "📦"},
-    {EditorType::ASSETS_BROWSER, "Assets Browser", "📁"},
-    {EditorType::CONSOLE, "Python Console", "📟"},
-    {EditorType::GAME_VIEW, "Game View", "🎮"}};
+const std::vector<EditorInfo> g_editors = {{EditorType::VIEWPORT_3D, "3D Viewport", "🎥"},
+                                           {EditorType::OUTLINER, "Outliner", "📐"},
+                                           {EditorType::PROPERTIES, "Properties", "📦"},
+                                           {EditorType::ASSETS_BROWSER, "Assets Browser", "📁"},
+                                           {EditorType::CONSOLE, "Python Console", "📟"},
+                                           {EditorType::GAME_VIEW, "Game View", "🎮"}};
 
 WidgetHeader::WidgetHeader(EditorType initial_type, QWidget *parent)
     : QWidget(parent), current_type_(initial_type)
@@ -28,15 +27,17 @@ WidgetHeader::WidgetHeader(EditorType initial_type, QWidget *parent)
   type_button_->setFixedWidth(24);
   type_button_->setFixedHeight(20);
   type_button_->setFlat(true);
-  
+
   // Minimal style for the button to look like Blender's icon button
-  type_button_->setStyleSheet("QPushButton { border: none; background: transparent; font-size: 14px; } "
-                              "QPushButton:hover { background: #444; border-radius: 2px; }");
+  type_button_->setStyleSheet(
+      "QPushButton { border: none; background: transparent; font-size: 14px; } "
+      "QPushButton:hover { background: #444; border-radius: 2px; }");
 
   layout->addWidget(type_button_);
-  
+
   title_label_ = new QLabel(this);
-  title_label_->setStyleSheet("color: #aaa; font-weight: bold; font-size: 11px; margin-left: 2px;");
+  title_label_->setStyleSheet(
+      "color: #aaa; font-weight: bold; font-size: 11px; margin-left: 2px;");
   layout->addWidget(title_label_);
 
   layout->addStretch();
@@ -44,7 +45,7 @@ WidgetHeader::WidgetHeader(EditorType initial_type, QWidget *parent)
   set_editor_type(initial_type);
 
   connect(type_button_, &QPushButton::clicked, this, &WidgetHeader::show_type_menu);
-  
+
   setFixedHeight(24);
   setStyleSheet("background-color: #2b2b2b; border-bottom: 1px solid #1a1a1a;");
 }
@@ -65,9 +66,10 @@ void WidgetHeader::set_editor_type(EditorType type)
 void WidgetHeader::show_type_menu()
 {
   QMenu menu(this);
-  menu.setStyleSheet("QMenu { background-color: #333; color: #eee; border: 1px solid #111; } "
-                     "QMenu::item { padding: 4px 20px; } "
-                     "QMenu::item:selected { background-color: #4c6a8d; }");
+  menu.setStyleSheet(
+      "QMenu { background-color: #333; color: #eee; border: 1px solid #111; } "
+      "QMenu::item { padding: 4px 20px; } "
+      "QMenu::item:selected { background-color: #4c6a8d; }");
 
   for (const auto &info : g_editors) {
     QAction *action = menu.addAction(info.icon + "  " + info.name);
