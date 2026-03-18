@@ -76,18 +76,6 @@ VPI_System::VPI_System() : qt_window_(nullptr), qt_app_(nullptr)
 
 VPI_System::~VPI_System() = default;
 
-VPI_QtWindow *VPI_System::create_window(char const *title,
-                                        int32_t left,
-                                        int32_t top,
-                                        uint32_t width,
-                                        uint32_t height,
-                                        VPI_QtWindow const *parent_window) noexcept
-{
-  qt_window_->create_window(title, left, top, width, height, parent_window);
-  qt_window_->window_manager_->add_window(qt_window_);
-  return qt_window_;
-}
-
 VPI_TSuccess VPI_System::init()
 {
   static int argc = 1;
@@ -113,6 +101,18 @@ VPI_TSuccess VPI_System::init()
   start_time_ = timer_.elapsed();
 
   return VPI_kSuccess;
+}
+
+VPI_QtWindow *VPI_System::create_window(char const *title,
+                                        int32_t left,
+                                        int32_t top,
+                                        uint32_t width,
+                                        uint32_t height,
+                                        VPI_QtWindow const *parent_window) noexcept
+{
+  qt_window_->create_window(title, left, top, width, height, parent_window);
+  qt_window_->window_manager_->add_window(qt_window_);
+  return qt_window_;
 }
 
 VPI_TSuccess VPI_System::exit(bool &is_running)

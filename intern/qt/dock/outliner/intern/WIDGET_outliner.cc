@@ -155,20 +155,20 @@ void OutlinerWidget::refresh_entities()
   // Level 3: Objects
   for (auto entity : objects_view) {
     auto &obj = objects_view.get<vektor::dna::Object>(entity);
-    QString name = QString::fromUtf8(obj.id_name);
+    QString name = QString::fromUtf8(obj.id.name);
 
     auto *name_item = new QStandardItem(name);
 
     // Set icons based on object type
     QString icon_str = "❓";
-    switch (obj.object_type) {
-      case DNA_MESH:
+    switch (obj.type) {
+      case ObjectType::Mesh:
         icon_str = "📐";
         break;
-      case DNA_CAMERA:
+      case ObjectType::Camera:
         icon_str = "🎥";
         break;
-      case DNA_LIGHT:
+      case ObjectType::Light:
         icon_str = "💡";
         break;
       default:

@@ -1,13 +1,13 @@
 #pragma once
 
+#include <cstdint>
+
 namespace vektor::dna {
 
 struct ID {
-  void *next = nullptr;
-  void *prev = nullptr;
-  struct ID *newid = nullptr;
-
   char name[/*MAX_ID_NAME*/ 258] = "";
+  uint64_t session_id;  ///< Run-time unique ID for synchronization
+  int type;            ///< IDType (Mesh, Object, Material, etc.)
 };
 
 struct IDPropertyUIData {

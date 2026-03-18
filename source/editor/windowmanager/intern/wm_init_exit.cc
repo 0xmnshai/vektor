@@ -27,19 +27,17 @@ void WM_init(lib::vkContext *vkC, int argc, const char **argv)
   auto screen_size = QApplication::screens()[0]->size();
 
   if (!vektor::creator::G.background) {
-    const char *title = "Vektor Editor";
+    char title_buf[256];
     if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_OPENGL) {
-      char title_buf[256];
-      const char *version = VEKTOR_VERSION;  // VKT_version_opengl_get();
-      snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - OpenGL", version);
-      editor_window = system->create_window(title_buf, 0, 0, screen_size.width(), screen_size.height(), nullptr);
+      snprintf(
+          title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - OpenGL", VEKTOR_VERSION);
     }
     else if (vektor::creator::G.gpu_backend == creator::GPU_BACKEND_METAL) {
-      char title_buf[256];
-      const char *version = VEKTOR_VERSION;
-      snprintf(title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - Metal", version);
-      editor_window = system->create_window(title_buf, 0, 0, screen_size.width(), screen_size.height(), nullptr);
+      snprintf(
+          title_buf, sizeof(title_buf), "Vektor Editor ( version : %s ) - Metal", VEKTOR_VERSION);
     }
+    editor_window = system->create_window(
+        title_buf, 0, 0, screen_size.width(), screen_size.height(), nullptr);
   }
 
   vektor::runtime::initialize(system, editor_window);

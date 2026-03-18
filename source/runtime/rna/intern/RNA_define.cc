@@ -3,16 +3,16 @@
 
 namespace vektor::rna {
 
-const char *rna_enum_object_type_to_string(dna::ObjectTypeDNA type)
+const char *rna_enum_object_type_to_string(dna::ObjectType type)
 {
   switch (type) {
-    case dna::DNA_COLLECTION:
-      return "collection";
-    case dna::DNA_MESH:
+    case dna::ObjectType::Empty:
+      return "empty";
+    case dna::ObjectType::Mesh:
       return "mesh";
-    case dna::DNA_CAMERA:
+    case dna::ObjectType::Camera:
       return "camera";
-    case dna::DNA_LIGHT:
+    case dna::ObjectType::Light:
       return "light";
     default:
       return "unknown";

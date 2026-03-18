@@ -9,7 +9,7 @@ void window_menu_setup(void *window)
 {
   MENU_file_register(window);
   MENU_window_register(window);
-  //   MENU_edit_register(menu_bar);
+  MENU_edit_register(window);
   //   MENU_help_register(menu_bar);
 }
 

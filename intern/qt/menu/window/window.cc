@@ -28,7 +28,7 @@ void MENU_window_register(void *window)
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen) {
       QRect screen_geometry = screen->geometry();
-      int width = 540;
+      int width = 620;
       int height = 440;
       int x = screen_geometry.left() + (screen_geometry.width() - width) / 2;
       int y = screen_geometry.top() + (screen_geometry.height() - height) / 2;
@@ -36,7 +36,7 @@ void MENU_window_register(void *window)
     }
 
     new_window->setup_menus();
-    QDockWidget *viewport_dock = new_window->setup_viewport_only();
+    QDockWidget *viewport_dock = new_window->setup_new_window_with_viewport();
     // viewport_dock->setFloating(true);
     // viewport_dock->setWindowTitle("Viewport");
     // viewport_dock->setFeatures(QDockWidget::DockWidgetMovable |

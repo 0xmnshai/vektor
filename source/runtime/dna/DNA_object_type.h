@@ -1,6 +1,11 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <memory>
+
+#include "../kernel/VKE_object_component.hh"
+#include "DNA_id.h"
+#include "DNA_mesh_types.h"
 
 namespace vektor::dna {
 
@@ -12,38 +17,36 @@ struct Active {
   bool active;
 };
 
-// we can add more as needed
-typedef enum EntityTypeDNA {
-  DNA_ENTITY_CUBE = 0,
-  DNA_ENTITY_CYLINDER = 1,
-  DNA_ENTITY_PLANE = 2,
-  DNA_ENTITY_SPHERE = 3,
-} EntityTypeDNA;
-
-typedef enum ObjectTypeDNA {
-  DNA_COLLECTION = 0,
-  DNA_MESH = 1,
-  DNA_CAMERA = 2,
-  DNA_LIGHT = 3,
-} ObjectTypeDNA;
+enum class ObjectType : uint8_t { Mesh, Camera, Light, Empty };
 
 typedef struct Transform {
-  glm::vec3 location;
-  glm::vec3 scale;
-  glm::vec3 rotation;
+  glm::vec3 location = glm::vec3(0.0f);
+  glm::vec3 scale = glm::vec3(1.0f);
+  glm::vec3 rotation = glm::vec3(0.0f);
 } Transform;
 
-typedef struct Material {
-  glm::vec4 color;
-} Material;
-
 typedef struct Object {
-  char id_name[64];
+  ID id;
+  char description[256] = "";
   Transform transform;
-  EntityTypeDNA type;
-  Material material;
-  void *shader_program;
-  ObjectTypeDNA object_type;
+  void *shader_program = nullptr;
+
+  std::shared_ptr<dna::Mesh> mesh;
+
+  ObjectType type = ObjectType::Empty;
+
+  std::vector<std::shared_ptr<kernel::VKE_ObjectComponent>> components;
+
+  Object() = default;
 } Object;
+
+// Dummy components for future use
+class PhysicsComponent : public kernel::VKE_ObjectComponent {
+ public:
+  void on_transform_updated() override
+  {
+    // Physics sync logic
+  }
+};
 
 }  // namespace vektor::dna

@@ -17,6 +17,7 @@ namespace vektor::gpu {
 CLG_LOGREF_DECLARE_GLOBAL(LOG_SHADER, "gpu_shader");
 
 extern void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &frag_code);
+
 extern void *GPU_metal_pipeline_create_from_source(const char *source,
                                                    const GPUShaderSourceParameters *params);
 
@@ -220,7 +221,8 @@ GPUShader *GPU_shader_create_from_source(const char *vert_path,
 
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Failed to open Metal source: %s", path.toUtf8().constData());
+      CLOG_ERROR(
+          LOG_SHADER, "[GPU_shader] Failed to open Metal source: %s", path.toUtf8().constData());
       return nullptr;
     }
 
@@ -262,19 +264,24 @@ GPUShader *GPU_shader_create_from_source(const char *vert_path,
     shader->program = new QOpenGLShaderProgram();
 
     if (!shader->program->addShaderFromSourceCode(QOpenGLShader::Vertex, v_code)) {
-      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Vertex compile error: %s", shader->program->log().toUtf8().constData());
+      CLOG_ERROR(LOG_SHADER,
+                 "[GPU_shader] Vertex compile error: %s",
+                 shader->program->log().toUtf8().constData());
       GPU_shader_free(shader);
       return nullptr;
     }
 
     if (!shader->program->addShaderFromSourceCode(QOpenGLShader::Fragment, f_code)) {
-      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Fragment compile error: %s", shader->program->log().toUtf8().constData());
+      CLOG_ERROR(LOG_SHADER,
+                 "[GPU_shader] Fragment compile error: %s",
+                 shader->program->log().toUtf8().constData());
       GPU_shader_free(shader);
       return nullptr;
     }
 
     if (!shader->program->link()) {
-      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Link error: %s", shader->program->log().toUtf8().constData());
+      CLOG_ERROR(
+          LOG_SHADER, "[GPU_shader] Link error: %s", shader->program->log().toUtf8().constData());
       GPU_shader_free(shader);
       return nullptr;
     }

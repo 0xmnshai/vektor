@@ -113,7 +113,7 @@ class VPI_QtWindow : public QMainWindow, public VPI_Window {
 
   void setup_menus();
   void setup_docks();
-  QDockWidget *setup_viewport_only();
+  QDockWidget *setup_new_window_with_viewport();
 
  protected:
   VPI_GLWidget *gl_widget_;

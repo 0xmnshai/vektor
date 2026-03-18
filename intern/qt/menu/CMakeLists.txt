@@ -14,7 +14,9 @@ target_link_libraries(vektor_qt_menu PUBLIC
     vektor_qt
     vektor_qt_menu_window
     vektor_qt_menu_file
+    vektor_qt_menu_edit
 )
 
 add_subdirectory(window)
 add_subdirectory(file)
+add_subdirectory(edit)

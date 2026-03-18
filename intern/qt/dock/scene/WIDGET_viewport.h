@@ -47,13 +47,6 @@ class ViewportWidget : public vpi::VPI_GLWidget, protected QOpenGLFunctions_4_1_
   std::map<int, bool> keys_;
   QTimer timer_;
 
-  // Cylinder rendering cache
-  GLuint cylinder_vao_ = 0;
-  GLuint cylinder_vbo_ = 0;
-  void *cylinder_metal_vbo_ = nullptr;
-  int cylinder_vertex_count_ = 0;
-  bool mesh_initialized_ = false;
   bool grid_initialized_ = false;
-  void init_cylinder_mesh();
 };
 }  // namespace qt::dock

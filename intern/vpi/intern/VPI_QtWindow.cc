@@ -217,7 +217,7 @@ void VPI_QtWindow::setup_docks()
   auto *outliner_dock = new QDockWidget("Outliner", this);
   outliner_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
   outliner_dock->setFeatures(features);
-  outliner_dock->setMinimumWidth(200);
+  outliner_dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   auto *outliner_area = new qt::dock::AreaWidget(qt::dock::EditorType::OUTLINER, this);
   outliner_dock->setWidget(outliner_area);
   addDockWidget(Qt::RightDockWidgetArea, outliner_dock);
@@ -226,7 +226,8 @@ void VPI_QtWindow::setup_docks()
   auto *properties_dock = new QDockWidget("Properties", this);
   properties_dock->setAllowedAreas(Qt::AllDockWidgetAreas);
   properties_dock->setFeatures(features);
-  properties_dock->setMinimumWidth(200);
+  properties_dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
   auto *properties_area = new qt::dock::AreaWidget(qt::dock::EditorType::PROPERTIES, this);
   properties_dock->setWidget(properties_area);
   addDockWidget(Qt::RightDockWidgetArea, properties_dock);
@@ -234,12 +235,21 @@ void VPI_QtWindow::setup_docks()
   // Stack Properties below Outliner on the right
   splitDockWidget(outliner_dock, properties_dock, Qt::Vertical);
 
+  QList<QDockWidget *> docks;
+  docks << scene_dock << outliner_dock;
+
+  // Width distribution (in pixels, relative weights also work)
+  QList<int> sizes;
+  sizes << 1400 << 100;  // Scene : Outliner = 85% : 15%
+
+  resizeDocks(docks, sizes, Qt::Horizontal);
+
   // Set a central widget to provide a stable reference for docking
   // TODO: this is causing a blank space in window, we have to fix this
   // setCentralWidget(new QWidget(this));
 }
 
-QDockWidget *VPI_QtWindow::setup_viewport_only()
+QDockWidget *VPI_QtWindow::setup_new_window_with_viewport()
 {
   setDockOptions(QMainWindow::AllowTabbedDocks | QMainWindow::AllowNestedDocks |
                  QMainWindow::AnimatedDocks);

@@ -1,9 +1,11 @@
 #include "ECS_mesh_primitives.h"
-#include <cmath>
 
 #ifndef M_PI
 #  define M_PI 3.14159265358979323846
 #endif
+
+#include "../../vmo/VMO_execute.h"
+#include "../../dna/DNA_object_type.h"
 
 namespace vektor::kernel {
 
@@ -22,12 +24,10 @@ void create_cylinder_mesh(std::vector<Vertex> &vertices, float radius, float hei
     float z2 = std::sin(angle2) * radius;
 
     // Side triangles (two triangles per segment)
-    // Triangle 1: (v1_bottom, v1_top, v2_bottom) 
     vertices.push_back({{x1, -halfHeight, z1}, {std::cos(angle1), 0.0f, std::sin(angle1)}});
     vertices.push_back({{x1, halfHeight, z1}, {std::cos(angle1), 0.0f, std::sin(angle1)}});
     vertices.push_back({{x2, -halfHeight, z2}, {std::cos(angle2), 0.0f, std::sin(angle2)}});
 
-    // Triangle 2: (v2_bottom, v1_top, v2_top)
     vertices.push_back({{x2, -halfHeight, z2}, {std::cos(angle2), 0.0f, std::sin(angle2)}});
     vertices.push_back({{x1, halfHeight, z1}, {std::cos(angle1), 0.0f, std::sin(angle1)}});
     vertices.push_back({{x2, halfHeight, z2}, {std::cos(angle2), 0.0f, std::sin(angle2)}});
@@ -42,6 +42,24 @@ void create_cylinder_mesh(std::vector<Vertex> &vertices, float radius, float hei
     vertices.push_back({{x2, -halfHeight, z2}, {0.0f, -1.0f, 0.0f}});
     vertices.push_back({{x1, -halfHeight, z1}, {0.0f, -1.0f, 0.0f}});
   }
+}
+
+void add_primitive_cube_exec(dna::Object *obj, float size)
+{
+  obj->mesh = std::make_shared<dna::Mesh>();
+  vmo::vmo_create_cube_exec(obj->mesh.get(), size);
+}
+
+void add_primitive_cylinder_exec(dna::Object *obj, float radius, float depth, int segments)
+{
+  obj->mesh = std::make_shared<dna::Mesh>();
+  vmo::vmo_create_cylinder_exec(obj->mesh.get(), radius, depth, segments);
+}
+
+void add_primitive_plane_exec(dna::Object *obj, float size)
+{
+  obj->mesh = std::make_shared<dna::Mesh>();
+  vmo::vmo_create_plane_exec(obj->mesh.get(), size);
 }
 
 }  // namespace vektor::kernel
