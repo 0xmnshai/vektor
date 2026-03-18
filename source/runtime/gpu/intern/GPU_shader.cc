@@ -352,6 +352,13 @@ void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float
   }
 }
 
+void GPU_shader_uniform_vector4(GPUShader *shader, const char *name, const float val[4])
+{
+  if (shader && shader->program) {
+    shader->program->setUniformValue(name, val[0], val[1], val[2], val[3]);
+  }
+}
+
 void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float val[16])
 {
   if (shader && shader->program) {

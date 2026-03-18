@@ -29,9 +29,9 @@ void MENU_edit_register(void *window)
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.8f,
-                                  0.8f,
-                                  0.8f);
+                                  0.2f,
+                                  0.2f,
+                                  0.22f);
   });
 
   QAction *add_cylinder = add_3d_menu->addAction("Cylinder");
@@ -44,9 +44,9 @@ void MENU_edit_register(void *window)
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.8f,
-                                  0.8f,
-                                  0.8f);
+                                  0.2f,
+                                  0.2f,
+                                  0.22f);
   });
 
   QAction *add_plane = add_3d_menu->addAction("Plane");
@@ -59,9 +59,9 @@ void MENU_edit_register(void *window)
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.8f,
-                                  0.8f,
-                                  0.8f);
+                                  0.2f,
+                                  0.2f,
+                                  0.22f);
   });
 }
 

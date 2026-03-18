@@ -41,6 +41,9 @@ void GPU_shader_free(GPUShader *shader);
 
 void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val);
 void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float val[3]);
+void GPU_shader_uniform_vector4(GPUShader *shader, const char *name, const float val[4]);
 void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float val[16]);
+
+// void GPU_shader_bind_texture(GPUShader *shader, const char *name, int slot, GPUTexture *tex);
 
 }  // namespace vektor::gpu

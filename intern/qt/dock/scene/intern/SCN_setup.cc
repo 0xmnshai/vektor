@@ -24,9 +24,9 @@ void SCN_init_default_scene()
                                 0.0f,
                                 0.0f,
                                 0.0f,
-                                0.4f,
-                                0.4f,
-                                0.4f);
+                                0.2f,
+                                0.2f,
+                                0.22f);
 }
 
 }  // namespace qt::scene
