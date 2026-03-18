@@ -24,14 +24,14 @@ void MENU_edit_register(void *window)
     vektor::kernel::create_entity(nullptr,
                                   nullptr,
                                   "Cube",
+                                  "Contruct a Cube with Default Materials",
                                   (int)vektor::dna::ObjectType::Mesh,
-                                  (int)vektor::dna::ObjectType::Mesh,
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.2f,
-                                  0.2f,
-                                  0.22f);
+                                  0.26f,
+                                  0.27f,
+                                  0.29f);
   });
 
   QAction *add_cylinder = add_3d_menu->addAction("Cylinder");
@@ -39,14 +39,14 @@ void MENU_edit_register(void *window)
     vektor::kernel::create_entity(nullptr,
                                   nullptr,
                                   "Cylinder",
+                                  "Contruct a Cyliner with Default Materials",
                                   (int)vektor::dna::ObjectType::Mesh,
-                                  (int)vektor::dna::ObjectType::Mesh,
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.2f,
-                                  0.2f,
-                                  0.22f);
+                                  0.26f,
+                                  0.27f,
+                                  0.29f);
   });
 
   QAction *add_plane = add_3d_menu->addAction("Plane");
@@ -54,14 +54,14 @@ void MENU_edit_register(void *window)
     vektor::kernel::create_entity(nullptr,
                                   nullptr,
                                   "Plane",
+                                  "Contruct a Plane with Default Materials",
                                   (int)vektor::dna::ObjectType::Mesh,
-                                  (int)vektor::dna::ObjectType::Mesh,
                                   0.0f,
                                   0.0f,
                                   0.0f,
-                                  0.2f,
-                                  0.2f,
-                                  0.22f);
+                                  0.26f,
+                                  0.27f,
+                                  0.29f);
   });
 }
 

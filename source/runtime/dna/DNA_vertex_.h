@@ -1,13 +1,13 @@
-#pragma once 
+#pragma once
 
 #include <glm/glm.hpp>
 
 namespace vektor::dna {
 
 // Helper struct to pack data for GPU
-struct GPUVertex {
+typedef struct GPUVertex {
   glm::vec3 pos;
   glm::vec3 normal;
-};
+} Vertex;
 
-}
+}  // namespace vektor::dna

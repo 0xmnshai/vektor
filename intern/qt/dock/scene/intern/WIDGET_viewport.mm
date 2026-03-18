@@ -4,6 +4,7 @@
 #include "../../../../../source/editor/windowmanager/wm_event_types.h"
 #include "../../../../../source/runtime/dna/DNA_camera.h"
 #include "../../../../../source/runtime/dna/DNA_object_type.h"
+#include "../../../../../source/runtime/draw/DRW_manager.hh"
 #include "../../../../../source/runtime/gpu/shaders/SHDR_grid.h"
 #include "../../../../../source/runtime/lib/intern/appdir.h"
 #include "../../../../source/runtime/gpu/GPU_shader.h"
@@ -11,15 +12,17 @@
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
+#include "../../intern/qt/dock/scene/SCN_setup.h"
 #include "../../intern/vpi/VPI_Types.h"
 #include "../WIDGET_viewport.h"
-#include "../../intern/qt/dock/scene/SCN_setup.h"
-#include "../../../../../source/runtime/draw/DRW_manager.hh"
 
 #ifdef __APPLE__
 #  import <Metal/Metal.h>
 #  import <QuartzCore/QuartzCore.h>
 #endif
+
+
+// TODO: Thinking to create a separate file for openGL for this, let's see in blender later, how they are doing this. ?
 
 namespace qt::dock {
 
@@ -58,7 +61,7 @@ void ViewportWidget::paintGL()
     grid_initialized_ = true;
   }
 
-// removed static meshes
+  // removed static meshes
   if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
     if (context_) {
       auto *mtl_context = dynamic_cast<vpi::VPI_ContextMTL *>(context_);
@@ -82,7 +85,8 @@ void ViewportWidget::paintGL()
     return;
   }
 
-  // TODO: we will move this to a separate class for WIDGET_viewport.cc and reanme this file to WIDGET_viewport.mm
+  // TODO: we will move this to a separate class for WIDGET_viewport.cc and reanme this file to
+  // WIDGET_viewport.mm
   initializeOpenGLFunctions();
   glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,8 +107,6 @@ void ViewportWidget::paintGL()
   vektor::draw::DRW_draw_view(nullptr, nullptr, view, projection);
   glDisable(GL_DEPTH_TEST);
 }
-
-
 
 void ViewportWidget::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -201,8 +203,16 @@ void ViewportWidget::wheelEvent(QWheelEvent *event)
   else {
     // Continuous scroll (Trackpad)
     if (right_shift_down_) {
-      camera_->move(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), false, false,
-                    false, false, false, false, (float)event->pixelDelta().y() * 0.2f);
+      camera_->move(glm::vec3(0, 0, 1),
+                    glm::vec3(1, 0, 0),
+                    glm::vec3(0, 1, 0),
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    (float)event->pixelDelta().y() * 0.2f);
     }
     else {
       camera_->fly((float)event->pixelDelta().x() * 0.2f, (float)event->pixelDelta().y() * 0.2f);

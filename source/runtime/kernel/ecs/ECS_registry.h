@@ -64,10 +64,10 @@ class ECSRegistry {
 };
 
 void create_entity(rna::VektorRNA *v_rna,
-                   rna::RNAStruct *object_type,
+                   rna::RNAStruct *rna_,
                    const char *name,
+                   const char *description,
                    int type,
-                   int object_type_dna,
                    float x,
                    float y,
                    float z,

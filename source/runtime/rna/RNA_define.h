@@ -7,6 +7,8 @@
 namespace vektor::rna {
 
 extern "C" {
+
+// TODO: these functions are still need to be implemented
 RNAStruct *RNA_def_struct(VektorRNA *rna, const char *name);
 RNAProperty *RNA_def_property(RNAStruct *srna, const char *name, int type, int subtype);
 

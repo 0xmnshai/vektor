@@ -61,15 +61,11 @@ void DRW_draw_view(vektor::dna::Scene *scene,
 
           [encoder setVertexBytes:&uniforms length:sizeof(uniforms) atIndex:1];
 
-          glm::vec4 color = obj.mesh->material.color.to_vec4();
+          glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+          if (!obj.mesh->materials.empty() && obj.mesh->materials[0]) {
+            color = obj.mesh->materials[0]->color.to_vec4();
+          }
           [encoder setFragmentBytes:&color length:sizeof(color) atIndex:0];
-
-          glm::vec4 lightPos = glm::vec4(10.0f, 15.0f, 10.0f, 1.0f);
-          [encoder setFragmentBytes:&lightPos length:sizeof(lightPos) atIndex:2];
-
-          glm::mat4 invView = glm::inverse(view);
-          glm::vec4 viewPos = invView[3];
-          [encoder setFragmentBytes:&viewPos length:sizeof(viewPos) atIndex:3];
 
           gpu::GPU_mesh_draw(gpu_mesh, encoder_or_context);
 #endif
@@ -86,15 +82,12 @@ void DRW_draw_view(vektor::dna::Scene *scene,
           gpu::GPU_shader_uniform_matrix4(gpu_shader, "view", &view[0][0]);
           gpu::GPU_shader_uniform_matrix4(gpu_shader, "projection", &projection[0][0]);
 
-          glm::vec4 color = obj.mesh->material.color.to_vec4();
-          gpu::GPU_shader_uniform_vector4(gpu_shader, "color", &color[0]);
-
-          glm::vec3 lightPos = glm::vec3(10.0f, 15.0f, 10.0f);
-          gpu::GPU_shader_uniform_vector3(gpu_shader, "lightPos", &lightPos[0]);
-
-          glm::mat4 invView = glm::inverse(view);
-          glm::vec3 viewPos = glm::vec3(invView[3]);
-          gpu::GPU_shader_uniform_vector3(gpu_shader, "viewPos", &viewPos[0]);
+          glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+          if (!obj.mesh->materials.empty() && obj.mesh->materials[0]) {
+            color = obj.mesh->materials[0]->color.to_vec4();
+          }
+          float color_arr[3] = {color.x, color.y, color.z};
+          gpu::GPU_shader_uniform_vector3(gpu_shader, "color", color_arr);
 
           gpu::GPU_mesh_draw(gpu_mesh, encoder_or_context);
 

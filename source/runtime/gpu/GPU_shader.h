@@ -32,6 +32,10 @@ GPUShader *GPU_shader_create_from_source(const char *vert_path,
                                          const char *frag_path,
                                          const GPUShaderSourceParameters *params = nullptr);
 
+GPUShader *GPU_shader_create_from_strings(const char *vert_src,
+                                          const char *frag_src,
+                                          const GPUShaderSourceParameters *params = nullptr);
+
 QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
 static void print_compute_results();
 
@@ -41,9 +45,6 @@ void GPU_shader_free(GPUShader *shader);
 
 void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val);
 void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float val[3]);
-void GPU_shader_uniform_vector4(GPUShader *shader, const char *name, const float val[4]);
 void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float val[16]);
-
-// void GPU_shader_bind_texture(GPUShader *shader, const char *name, int slot, GPUTexture *tex);
 
 }  // namespace vektor::gpu

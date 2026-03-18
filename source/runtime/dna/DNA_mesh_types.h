@@ -2,18 +2,20 @@
 
 #include "DNA_id.h"
 #include "DNA_material_types.h"
+#include <memory>
+#include <vector>
 
 namespace vektor::dna {
 
 typedef struct MVert {
-  glm::vec3 co;
-  glm::vec3 no;
-  glm::vec2 uv;
+  glm::vec3 co;  // coordintes
+  glm::vec3 no;  // normals
+  glm::vec2 uv;  // texture coordinates
 } MVert;
 
 typedef struct MPoly {
-  int first_corner;
-  int num_corners;
+  int first_corner;  // where the face starts
+  int num_corners;   // number of vertices in a face
 } MPoly;
 
 typedef struct MEdge {
@@ -22,9 +24,9 @@ typedef struct MEdge {
 } MEdge;
 
 typedef struct MLoop {
-  int v;
-  int e;
-  int f;
+  int v;  // vertext index
+  int e;  // edge index
+  int f;  // face index
   glm::vec2 uv;
 } MLoop;
 
@@ -44,14 +46,14 @@ typedef struct Mesh {
   MLoop *mloop = nullptr;  // pointer to face corners
   MVert *mvert = nullptr;  // pointer to vertices
 
-  Material material;
+  std::vector<std::shared_ptr<Material>> materials;
 
 } Mesh;
 }  // namespace vektor::dna
 
 /**
 
-  // we will move these method in rna so that we can use it 
+  // we will move these method in rna so that we can use it
    std::vector<glm::vec3> mesh_vert_positions(Mesh* mesh) ;
    std::vector<glm::vec3> mesh_vert_normals(Mesh* mesh) ;
    std::vector<glm::vec2> mesh_vert_uvs(Mesh* mesh) ;

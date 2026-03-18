@@ -5,7 +5,7 @@ namespace vektor::vmo {
 
 void vmo_create_cylinder_exec(dna::Mesh *mesh, float radius, float depth, int segments)
 {
-  float halfDepth = depth / 2.0f;
+  float half_depth = depth / 2.0f;
   int num_verts = segments * 2 + 2;  // +2 for centers of caps
   int num_faces = segments * 3;      // Side quads + top triangles + bottom triangles
   int num_loops = segments * 4 + segments * 3 + segments * 3;
@@ -24,8 +24,8 @@ void vmo_create_cylinder_exec(dna::Mesh *mesh, float radius, float depth, int se
     float x = std::cos(angle) * radius;
     float z = std::sin(angle) * radius;
 
-    mesh->mvert[i].co = glm::vec3(x, halfDepth, z);               // Top
-    mesh->mvert[i + segments].co = glm::vec3(x, -halfDepth, z);   // Bottom
+    mesh->mvert[i].co = glm::vec3(x, half_depth, z);               // Top
+    mesh->mvert[i + segments].co = glm::vec3(x, -half_depth, z);   // Bottom
     
     // Calculate normals for smooth shading on the cylinder sides
     glm::vec3 normal = glm::normalize(glm::vec3(x, 0.0f, z));
@@ -36,9 +36,9 @@ void vmo_create_cylinder_exec(dna::Mesh *mesh, float radius, float depth, int se
   // Centers for caps
   int v_top_center = segments * 2;
   int v_bottom_center = segments * 2 + 1;
-  mesh->mvert[v_top_center].co = glm::vec3(0, halfDepth, 0);
+  mesh->mvert[v_top_center].co = glm::vec3(0, half_depth, 0);
   mesh->mvert[v_top_center].no = glm::vec3(0, 1.0f, 0);
-  mesh->mvert[v_bottom_center].co = glm::vec3(0, -halfDepth, 0);
+  mesh->mvert[v_bottom_center].co = glm::vec3(0, -half_depth, 0);
   mesh->mvert[v_bottom_center].no = glm::vec3(0, -1.0f, 0);
 
   int f_idx = 0;

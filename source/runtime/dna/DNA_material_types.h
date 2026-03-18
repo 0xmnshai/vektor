@@ -130,11 +130,20 @@ typedef struct Material {
   char description[256];
   char name[64];
 
-  // color
-  Color color = {1.0, 1.0, 1.0, 1.0};
-
+  // Base PBR properties
+  // TODO: create material editor to edit on these properties 
+  Color color = {1.0, 1.0, 1.0, 1.0}; // Base Color
+  float metallic = 0.0f;
+  float specular = 0.5f;
   float roughness = 0.4f;
-  float metallic = 0;
+  float anisotropy = 0.0f;
+  Color emissive_color = {0.0, 0.0, 0.0, 1.0};
+  float opacity = 1.0f;
+  float opacity_mask = 1.0f;
+  glm::vec3 normal = {0.0f, 0.0f, 1.0f};
+  glm::vec3 world_position_offset = {0.0f, 0.0f, 0.0f};
+  float ambient_occlusion = 1.0f;
+  float pixel_depth_offset = 0.0f;
 
   char pr_type = MA_SPHERE;
   short pr_texture = 0;

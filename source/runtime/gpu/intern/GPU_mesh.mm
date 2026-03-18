@@ -135,7 +135,9 @@ void GPU_mesh_free(GPUMesh *gpu_mesh)
     // we might need strict bridging if not completely handled by the caller.
     // For now, assume ARC handles it if bridged correctly or we manually release.
     // id<MTLBuffer> vbo = (__bridge_transfer id<MTLBuffer>)gpu_mesh->metal_vbo;
+    // id<MTLBuffer> ebo = (__bridge_transfer id<MTLBuffer>)gpu_mesh->metal_ebo;
     // vbo = nil;
+    // ebo = nil;
   }
 #endif
 
@@ -149,7 +151,7 @@ void GPU_mesh_draw(GPUMesh *gpu_mesh, void *command_encoder)
 
   if (gpu_mesh->backend == GPUMesh::GPU_BACKEND_METAL && command_encoder) {
 #ifdef __APPLE__
-    id<MTLRenderCommandEncoder> encoder = (id<MTLRenderCommandEncoder>)command_encoder;
+    auto encoder = (id<MTLRenderCommandEncoder>)command_encoder;
     [encoder setVertexBuffer:(id<MTLBuffer>)gpu_mesh->metal_vbo offset:0 atIndex:0];
     [encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                         indexCount:gpu_mesh->index_count

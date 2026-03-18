@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <glm/glm.hpp>
+
+#include "../../dna/DNA_vertex_.h"
 
 namespace vektor::dna {
 struct Object;
@@ -9,13 +10,9 @@ struct Object;
 
 namespace vektor::kernel {
 
-struct Vertex {
-  glm::vec3 pos;
-  glm::vec3 normal;
-};
-
-// VPI primitives (Legacy)
-void create_cylinder_mesh(std::vector<Vertex> &vertices, float radius, float height, int segments);
+// TODO: we will remove this function and will try using the exec one, and remove dependecies of this function as well 
+// VPI primitives (Legacy) 
+void create_cylinder_mesh(std::vector<dna::Vertex> &vertices, float radius, float height, int segments);
 
 // VMO Primitives (New System)
 void add_primitive_cube_exec(dna::Object *obj, float size);

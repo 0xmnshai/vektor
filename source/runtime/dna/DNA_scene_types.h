@@ -5,8 +5,7 @@
 
 namespace vektor::dna {
 
-
-  // modify the scene according to the codebase ? 
+// modify the scene according to the codebase ?
 typedef struct Scene {
   ID id;
 
@@ -15,6 +14,8 @@ typedef struct Scene {
   int objects_len;
 
   void *world;
+
+  Scene() : objects(nullptr), objects_len(0), world(nullptr) {}
 } Scene;
 
 }  // namespace vektor::dna

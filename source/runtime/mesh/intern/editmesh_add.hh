@@ -1,12 +1,13 @@
 #pragma once
 
+#include "../mesh.h"
 #include "../../dna/DNA_object_type.h"
 #include "../../kernel/ecs/ECS_mesh_primitives.h"
 
 namespace vektor::mesh {
 
 void mesh_add_plane(struct dna::Object *obj, float size)
-{
+{ 
   kernel::add_primitive_plane_exec(obj, size);
 }
 

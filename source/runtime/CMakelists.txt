@@ -7,6 +7,7 @@ add_subdirectory(loader)
 add_subdirectory(rna)
 add_subdirectory(gpu)
 add_subdirectory(draw)
+add_subdirectory(mesh)
 
 add_library(runtime STATIC 
     creator.cc 

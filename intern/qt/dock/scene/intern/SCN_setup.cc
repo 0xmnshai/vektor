@@ -19,14 +19,14 @@ void SCN_init_default_scene()
   vektor::kernel::create_entity(nullptr,
                                 nullptr,
                                 "Cube",
+                                "Cube",
                                 (int)vektor::dna::ObjectType::Mesh,
-                                (int)vektor::dna::ObjectType::Mesh,
                                 0.0f,
                                 0.0f,
                                 0.0f,
-                                0.2f,
-                                0.2f,
-                                0.22f);
+                                0.26f,
+                                0.27f,
+                                0.29f);
 }
 
 }  // namespace qt::scene

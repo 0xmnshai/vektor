@@ -290,6 +290,48 @@ GPUShader *GPU_shader_create_from_source(const char *vert_path,
   }
 }
 
+GPUShader *GPU_shader_create_from_strings(const char *vert_src,
+                                          const char *frag_src,
+                                          const GPUShaderSourceParameters *params)
+{
+  const bool is_metal = (creator::G.gpu_backend == creator::GPU_BACKEND_METAL);
+
+  auto *shader = (GPUShader *)MEM_mallocN(sizeof(GPUShader), "GPU_shader");
+  shader->backend = is_metal ? GPUShader::GPU_BACKEND_METAL : GPUShader::GPU_BACKEND_OPENGL;
+  shader->program = nullptr;
+  shader->metal_pipeline = nullptr;
+
+  if (is_metal) {
+    shader->metal_pipeline = GPU_metal_pipeline_create_from_source(vert_src, params);
+    if (!shader->metal_pipeline) {
+      MEM_freeN(shader);
+      return nullptr;
+    }
+  } else {
+    shader->program = new QOpenGLShaderProgram();
+
+    if (!shader->program->addShaderFromSourceCode(QOpenGLShader::Vertex, vert_src)) {
+      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Vertex compile error: %s", shader->program->log().toUtf8().constData());
+      GPU_shader_free(shader);
+      return nullptr;
+    }
+
+    if (!shader->program->addShaderFromSourceCode(QOpenGLShader::Fragment, frag_src)) {
+      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Fragment compile error: %s", shader->program->log().toUtf8().constData());
+      GPU_shader_free(shader);
+      return nullptr;
+    }
+
+    if (!shader->program->link()) {
+      CLOG_ERROR(LOG_SHADER, "[GPU_shader] Link error: %s", shader->program->log().toUtf8().constData());
+      GPU_shader_free(shader);
+      return nullptr;
+    }
+  }
+
+  return shader;
+}
+
 void print_compute_results()
 {
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -349,13 +391,6 @@ void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float
 {
   if (shader && shader->program) {
     shader->program->setUniformValue(name, val[0], val[1], val[2]);
-  }
-}
-
-void GPU_shader_uniform_vector4(GPUShader *shader, const char *name, const float val[4])
-{
-  if (shader && shader->program) {
-    shader->program->setUniformValue(name, val[0], val[1], val[2], val[3]);
   }
 }
 

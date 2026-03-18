@@ -2,7 +2,7 @@ import os
 
 def aggregate_files(output_file='code.txt'):
     exclude_dirs = {os.path.abspath(d) for d in ['build', 'extern/deps', 'logs','.conda','.config','.git','.vscode','venv','compute/target','compute/build','extern/vendor']}
-    exclude_files = {'code.py', 'code.txt'}
+    exclude_files = {'code.py', 'code.txt','.gitignore','.DS_Store','.md'}
     
     with open(output_file, 'w', encoding='utf-8') as outfile:
         for root, dirs, files in os.walk('.'):
@@ -22,7 +22,7 @@ def aggregate_files(output_file='code.txt'):
             dirs[:] = [d for d in dirs if os.path.join(root, d) not in exclude_dirs]
 
             for file in files:
-                if file in exclude_files:
+                if file in exclude_files or file.endswith(tuple(exclude_files)):
                     continue
                 
                 file_path = os.path.join(root, file)
