@@ -1,5 +1,4 @@
 #import <Metal/Metal.h>
-#include <iostream>
 #include <QDebug>
 #include <QMatrix4x4>
 #import <QuartzCore/QuartzCore.h>
@@ -164,7 +163,7 @@ void GridShader::draw(const glm::mat4 &projection, const glm::mat4 &view)
         auto vbo = (id<MTLBuffer>)m_mtl_vbo;
 
         if (!vbo) {
-            return;
+          return;
         }
 
         [encoder setRenderPipelineState:pipeline];

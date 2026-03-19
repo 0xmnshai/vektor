@@ -29,7 +29,7 @@ glm::mat4 Camera::projection_matrix(float aspect) const
 
 void Camera::orbit(float dx, float dy)
 {
-  float sensitivity = 1.0f;  // camera_dna_.distance / 2.0f;
+  float sensitivity = camera_dna_.distance / 2.0f;
   if (sensitivity < 0.1f)
     sensitivity = 0.1f;
   if (sensitivity > 2.0f)
