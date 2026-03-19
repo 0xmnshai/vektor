@@ -272,7 +272,7 @@ void ViewportWidget::update_camera()
 {
   float move_speed = 0.1f;
   if (keys_[Qt::Key_Shift]) {
-    move_speed *= 5.0f;
+    move_speed *= 2.0f;
   }
 
   glm::vec3 forward = camera_->get_forward_vector();

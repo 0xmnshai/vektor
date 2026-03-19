@@ -80,9 +80,9 @@ void GridShader::init(const QString &shader_path)
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     QOpenGLShaderProgram *program = GPU_shader_get_program(shader_);
-    int posAttr = program->attributeLocation("aPos");
-    glEnableVertexAttribArray(posAttr);
-    glVertexAttribPointer(posAttr, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    int pos_attr = program->attributeLocation("aPos");
+    glEnableVertexAttribArray(pos_attr);
+    glVertexAttribPointer(pos_attr, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -156,6 +156,7 @@ void GridShader::draw(const glm::mat4 &projection, const glm::mat4 &view)
     auto *mtl_context = dynamic_cast<vpi::VPI_ContextMTL *>(active_context);
 
     if (mtl_context) {
+      mtl_context->set_depth_write_enabled(false);
       auto encoder = (id<MTLRenderCommandEncoder>)mtl_context->get_current_command_encoder();
 
       if (encoder && shader_->metal_pipeline) {
@@ -187,6 +188,7 @@ void GridShader::draw(const glm::mat4 &projection, const glm::mat4 &view)
 
         [encoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:6];
       }
+      mtl_context->set_depth_write_enabled(true);
     }
 #endif
   }

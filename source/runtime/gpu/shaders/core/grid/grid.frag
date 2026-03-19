@@ -22,9 +22,11 @@ vec4 grid(vec3 fragPos3D, float scale, bool drawAxis)
     vec4 color = vec4(0.4, 0.4, 0.4, 1.0 - min(line, 1.0));
 
     if (drawAxis) {
-        if (abs(fragPos3D.x) < 0.1 * minimumx)
-            color = vec4(0.1, 0.1, 0.9, 1.0 - min(line, 1.0));  // Z axis (Blue)
-        if (abs(fragPos3D.z) < 0.1 * minimumz)
+        float fwx = fwidth(fragPos3D.x);
+        float fwz = fwidth(fragPos3D.z);
+        if (abs(fragPos3D.x) < fwx)
+            color = vec4(0.1, 0.9, 0.1, 1.0 - min(line, 1.0));  // Z axis (Green)
+        if (abs(fragPos3D.z) < fwz)
             color = vec4(0.9, 0.1, 0.1, 1.0 - min(line, 1.0));  // X axis (Red)
     }
 

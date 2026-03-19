@@ -19,7 +19,7 @@ struct DNA_Camera {
   DNA_CameraType type;
 
   glm::vec3 pivot = glm::vec3(0.0f);
-  float distance = 15.0f;
+  float distance = 8.0f;
   float rotation_x = 30.0f;
   float rotation_y = 45.0f;
   float fov = 45.0f;

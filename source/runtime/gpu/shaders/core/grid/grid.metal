@@ -14,6 +14,11 @@ struct VertexOutput {
     float3 farPoint;
 };
 
+struct FragmentOutput {
+    float4 color [[color(0)]];
+    float depth [[depth(any)]];
+};
+
 float3 unprojectPoint(float x, float y, float z, float4x4 viewInv, float4x4 projInv) {
     float4 unprojectedPoint = viewInv * projInv * float4(x, y, z, 1.0);
     return unprojectedPoint.xyz / unprojectedPoint.w;
@@ -31,6 +36,11 @@ vertex VertexOutput vertex_main(uint vertexID [[vertex_id]],
     return out;
 }
 
+float computeDepth(float3 pos, float4x4 projection, float4x4 view) {
+    float4 clip_space_pos = projection * view * float4(pos, 1.0);
+    return (clip_space_pos.z / clip_space_pos.w);
+}
+
 float4 grid(float3 fragPos3D, float scale, bool drawAxis) {
     float2 coord = fragPos3D.xz * scale;
     float2 derivative = fwidth(coord);
@@ -43,9 +53,11 @@ float4 grid(float3 fragPos3D, float scale, bool drawAxis) {
     float4 color = float4(0.4, 0.4, 0.4, 1.0 - min(line, 1.0));
 
     if (drawAxis) {
-        if (abs(fragPos3D.x) < 0.1 * minimumx)
-            color = float4(0.1, 0.1, 0.9, 1.0 - min(line, 1.0)); // Z axis (Blue)
-        if (abs(fragPos3D.z) < 0.1 * minimumz)
+        float fwx = fwidth(fragPos3D.x);
+        float fwz = fwidth(fragPos3D.z);
+        if (abs(fragPos3D.x) < fwx)
+            color = float4(0.1, 0.9, 0.1, 1.0 - min(line, 1.0)); // Z axis (Green)
+        if (abs(fragPos3D.z) < fwz)
             color = float4(0.9, 0.1, 0.1, 1.0 - min(line, 1.0)); // X axis (Red)
     }
 
@@ -61,7 +73,7 @@ float computeLinearDepth(float3 pos, float4x4 projection, float4x4 view) {
     return linearDepth / 100.0;
 }
 
-fragment float4 fragment_main(VertexOutput in [[stage_in]],
+fragment FragmentOutput fragment_main(VertexOutput in [[stage_in]],
                              constant Uniforms &uniforms [[buffer(1)]]) {
     float t = -in.nearPoint.y / (in.farPoint.y - in.nearPoint.y);
     if (t <= 0.0001) discard_fragment();
@@ -79,5 +91,10 @@ fragment float4 fragment_main(VertexOutput in [[stage_in]],
     outColor.a = max(color1.a, color10.a);
     outColor.a *= fading;
     
-    return outColor;
+    FragmentOutput out;
+    out.color = outColor;
+    float depth = computeDepth(fragPos3D, uniforms.projection, uniforms.view);
+    // Map GL NDC depth [-1, 1] to Metal [0, 1]
+    out.depth = (depth + 1.0) * 0.5;
+    return out;
 }
