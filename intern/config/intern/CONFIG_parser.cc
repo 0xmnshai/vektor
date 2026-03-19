@@ -7,7 +7,7 @@
 
 namespace config {
 
-ConfigParser::ConfigParser(const std::string &filename) : filename_(filename) {}
+ConfigParser::ConfigParser(const std::string &filename) : filename_(std::move(filename)) {}
 
 bool ConfigParser::load()
 {

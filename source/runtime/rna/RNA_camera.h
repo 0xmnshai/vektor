@@ -96,6 +96,7 @@ class Camera {
   [[nodiscard]] glm::vec3 get_right_vector() const;
   [[nodiscard]] glm::vec3 get_up_vector() const;
 
+
  protected:
   dna::DNA_Camera camera_dna_;
 };

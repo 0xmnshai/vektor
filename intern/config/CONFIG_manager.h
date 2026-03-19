@@ -36,15 +36,15 @@ class ConfigManager {
                               const std::string &key,
                               bool default_val = false) const;
 
-  [[nodiscard]] std::unordered_map<std::string, std::string> get_section(const std::string &file,
-                                                                         const std::string &section) const;
+  [[nodiscard]] std::unordered_map<std::string, std::string> get_section(
+      const std::string &file, const std::string &section) const;
 
   ConfigManager &operator=(const ConfigManager &) = delete;
+  explicit ConfigManager(const ConfigManager &) = delete;
 
  private:
   ConfigManager() = default;
   ~ConfigManager() = default;
-  explicit ConfigManager(const ConfigManager &) = delete;
 
   struct ConfigFileData {
     std::string path;

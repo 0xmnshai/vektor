@@ -1,3 +1,4 @@
+#include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -34,8 +35,8 @@ void Camera::orbit(float dx, float dy)
     sensitivity = 0.1f;
   if (sensitivity > 2.0f)
     sensitivity = 2.0f;
-  camera_dna_.rotation_y += (/*0.5 * */ sensitivity) * dx;
-  camera_dna_.rotation_x += (/*0.5 * */ sensitivity) * dy;
+  camera_dna_.rotation_y += sensitivity * dx;
+  camera_dna_.rotation_x += sensitivity * dy;
 }
 
 void Camera::pan(float dx, float dy)
@@ -129,6 +130,7 @@ void Camera::move(const glm::vec3 &forward,
   if (e)
     camera_dna_.pivot += up * speed;
 }
+
 
 glm::vec3 Camera::get_forward_vector() const
 {

@@ -21,8 +21,8 @@
 #  import <QuartzCore/QuartzCore.h>
 #endif
 
-
-// TODO: Thinking to create a separate file for openGL for this, let's see in blender later, how they are doing this. ?
+// TODO: Thinking to create a separate file for openGL for this, let's see in blender later, how
+// they are doing this. ?
 
 namespace qt::dock {
 
@@ -203,16 +203,7 @@ void ViewportWidget::wheelEvent(QWheelEvent *event)
   else {
     // Continuous scroll (Trackpad)
     if (right_shift_down_) {
-      camera_->move(glm::vec3(0, 0, 1),
-                    glm::vec3(1, 0, 0),
-                    glm::vec3(0, 1, 0),
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    (float)event->pixelDelta().y() * 0.2f);
+      camera_->pan((float)event->pixelDelta().x() * 0.5f, (float)event->pixelDelta().y() * 0.5f);
     }
     else {
       camera_->fly((float)event->pixelDelta().x() * 0.2f, (float)event->pixelDelta().y() * 0.2f);
@@ -309,8 +300,10 @@ bool ViewportWidget::event(QEvent *event)
 
 bool ViewportWidget::gesture_event(QGestureEvent *event)
 {
-  if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+  if (QGesture *pinch = event->gesture(Qt::PinchGesture)) {
     pinch_Triggered(dynamic_cast<QPinchGesture *>(pinch));
+    event->accept(Qt::PinchGesture);
+  }
   return true;
 }
 
@@ -327,6 +320,7 @@ void ViewportWidget::pinch_Triggered(QPinchGesture *gesture)
 
       float zoom_factor = camera_->distance() / old_dist;
       camera_->set_pivot(mouse_world + (camera_->pivot() - mouse_world) * zoom_factor);
+
       update();
     }
   }
