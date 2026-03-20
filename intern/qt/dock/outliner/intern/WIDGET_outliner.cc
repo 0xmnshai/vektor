@@ -35,7 +35,13 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
 
   connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerWidget::on_search_text_changed);
 
+  filter_timer_ = new QTimer(this);
+  filter_timer_->setSingleShot(true);
   connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
+
+  refresh_timer_ = new QTimer(this);
+  refresh_timer_->setSingleShot(true);
+  connect(refresh_timer_, &QTimer::timeout, this, &OutlinerWidget::refresh_entities);
 
   connect(tree_view_,
           &QTreeView::customContextMenuRequested,
@@ -45,7 +51,7 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   connect(qt::scene::SCN_notifier::instance(),
           &qt::scene::SCN_notifier::sceneChanged,
           this,
-          &OutlinerWidget::refresh_entities);
+          [this]() { refresh_timer_->start(10); });
 
   refresh_entities();
 }
@@ -79,9 +85,6 @@ void OutlinerWidget::build_ui()
       "QTreeView::branch:open:has-children:!has-siblings, "
       "QTreeView::branch:open:has-children:has-siblings { image: none; }");
 
-  filter_timer_ = new QTimer(this);
-  filter_timer_->setSingleShot(true);
-
   layout->addWidget(search_bar_);
   layout->addWidget(tree_view_);
 
@@ -109,6 +112,7 @@ void OutlinerWidget::refresh_entities()
   is_refreshing_ = true;
 
   model_->removeRows(0, model_->rowCount());
+  entity_to_item_.clear();
 
   // Level 1: Scene Collection
   auto *root_item = new QStandardItem("Scene Collection");
@@ -136,10 +140,12 @@ void OutlinerWidget::refresh_entities()
 }
 
 QList<QStandardItem *> OutlinerWidget::create_object_item(entt::entity entity,
-                                                        const vektor::dna::Object &obj)
+                                                         const vektor::dna::Object &obj)
 {
   QString name = QString::fromUtf8(obj.id.name);
   auto *name_item = new QStandardItem(name);
+
+  entity_to_item_[entity] = name_item;
 
   QString icon = "❓";
   switch (obj.type) {
@@ -219,24 +225,24 @@ void OutlinerWidget::sync_selection_from_scene()
   auto &reg = registry.registry();
   auto view = reg.view<vektor::dna::Object>();
 
-  // Brute force sync for now
-  for (int i = 0; i < model_->rowCount(); ++i) {
-    QStandardItem *root = model_->item(i);
-    for (int j = 0; j < root->rowCount(); ++j) {
-      QStandardItem *coll = root->child(j);
-      for (int k = 0; k < coll->rowCount(); ++k) {
-        QStandardItem *item = coll->child(k);
-        if (item->data(Qt::UserRole).isValid()) {
-          auto entity = (entt::entity)item->data(Qt::UserRole).toUInt();
-          if (vektor::rna::RNA_ecs_is_selected(&registry, entity)) {
-            QModelIndex src = model_->indexFromItem(item);
-            QModelIndex proxy = proxy_model_->mapFromSource(src);
-            tree_view_->selectionModel()->select(
-                proxy, QItemSelectionModel::Select | QItemSelectionModel::Rows);
-          }
-        }
+  QItemSelection selection;
+  for (auto entity : view) {
+    if (vektor::rna::RNA_ecs_is_selected(&registry, entity)) {
+      auto it = entity_to_item_.find(entity);
+      if (it != entity_to_item_.end()) {
+        QModelIndex src = model_->indexFromItem(it->second);
+        QModelIndex proxy = proxy_model_->mapFromSource(src);
+        selection.select(proxy, proxy);
       }
     }
+  }
+
+  if (!selection.isEmpty()) {
+    tree_view_->selectionModel()->select(
+        selection, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+  }
+  else {
+    tree_view_->selectionModel()->clearSelection();
   }
 }
 
@@ -265,7 +271,9 @@ void OutlinerWidget::build_object_context_menu(QMenu &menu, entt::entity entity)
   connect(select, &QAction::triggered, [this, entity]() {
     auto &registry = vektor::kernel::ECSRegistry::instance();
     vektor::rna::RNA_ecs_set_selected(&registry, entity, true);
-    refresh_entities();  // Refresh to show selection if needed, or rely on notifier
+    // Selection will be synced via scene notifier if it triggers, 
+    // but for immediate feedback we can call sync_selection_from_scene.
+    sync_selection_from_scene();
   });
 
   QAction *delete_obj = menu.addAction("Delete");
