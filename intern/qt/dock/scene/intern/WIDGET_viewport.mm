@@ -11,7 +11,7 @@
 #include "../../../../source/runtime/gpu/GPU_shader.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_mesh_primitives.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
-#include "../../../../source/runtime/lib/VLI_math_geom.hh"
+#include "../../../../source/runtime/lib/VLI_math_geom.h"
 #include "../../../../source/runtime/rna/RNA_ecs_registry.h"
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"

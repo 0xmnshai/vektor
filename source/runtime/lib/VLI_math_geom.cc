@@ -2,7 +2,7 @@
 #include <cfloat>
 #include <glm/glm.hpp>
 
-#include "VLI_math_geom.hh"
+#include "VLI_math_geom.h"
 
 namespace vektor::lib {
 
