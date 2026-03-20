@@ -11,6 +11,7 @@
 #include "../../../../source/runtime/gpu/GPU_shader.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_mesh_primitives.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
+#include "../../../../source/runtime/lib/VLI_math_geom.hh"
 #include "../../../../source/runtime/rna/RNA_ecs_registry.h"
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
@@ -243,19 +244,6 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
     camera_->screen_to_ray(
         (float)event->pos().x(), (float)event->pos().y(), width(), height(), ray_origin, ray_dir);
 
-    // TODO :We can also implement somthing like this ?
-    // auto &registry = vektor::kernel::ECSRegistry::instance().registry();
-    // auto objects_view = registry.view<vektor::dna::Object>();
-
-    // for (auto entity : objects_view) {
-    //   auto &obj = objects_view.get<vektor::dna::Object>(entity);
-    //   if (obj.mesh) {
-    //     if (obj.mesh->intersects(ray_origin, ray_dir)) {
-    //       obj.select_flag |= vektor::dna::BASE_SELECTED;
-    //     }
-    //   }
-    // }
-
     vektor::dna::Object *closest_obj = nullptr;
     entt::entity closest_entity = entt::null;
     float closest_dist = FLT_MAX;
@@ -276,36 +264,30 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
       auto &obj = objects_view.get<vektor::dna::Object>(entity);
 
       if (obj.mesh) {
-        // Special case for Plane intersection
-        if (std::string(obj.description).find("Plane") != std::string::npos) {
-          glm::vec3 n(0, 1, 0);
-          float denom = glm::dot(n, ray_dir);
-          if (abs(denom) > 1e-6) {
-            glm::vec3 p0 = obj.transform.location;
-            float t = glm::dot(p0 - ray_origin, n) / denom;
-            if (t > 0 && t < closest_dist) {
-              glm::vec3 hit_pt = ray_origin + ray_dir * t;
-              // Assuming scale 1.0, plane is 10x10 so extends 5 units in x and z
-              if (abs(hit_pt.x - p0.x) <= 5.0f && abs(hit_pt.z - p0.z) <= 5.0f) {
-                closest_dist = t;
-                closest_obj = &obj;
-                closest_entity = entity;
-              }
-            }
-          }
-          continue;
-        }
+        // Calculate model matrix
+        auto model = glm::mat4(1.0f);
+        model = glm::translate(model, obj.transform.location);
+        model = glm::rotate(model, obj.transform.rotation.x, glm::vec3(1, 0, 0));
+        model = glm::rotate(model, obj.transform.rotation.y, glm::vec3(0, 1, 0));
+        model = glm::rotate(model, obj.transform.rotation.z, glm::vec3(0, 0, 1));
+        model = glm::scale(model, obj.transform.scale);
 
-        float radius = (obj.type == vektor::dna::ObjectType::Camera) ? 0.3f : 1.0f;
-        glm::vec3 oc = ray_origin - obj.transform.location;
-        float b = glm::dot(oc, ray_dir);
-        float c = glm::dot(oc, oc) - radius * radius;
-        float discriminant = b * b - c;
+        // Inverse model matrix to bring ray into object space
+        glm::mat4 inv_model = glm::inverse(model);
 
-        if (discriminant > 0) {
-          float t = -b - sqrt(discriminant);
-          if (t > 0 && t < closest_dist) {
-            closest_dist = t;
+        // Transform ray origin and direction to object space
+        glm::vec3 obj_ray_origin = glm::vec3(inv_model * glm::vec4(ray_origin, 1.0f));
+        glm::vec3 obj_ray_dir = glm::normalize(glm::vec3(inv_model * glm::vec4(ray_dir, 0.0f)));
+
+        float t = vektor::lib::ray_mesh_intersect(obj_ray_origin, obj_ray_dir, obj.mesh.get());
+
+        if (t != FLT_MAX) {
+          // Transform hit distance back to world space for depth comparison
+          glm::vec3 world_hit_pt = glm::vec3(model * glm::vec4(obj_ray_origin + obj_ray_dir * t, 1.0f));
+          float world_t = glm::length(world_hit_pt - ray_origin);
+
+          if (world_t < closest_dist) {
+            closest_dist = world_t;
             closest_obj = &obj;
             closest_entity = entity;
           }
@@ -418,29 +400,3 @@ void ViewportWidget::pinch_Triggered(QPinchGesture *gesture)
 }
 
 }  // namespace qt::dock
-
-/**
-
-
-TODO:
-
-outline.vert
-
-   vec4 pos_clip = projection * view * model * vec4(aPos, 1.0);
-    vec4 center_clip = projection * view * model * vec4(0.0, 0.0, 0.0, 1.0);
-
-    vec2 p_ndc = pos_clip.xy / pos_clip.w;
-    vec2 c_ndc = center_clip.xy / center_clip.w;
-
-    vec2 dir = p_ndc - c_ndc;
-    float len = length(dir);
-    if (len > 0.0001) {
-        p_ndc += (dir / len) * (offset * 2.0);
-    }
-
-    pos_clip.xy = p_ndc * pos_clip.w;
-    pos_clip.z += 0.005 * pos_clip.w; // Push away slightly
-
-    gl_Position = pos_clip;
-
-*/

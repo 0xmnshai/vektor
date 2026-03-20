@@ -11,8 +11,6 @@ class PropertiesPanel : public QWidget {
  public:
   explicit PropertiesPanel(QWidget *parent = nullptr);
 
-  void set_selected_object(vektor::dna::Object *object);
-
  private slots:
   void on_selection_changed();
 

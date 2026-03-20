@@ -11,6 +11,8 @@
 namespace qt::dock {
 PropertiesPanel::PropertiesPanel(QWidget *parent) : QWidget(parent)
 {
+  setMinimumWidth(360);
+
   auto *layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
@@ -18,6 +20,7 @@ PropertiesPanel::PropertiesPanel(QWidget *parent) : QWidget(parent)
   auto *scroll_area = new QScrollArea();
   scroll_area->setWidgetResizable(true);
   scroll_area->setFrameShape(QFrame::NoFrame);
+  scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scroll_area->setStyleSheet("background-color: #212121;");
 
   container_widget_ = new QWidget();
