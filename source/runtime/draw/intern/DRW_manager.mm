@@ -155,16 +155,25 @@ void DRW_prepare_view(vektor::dna::Scene *scene)
           if (vpi_context) {
             auto *mtl_context = dynamic_cast<::vpi::VPI_ContextMTL *>(vpi_context);
             if (mtl_context) {
-              id<MTLCommandBuffer> commandBuffer = (id<MTLCommandBuffer>)mtl_context->get_current_command_buffer();
+              id<MTLCommandBuffer> commandBuffer = (id<MTLCommandBuffer>)
+                                                       mtl_context->get_current_command_buffer();
+              bool owns_command_buffer = false;
+              if (!commandBuffer) {
+                commandBuffer = [mtl_context->get_metal_command_queue() commandBuffer];
+                owns_command_buffer = true;
+              }
+
               if (commandBuffer) {
                 MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
-                passDesc.depthAttachment.texture = (id<MTLTexture>)shadow_fb->depth_tex->metal_texture;
+                passDesc.depthAttachment.texture = (id<MTLTexture>)
+                                                       shadow_fb->depth_tex->metal_texture;
                 passDesc.depthAttachment.slice = i;
                 passDesc.depthAttachment.loadAction = MTLLoadActionClear;
                 passDesc.depthAttachment.storeAction = MTLStoreActionStore;
                 passDesc.depthAttachment.clearDepth = 1.0;
 
-                id<MTLRenderCommandEncoder> shadowEncoder = [commandBuffer renderCommandEncoderWithDescriptor:passDesc];
+                id<MTLRenderCommandEncoder> shadowEncoder = [commandBuffer
+                    renderCommandEncoderWithDescriptor:passDesc];
                 [shadowEncoder setLabel:[NSString stringWithFormat:@"ShadowPass_Light%d", i]];
                 gpu::GPU_shader_bind_metal(shadow_shdr, shadowEncoder);
 
@@ -189,13 +198,17 @@ void DRW_prepare_view(vektor::dna::Scene *scene)
 
                     static std::map<void *, gpu::GPUMesh *> shadow_mesh_cache;
                     if (shadow_mesh_cache.find(obj.mesh.get()) == shadow_mesh_cache.end()) {
-                      shadow_mesh_cache[obj.mesh.get()] = gpu::GPU_mesh_create_from_dna_mesh(obj.mesh.get());
+                      shadow_mesh_cache[obj.mesh.get()] = gpu::GPU_mesh_create_from_dna_mesh(
+                          obj.mesh.get());
                     }
                     gpu::GPUMesh *gpu_mesh = shadow_mesh_cache[obj.mesh.get()];
                     gpu::GPU_mesh_draw(gpu_mesh, shadowEncoder);
                   }
                 }
                 [shadowEncoder endEncoding];
+                if (owns_command_buffer) {
+                  [commandBuffer commit];
+                }
               }
             }
           }
@@ -267,11 +280,17 @@ void DRW_draw_view(vektor::dna::Scene *scene,
     gpu::GPU_shader_uniform_int(gpu_shader, "numLights", g_lighting.num_lights);
     for (int i = 0; i < g_lighting.num_lights; i++) {
       QString prefix = QString("lights[%1].").arg(i);
-      gpu::GPU_shader_uniform_int(gpu_shader, (prefix + "type").toUtf8().constData(), g_lighting.lights[i].type);
-      gpu::GPU_shader_uniform_vector3(gpu_shader, (prefix + "position").toUtf8().constData(), &g_lighting.lights[i].position[0]);
-      gpu::GPU_shader_uniform_vector3(gpu_shader, (prefix + "color").toUtf8().constData(), &g_lighting.lights[i].color[0]);
-      gpu::GPU_shader_uniform_float(gpu_shader, (prefix + "energy").toUtf8().constData(), g_lighting.lights[i].energy);
-      gpu::GPU_shader_uniform_float(gpu_shader, (prefix + "range").toUtf8().constData(), g_lighting.lights[i].range);
+      gpu::GPU_shader_uniform_int(
+          gpu_shader, (prefix + "type").toUtf8().constData(), g_lighting.lights[i].type);
+      gpu::GPU_shader_uniform_vector3(gpu_shader,
+                                      (prefix + "position").toUtf8().constData(),
+                                      &g_lighting.lights[i].position[0]);
+      gpu::GPU_shader_uniform_vector3(
+          gpu_shader, (prefix + "color").toUtf8().constData(), &g_lighting.lights[i].color[0]);
+      gpu::GPU_shader_uniform_float(
+          gpu_shader, (prefix + "energy").toUtf8().constData(), g_lighting.lights[i].energy);
+      gpu::GPU_shader_uniform_float(
+          gpu_shader, (prefix + "range").toUtf8().constData(), g_lighting.lights[i].range);
     }
 
     // Draw objects (Both meshes and light icons)
@@ -287,6 +306,13 @@ void DRW_draw_view(vektor::dna::Scene *scene,
         gpu::GPU_shader_uniform_matrix4(gpu_shader, "model", &model[0][0]);
         gpu::GPU_shader_uniform_int(gpu_shader, "isLight", obj.type == dna::ObjectType::Light);
 
+        dna::Color objectColor = {0.8f, 0.8f, 0.8f, 1.0f};
+        if (obj.mesh && !obj.mesh->materials.empty()) {
+          objectColor = obj.mesh->materials[0]->color;
+        }
+        float color_val[4] = {objectColor.r, objectColor.g, objectColor.b, objectColor.a};
+        gpu::GPU_shader_uniform_vector4(gpu_shader, "objectColor", color_val);
+
         static std::map<void *, gpu::GPUMesh *> mesh_cache;
         if (mesh_cache.find(obj.mesh.get()) == mesh_cache.end()) {
           mesh_cache[obj.mesh.get()] = gpu::GPU_mesh_create_from_dna_mesh(obj.mesh.get());
@@ -299,23 +325,36 @@ void DRW_draw_view(vektor::dna::Scene *scene,
   else {
 #ifdef __APPLE__
     id<MTLRenderCommandEncoder> mtl_encoder = (id<MTLRenderCommandEncoder>)encoder_or_context;
-    if (!mtl_encoder) return;
+    if (!mtl_encoder)
+      return;
 
     gpu::GPU_shader_bind_metal(gpu_shader, mtl_encoder);
+
+    // Set depth stencil state for Metal
+    auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
+    MTLDepthStencilDescriptor *depthDesc = [[MTLDepthStencilDescriptor alloc] init];
+    depthDesc.depthCompareFunction = MTLCompareFunctionLess;
+    depthDesc.depthWriteEnabled = YES;
+    id<MTLDepthStencilState> depthStencilState = [device
+        newDepthStencilStateWithDescriptor:depthDesc];
+    [mtl_encoder setDepthStencilState:depthStencilState];
 
     struct {
       glm::mat4 view;
       glm::mat4 projection;
       glm::mat4 lightSpaceMatrices[MAX_SHADOW_LIGHTS];
       LightingUniforms lighting;
+      glm::vec3 viewPos;
+      float _pad_viewPos;
       float time;
       float padding[3];
     } uniforms = {};
 
     uniforms.view = view;
     uniforms.projection = projection;
+    uniforms.viewPos = glm::vec3(glm::inverse(view)[3]);  // Camera position
     for (int i = 0; i < MAX_SHADOW_LIGHTS; i++) {
-        uniforms.lightSpaceMatrices[i] = g_lightSpaceMatrices[i];
+      uniforms.lightSpaceMatrices[i] = g_lightSpaceMatrices[i];
     }
     uniforms.lighting = g_lighting;
     uniforms.time = time;
@@ -325,7 +364,8 @@ void DRW_draw_view(vektor::dna::Scene *scene,
 
     auto *shadow_fb = get_shadow_fb_array();
     if (shadow_fb && shadow_fb->depth_tex) {
-        [mtl_encoder setFragmentTexture:(id<MTLTexture>)shadow_fb->depth_tex->metal_texture atIndex:0];
+      [mtl_encoder setFragmentTexture:(id<MTLTexture>)shadow_fb->depth_tex->metal_texture
+                              atIndex:0];
     }
 
     for (auto entity : objects_view) {
@@ -346,6 +386,18 @@ void DRW_draw_view(vektor::dna::Scene *scene,
 
         [mtl_encoder setVertexBytes:&obj_uniforms length:sizeof(obj_uniforms) atIndex:2];
 
+        // Restore missing fragment buffers for color and emissive
+        dna::Color color = {0.8f, 0.8f, 0.8f, 1.0f};
+        glm::vec3 emissive = {0.0f, 0.0f, 0.0f};
+        if (!obj.mesh->materials.empty()) {
+          color = obj.mesh->materials[0]->color;
+          emissive = glm::vec3(obj.mesh->materials[0]->emissive_color.r,
+                               obj.mesh->materials[0]->emissive_color.g,
+                               obj.mesh->materials[0]->emissive_color.b);
+        }
+        [mtl_encoder setFragmentBytes:&color length:sizeof(color) atIndex:0];
+        [mtl_encoder setFragmentBytes:&emissive length:sizeof(emissive) atIndex:3];
+
         static std::map<void *, gpu::GPUMesh *> mesh_cache;
         if (mesh_cache.find(obj.mesh.get()) == mesh_cache.end()) {
           mesh_cache[obj.mesh.get()] = gpu::GPU_mesh_create_from_dna_mesh(obj.mesh.get());
@@ -358,4 +410,4 @@ void DRW_draw_view(vektor::dna::Scene *scene,
   }
 }
 
-} // namespace vektor::draw
+}  // namespace vektor::draw

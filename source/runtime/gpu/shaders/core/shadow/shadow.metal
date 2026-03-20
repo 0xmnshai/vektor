@@ -22,6 +22,8 @@ vertex VertexOut vertex_main(uint vertexID [[vertex_id]],
     VertexOut out;
     float3 pos = float3(vertices[vertexID].position);
     out.position = uniforms.lightSpaceMatrix * uniforms.model * float4(pos, 1.0);
+    // Remap OpenGL Z [-1, 1] to Metal [0, 1] for depth
+    out.position.z = (out.position.z + out.position.w) * 0.5;
     return out;
 }
 

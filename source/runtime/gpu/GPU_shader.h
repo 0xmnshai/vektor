@@ -47,6 +47,7 @@ void GPU_shader_free(GPUShader *shader);
 void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val);
 void GPU_shader_uniform_int(GPUShader *shader, const char *name, int val);
 void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float val[3]);
+void GPU_shader_uniform_vector4(GPUShader *shader, const char *name, const float val[4]);
 void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float val[16]);
 void GPU_shader_uniform_matrix4_array(GPUShader *shader, const char *name, const float *val, int count);
 void GPU_shader_uniform_texture(GPUShader *shader, const char *name, int slot);

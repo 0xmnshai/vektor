@@ -154,12 +154,14 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   [desc release];
 
   if (error) {
+    qDebug() << "[GPU_shader_metal] Pipeline error for source shader:" << [[error localizedDescription] UTF8String];
     CLOG_ERROR(LOG_SHADER,
                "[GPU_shader_metal] Pipeline error for source shader: %s",
                [[error localizedDescription] UTF8String]);
     return nullptr;
   }
 
+  qDebug() << "[GPU_shader_metal] Successfully created Metal pipeline from source for functions:" << v_entry << "," << f_entry;
   CLOG_INFO(LOG_SHADER, "[GPU_shader_metal] Successfully created Metal pipeline from source");
   return (void *)pipeline;
 }

@@ -20,6 +20,7 @@ uniform int numLights;
 uniform Light lights[8];
 uniform sampler2DArray shadowMapArray;
 uniform bool isLight;
+uniform vec4 objectColor;
 
 float calculateShadow(int layer, vec4 fragPosLightSpace) {
     // perform perspective divide
@@ -82,6 +83,6 @@ void main() {
     }
 
     // Ambient
-    vec3 ambient = 0.05 * vec3(1.0);
-    FragColor = vec4(ambient + color, 1.0);
+    vec3 ambient = 0.05 * objectColor.rgb;
+    FragColor = vec4(ambient + color * objectColor.rgb, objectColor.a);
 }

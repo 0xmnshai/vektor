@@ -118,7 +118,7 @@ void ViewportWidget::paintGL()
     QOpenGLFunctions_4_1_Core gl_func;
     gl_func.initializeOpenGLFunctions();
     float dpr = (float)devicePixelRatio();
-    gl_func.glViewport(0, 0, width() * dpr, height() * dpr);
+    gl_func.glViewport(0, 0, width() * (int)dpr, height() * (int)dpr);
   }
 
   if (grid_shader_) {

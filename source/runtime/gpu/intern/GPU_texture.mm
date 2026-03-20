@@ -61,11 +61,11 @@ GPUTexture *GPU_texture_create_2d_array(int width, int height, int layers, eGPUT
     auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
     MTLTextureDescriptor *texDesc = [MTLTextureDescriptor
         texture2DDescriptorWithPixelFormat:(format == GPU_DEPTH_COMPONENT24 ?
-                                                MTLPixelFormatDepth32Float :
+                                                MTLPixelFormatDepth32Float_Stencil8 :
                                                 MTLPixelFormatRGBA8Unorm)
                                       width:width
                                      height:height
-                                  mipmapped:NO];
+                                   mipmapped:NO];
     texDesc.textureType = MTLTextureType2DArray;
     texDesc.arrayLength = layers;
     texDesc.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
@@ -119,11 +119,11 @@ GPUTexture *GPU_texture_create_2d(int width, int height, eGPUTextureFormat forma
     auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
     MTLTextureDescriptor *texDesc = [MTLTextureDescriptor
         texture2DDescriptorWithPixelFormat:(format == GPU_DEPTH_COMPONENT24 ?
-                                                MTLPixelFormatDepth32Float :
+                                                MTLPixelFormatDepth32Float_Stencil8 :
                                                 MTLPixelFormatRGBA8Unorm)
                                       width:width
                                      height:height
-                                  mipmapped:NO];
+                                   mipmapped:NO];
     texDesc.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
     texDesc.storageMode = MTLStorageModePrivate;
     tex->metal_texture = (void *)[device newTextureWithDescriptor:texDesc];
