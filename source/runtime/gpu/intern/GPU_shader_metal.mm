@@ -58,7 +58,7 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
   desc.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
   desc.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
   desc.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
-  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;
+  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
                                                                                 error:&error];
@@ -139,7 +139,7 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   desc.colorAttachments[0].sourceRGBBlendFactor = MTLBlendFactorSourceAlpha;
   desc.colorAttachments[0].destinationRGBBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
   desc.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
-  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorZero;
+  desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
                                                                                 error:&error];

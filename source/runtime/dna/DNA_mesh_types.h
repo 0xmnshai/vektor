@@ -1,9 +1,10 @@
 #pragma once
 
-#include "DNA_id.h"
-#include "DNA_material_types.h"
 #include <memory>
 #include <vector>
+
+#include "DNA_id.h"
+#include "DNA_material_types.h"
 
 namespace vektor::dna {
 

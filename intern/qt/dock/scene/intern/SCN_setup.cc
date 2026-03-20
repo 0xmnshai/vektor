@@ -18,8 +18,8 @@ void SCN_init_default_scene()
   // Create test entities only once
   vektor::kernel::create_entity(nullptr,
                                 nullptr,
-                                "Cube",
-                                "Cube",
+                                "Plane",
+                                "Contruct a Plane for default scene view",
                                 (int)vektor::dna::ObjectType::Mesh,
                                 0.0f,
                                 0.0f,

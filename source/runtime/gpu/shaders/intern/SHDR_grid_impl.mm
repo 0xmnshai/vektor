@@ -8,6 +8,10 @@
 #include "../../../runtime/creator_global.h"
 #include "../SHDR_grid.h"
 
+
+// TODO: Implement shader class for every object
+// TODO: Create some pre-defined object shaders so that it's easy to use 
+
 namespace vektor::gpu {
 
 GridShader::GridShader() : BaseShader("Grid") {}

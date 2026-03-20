@@ -11,6 +11,12 @@ struct ObjectDrawData {
   // Further details like transform buffers could go here
 };
 
-void DRW_draw_view(vektor::dna::Scene *scene, void *encoder_or_context, const glm::mat4 &view, const glm::mat4 &projection);
+void DRW_draw_view(vektor::dna::Scene *scene,
+                   void *encoder_or_context,
+                   const glm::mat4 &view,
+                   const glm::mat4 &projection,
+                   int width,
+                   int height,
+                   float time);
 
 } // namespace vektor::draw

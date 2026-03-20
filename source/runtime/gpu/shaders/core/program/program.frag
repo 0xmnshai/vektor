@@ -1,9 +1,13 @@
 #version 410 core
+
 out vec4 FragColor;
+
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
+
 uniform vec3 color;
+
 void main() {
     vec3 lightDir = normalize(vec3(0.5, 1.0, 0.5));
     vec3 norm = normalize(Normal);
@@ -17,5 +21,6 @@ void main() {
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
     vec3 specular = 0.05 * spec * vec3(1.0);
+    
     FragColor = vec4(ambient + diffuse + specular, 1.0);
 }

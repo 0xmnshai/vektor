@@ -1,5 +1,6 @@
 #include "entt/entt.hpp"
 #include <glm/glm.hpp>
+#include <string>
 
 #include "../../dna/DNA_object_type.h"
 #include "../../rna/RNA_ecs_registry.h"
@@ -10,7 +11,6 @@
 #include "../../creator_global.h"
 #include "../../gpu/GPU_shader.h"
 #include "../../lib/intern/appdir.h"
-#include <string>
 
 #include "ECS_mesh_primitives.h"
 
@@ -68,7 +68,8 @@ void create_entity(rna::VektorRNA *v_rna,
 
     vektor::gpu::GPUShaderSourceParameters params = {nullptr};
 
-    const std::string dir_path = std::string(lib::get_application_dir_path()) + "/../../source/runtime/gpu";
+    const std::string dir_path = std::string(lib::get_application_dir_path()) +
+                                 "/../../source/runtime/gpu";
 
     const std::string vert_path = dir_path + "/shaders/core/program/program.vert";
     const std::string frag_path = dir_path + "/shaders/core/program/program.frag";
@@ -95,6 +96,12 @@ void create_entity(rna::VektorRNA *v_rna,
   // rna::PointerRNA object_ptr = rna::RNA_pointer_from_entity<dna::Object>(
   //     registry.registry(), entity, object_type);
 
+  outliner_notify_scene_changed();
+}
+
+void destroy_entity(entt::entity entity)
+{
+  ECSRegistry::instance().destroy_entity(entity);
   outliner_notify_scene_changed();
 }
 }  // namespace vektor::kernel

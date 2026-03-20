@@ -6,7 +6,8 @@ QString UI_style_manager::get_qt_style()
 {
   auto &cfg = config::ConfigManager::instance();
   // Load the stylesheet config
-  cfg.load("qt_style", "/Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/config/ini/qt_style.ini");
+  cfg.load("qt_style",
+           "/Users/lazycodebaker/Documents/Dev/CPP/vektor/intern/config/ini/qt_style.ini");
 
   // Fetch styles with fallbacks mapping to the original defaults
   QString main_bg = QString::fromStdString(

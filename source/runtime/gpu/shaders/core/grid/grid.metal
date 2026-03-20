@@ -81,7 +81,7 @@ fragment FragmentOutput fragment_main(VertexOutput in [[stage_in]],
     float3 fragPos3D = in.nearPoint + t * (in.farPoint - in.nearPoint);
     
     float linearDepth = computeLinearDepth(fragPos3D, uniforms.projection, uniforms.view);
-    float fading = exp(-linearDepth * 10.0);
+    float fading = exp(-linearDepth * 2.0); // Relaxed fading (was 10.0)
 
     float4 color1 = grid(fragPos3D, 1.0, true);
     float4 color10 = grid(fragPos3D, 0.1, true);

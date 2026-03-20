@@ -1,5 +1,6 @@
 #include <QSizePolicy>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 #include "../../../../../source/editor/windowmanager/wm_event_types.h"
 #include "../../../../../source/runtime/dna/DNA_camera.h"
@@ -14,12 +15,15 @@
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
 #include "../../intern/qt/dock/scene/SCN_setup.h"
 #include "../../intern/vpi/VPI_Types.h"
+#include "../SCN_notifier.h"
 #include "../WIDGET_viewport.h"
 
 #ifdef __APPLE__
 #  import <Metal/Metal.h>
 #  import <QuartzCore/QuartzCore.h>
 #endif
+
+#define float_to_int(x) ((int)((x) + 0.5f))
 
 // TODO: Thinking to create a separate file for openGL for this, let's see in blender later, how
 // they are doing this. ?
@@ -78,7 +82,11 @@ void ViewportWidget::paintGL()
 
       auto encoder = (id<MTLRenderCommandEncoder>)mtl_context->get_current_command_encoder();
       // Metal rendering for ECS objects via Draw Manager
-      vektor::draw::DRW_draw_view(nullptr, encoder, view, projection);
+      static float time = 0.0f;
+      time += 0.016f;
+      auto dpr = (float)devicePixelRatio();
+      vektor::draw::DRW_draw_view(
+          nullptr, encoder, view, projection, (width() * (int)dpr), (height() * (int)dpr), time);
 
       mtl_context->end_render_pass();
     }
@@ -89,7 +97,7 @@ void ViewportWidget::paintGL()
   // WIDGET_viewport.mm
   initializeOpenGLFunctions();
   glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
 
   vpi::VPI_GLWidget::paintGL();
@@ -104,7 +112,11 @@ void ViewportWidget::paintGL()
     glDepthMask(GL_TRUE);
   }
 
-  vektor::draw::DRW_draw_view(nullptr, nullptr, view, projection);
+  static float time = 0.0f;
+  time += 0.016f;
+  float dpr = (float)devicePixelRatio();
+  vektor::draw::DRW_draw_view(
+      nullptr, nullptr, view, projection, (width() * (int)dpr), (height() * (int)dpr), time);
   glDisable(GL_DEPTH_TEST);
 }
 
@@ -129,10 +141,10 @@ void ViewportWidget::mouseReleaseEvent(QMouseEvent *event)
   }
 
   VPI_TEventMouseButtonData mouse_event_data = {
-      .x = (int)event->position().x(),
-      .y = (int)event->position().y(),
+      .x = (int32_t)event->position().x(),
+      .y = (int32_t)event->position().y(),
       .button = (uint32_t)wm_event,
-      .modifiers = event->modifiers(),
+      .modifiers = (uint32_t)event->modifiers(),
       .type = VPI_kMouseButton,
   };
 
@@ -144,8 +156,8 @@ void ViewportWidget::mouseReleaseEvent(QMouseEvent *event)
 void ViewportWidget::mouseMoveEvent(QMouseEvent *event)
 {
   VPI_TEventCursorData mouse_event_data = {
-      .x = (int)event->position().x(),
-      .y = (int)event->position().y(),
+      .x = (int32_t)event->position().x(),
+      .y = (int32_t)event->position().y(),
       .type = VPI_kCursorMove,
   };
 
@@ -211,9 +223,9 @@ void ViewportWidget::wheelEvent(QWheelEvent *event)
   }
 
   VPI_TEventMouseWheelData mouse_wheel_event_data = {
-      .delta_x = event->pixelDelta().x(),
-      .delta_y = event->pixelDelta().y(),
-      .modifiers = event->modifiers(),
+      .delta_x = (int32_t)event->pixelDelta().x(),
+      .delta_y = (int32_t)event->pixelDelta().y(),
+      .modifiers = (uint32_t)event->modifiers(),
   };
 
   auto *window = dynamic_cast<vpi::VPI_QtWindow *>(context_->get_window());
@@ -226,9 +238,84 @@ void ViewportWidget::wheelEvent(QWheelEvent *event)
 void ViewportWidget::mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton) {
-    glm::vec3 rayOrigin, rayDir;
+    glm::vec3 ray_origin, ray_dir;
     camera_->screen_to_ray(
-        (float)event->pos().x(), (float)event->pos().y(), width(), height(), rayOrigin, rayDir);
+        (float)event->pos().x(), (float)event->pos().y(), width(), height(), ray_origin, ray_dir);
+
+    // TODO :We can also implement somthing like this ?
+    // auto &registry = vektor::kernel::ECSRegistry::instance().registry();
+    // auto objects_view = registry.view<vektor::dna::Object>();
+
+    // for (auto entity : objects_view) {
+    //   auto &obj = objects_view.get<vektor::dna::Object>(entity);
+    //   if (obj.mesh) {
+    //     if (obj.mesh->intersects(ray_origin, ray_dir)) {
+    //       obj.select_flag |= vektor::dna::BASE_SELECTED;
+    //     }
+    //   }
+    // }
+
+    vektor::dna::Object *closest_obj = nullptr;
+    entt::entity closest_entity = entt::null;
+    float closest_dist = FLT_MAX;
+
+    auto &registry = vektor::kernel::ECSRegistry::instance().registry();
+    auto objects_view = registry.view<vektor::dna::Object>();
+
+    // Clear selection
+    for (auto entity : objects_view) {
+      auto &obj = objects_view.get<vektor::dna::Object>(entity);
+      obj.select_flag &= ~vektor::dna::BASE_SELECTED;
+      registry.remove<vektor::dna::Selected>(entity);
+    }
+
+    for (auto entity : objects_view) {
+      auto &obj = objects_view.get<vektor::dna::Object>(entity);
+
+      if (obj.mesh) {
+        // Special case for Plane intersection
+        if (std::string(obj.description).find("Plane") != std::string::npos) {
+          glm::vec3 n(0, 1, 0);
+          float denom = glm::dot(n, ray_dir);
+          if (abs(denom) > 1e-6) {
+            glm::vec3 p0 = obj.transform.location;
+            float t = glm::dot(p0 - ray_origin, n) / denom;
+            if (t > 0 && t < closest_dist) {
+              glm::vec3 hit_pt = ray_origin + ray_dir * t;
+              // Assuming scale 1.0, plane is 10x10 so extends 5 units in x and z
+              if (abs(hit_pt.x - p0.x) <= 5.0f && abs(hit_pt.z - p0.z) <= 5.0f) {
+                closest_dist = t;
+                closest_obj = &obj;
+                closest_entity = entity;
+              }
+            }
+          }
+          continue;
+        }
+
+        float radius = (obj.type == vektor::dna::ObjectType::Camera) ? 0.3f : 1.0f;
+        glm::vec3 oc = ray_origin - obj.transform.location;
+        float b = glm::dot(oc, ray_dir);
+        float c = glm::dot(oc, oc) - radius * radius;
+        float discriminant = b * b - c;
+
+        if (discriminant > 0) {
+          float t = -b - sqrt(discriminant);
+          if (t > 0 && t < closest_dist) {
+            closest_dist = t;
+            closest_obj = &obj;
+            closest_entity = entity;
+          }
+        }
+      }
+    }
+
+    if (closest_obj) {
+      closest_obj->select_flag |= vektor::dna::BASE_SELECTED;
+      registry.emplace_or_replace<vektor::dna::Selected>(closest_entity, true);
+    }
+
+    outliner_notify_scene_changed();
   }
   else if (event->button() == Qt::RightButton) {
     right_mouse_down_ = true;
@@ -240,10 +327,10 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
   setFocus();
 
   VPI_TEventMouseButtonData mouse_button_event_data = {
-      .x = event->pos().x(),
-      .y = event->pos().y(),
+      .x = (int32_t)event->pos().x(),
+      .y = (int32_t)event->pos().y(),
       .button = (uint32_t)event->button(),
-      .modifiers = event->modifiers(),
+      .modifiers = (uint32_t)event->modifiers(),
       .type = VPI_kMouseButton,
   };
 
@@ -327,3 +414,29 @@ void ViewportWidget::pinch_Triggered(QPinchGesture *gesture)
 }
 
 }  // namespace qt::dock
+
+/**
+
+
+TODO:
+
+outline.vert
+
+   vec4 pos_clip = projection * view * model * vec4(aPos, 1.0);
+    vec4 center_clip = projection * view * model * vec4(0.0, 0.0, 0.0, 1.0);
+
+    vec2 p_ndc = pos_clip.xy / pos_clip.w;
+    vec2 c_ndc = center_clip.xy / center_clip.w;
+
+    vec2 dir = p_ndc - c_ndc;
+    float len = length(dir);
+    if (len > 0.0001) {
+        p_ndc += (dir / len) * (offset * 2.0);
+    }
+
+    pos_clip.xy = p_ndc * pos_clip.w;
+    pos_clip.z += 0.005 * pos_clip.w; // Push away slightly
+
+    gl_Position = pos_clip;
+
+*/

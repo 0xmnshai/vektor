@@ -43,5 +43,10 @@ void RNA_ecs_set_active(ECSRegistry *registry, entt::entity entity, bool active)
 {
   registry->emplace_or_replace<dna::Active>(entity, active);
 }
+
+void RNA_ecs_destroy_entity(ECSRegistry *registry, entt::entity entity)
+{
+  registry->destroy_entity(entity);
+}
 }
 }  // namespace vektor::rna

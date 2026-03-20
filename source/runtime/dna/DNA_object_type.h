@@ -25,11 +25,18 @@ typedef struct Transform {
   glm::vec3 rotation = glm::vec3(0.0f);
 } Transform;
 
+enum OBSelectionFlags {
+  BASE_SELECTED = (1 << 0),
+  BASE_ACTIVE = (1 << 1),
+};
+
 typedef struct Object {
   ID id;
   char description[256] = "";
   Transform transform;
   void *shader_program = nullptr;
+
+  uint32_t select_flag = 0;
 
   std::shared_ptr<dna::Mesh> mesh;
 

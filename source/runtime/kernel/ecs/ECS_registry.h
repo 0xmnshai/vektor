@@ -53,6 +53,11 @@ class ECSRegistry {
     registry_.remove<T>(entity);
   }
 
+  void destroy_entity(entt::entity entity)
+  {
+    registry_.destroy(entity);
+  }
+
   explicit operator entt::registry &()
   {
     return registry_;

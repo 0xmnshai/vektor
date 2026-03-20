@@ -16,7 +16,7 @@ void add_primitive_cube_exec(dna::Object *obj, float size)
   
   auto mat = std::make_shared<dna::Material>();
   // we have decrease the alpha value for now, to check 
-  mat->color = dna::Color(0.26f, 0.27f, 0.29f, 0.8f);
+  mat->color = dna::Color(0.26f, 0.27f, 0.29f, 1.0f);
   strcpy(mat->name, "DefaultMaterial");
   obj->mesh->materials.push_back(mat);
 }
