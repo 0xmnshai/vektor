@@ -5,6 +5,43 @@
 
 namespace vektor::gpu {
 
+GPUFrameBuffer *GPU_framebuffer_create_depth_array(int width, int height, int layers)
+{
+  auto *fb = new GPUFrameBuffer();
+  fb->width = width;
+  fb->height = height;
+  fb->opengl_id = 0;
+  fb->depth_tex = GPU_texture_create_2d_array(width, height, layers, GPU_DEPTH_COMPONENT24);
+
+  if (creator::G.gpu_backend == creator::GPU_BACKEND_OPENGL) {
+    QOpenGLFunctions_4_1_Core gl;
+    gl.initializeOpenGLFunctions();
+
+    gl.glGenFramebuffers(1, &fb->opengl_id);
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, fb->opengl_id);
+    // Bind the first layer initially
+    gl.glFramebufferTextureLayer(
+        GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb->depth_tex->opengl_id, 0, 0);
+
+    gl.glDrawBuffer(GL_NONE);
+    gl.glReadBuffer(GL_NONE);
+
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
+  return fb;
+}
+
+void GPU_framebuffer_attach_depth_layer(GPUFrameBuffer *fb, int layer)
+{
+  if (creator::G.gpu_backend == creator::GPU_BACKEND_OPENGL) {
+    QOpenGLFunctions_4_1_Core gl;
+    gl.initializeOpenGLFunctions();
+    gl.glBindFramebuffer(GL_FRAMEBUFFER, fb->opengl_id);
+    gl.glFramebufferTextureLayer(
+        GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb->depth_tex->opengl_id, 0, layer);
+  }
+}
+
 GPUFrameBuffer *GPU_framebuffer_create_depth_only(int width, int height)
 {
   auto *fb = new GPUFrameBuffer();
@@ -45,8 +82,6 @@ void GPU_framebuffer_bind(GPUFrameBuffer *fb)
       gl.glViewport(0, 0, fb->width, fb->height);
     }
     else {
-      // On macOS/Qt, the default framebuffer is NOT 0 — Qt manages its own FBO.
-      // We MUST query and restore Qt's actual default FBO here or rendering goes to void.
       GLuint default_fbo = 0;
       auto *ctx = QOpenGLContext::currentContext();
       if (ctx) {

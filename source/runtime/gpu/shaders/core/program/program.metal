@@ -10,108 +10,109 @@ struct VertexOut {
     float4 position [[position]];
     float3 vNormal;
     float3 vFragPos;
-    float4 vFragPosLightSpace;
+    float4 vFragPosLightSpace[8];
+    int isLight [[flat]];
 };
 
-struct Uniforms {
-    float4x4 model;
+struct Light {
+    int type;            // 4 bytes
+    float _pad0[3];      // 12 bytes
+    float3 position;     // 16 bytes (aligned)
+    float3 color;        // 16 bytes (aligned)
+    float energy;        // 4 bytes
+    float range;         // 4 bytes
+    float _pad2[2];      // 8 bytes (padding to 64 bytes)
+};
+
+struct LightingUniforms {
+    int numLights;       // 4 bytes
+    float _pad0[3];      // 12 bytes
+    Light lights[8];     // 8 * 64 = 512 bytes
+};
+
+struct GlobalUniforms {
     float4x4 view;
     float4x4 projection;
-    float4x4 lightSpaceMatrix;
-};
-
-// Must match C++ GPULight struct layout (64 bytes total, 16-byte aligned)
-struct Light {
-    int type;          // 4 bytes
-    float3 _pad0;      // 12 bytes (padding)
-    packed_float3 position; // 12 bytes
-    float _pad1;       // 4 bytes
-    packed_float3 color;    // 12 bytes
-    float energy;      // 4 bytes
-    float range;       // 4 bytes
-    float3 _pad2;      // 12 bytes (padding to 64 bytes)
-};
-
-// Must match C++ LightingUniforms struct (num_lights + 12-byte pad + lights)
-struct LightingUniforms {
-    int numLights;     // 4 bytes
-    float3 _pad0;      // 12 bytes (padding to 16-byte boundary)
-    Light lights[8];   // 8 * 64 = 512 bytes
+    float4x4 lightSpaceMatrices[8];
+    LightingUniforms lighting;
+    float time;
+    float padding[3];
 };
 
 vertex VertexOut vertex_main(uint vertexID [[vertex_id]],
                              const device Vertex* vertices [[buffer(0)]],
-                             constant Uniforms &uniforms [[buffer(1)]])
+                             constant struct { float4x4 model; int isLight; } &obj [[buffer(2)]],
+                             constant GlobalUniforms &uniforms [[buffer(1)]])
 {
     VertexOut out;
     device const Vertex &v = vertices[vertexID];
-    out.vFragPos = (uniforms.model * float4(float3(v.position), 1.0)).xyz;
-    out.vNormal = (uniforms.model * float4(float3(v.normal), 0.0)).xyz;
-    out.vFragPosLightSpace = uniforms.lightSpaceMatrix * float4(out.vFragPos, 1.0);
+    out.vFragPos = (obj.model * float4(float3(v.position), 1.0)).xyz;
+    out.vNormal = (obj.model * float4(float3(v.normal), 0.0)).xyz;
+    for (int i = 0; i < 8; i++) {
+        out.vFragPosLightSpace[i] = uniforms.lightSpaceMatrices[i] * float4(out.vFragPos, 1.0);
+    }
     out.position = uniforms.projection * uniforms.view * float4(out.vFragPos, 1.0);
+    out.isLight = obj.isLight;
     return out;
 }
 
-float3 calculateLight(Light light, float3 fragPos, float3 normal, float3 viewDir) {
-    float3 lightDir = normalize(light.position - fragPos);
-    float distance = length(light.position - fragPos);
+float calculateMetalShadow(texture2d_array<float> shadowMapArray, sampler shadowSampler, float4 lightSpacePos, int layer) {
+    float3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    float2 shadowCoords = projCoords.xy * 0.5 + 0.5;
+    shadowCoords.y = 1.0 - shadowCoords.y; // Flip Y for Metal
     
-    // Physical-ish falloff
-    float attenuation = 1.0 / (1.0 + 0.1 * distance + 0.01 * distance * distance);
-    // Soft range limit
-    attenuation *= clamp(1.0 - (distance / light.range), 0.0, 1.0);
+    if (projCoords.z > 1.0 || projCoords.z < 0.0) return 0.0;
 
-    float diff = max(dot(normal, lightDir), 0.0);
-    float3 diffuse = diff * light.color * light.energy;
-
-    float3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    float3 specular = 0.5 * spec * light.color * light.energy;
-
-    return (diffuse + specular) * attenuation;
+    float currentDepth = projCoords.z;
+    float bias = 0.005;
+    float shadow = 0.0;
+    
+    float2 texelSize = 1.0 / float2(shadowMapArray.get_width(), shadowMapArray.get_height());
+    
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = shadowMapArray.sample(shadowSampler, shadowCoords + float2(x, y) * texelSize, layer);
+            shadow += (currentDepth - bias > pcfDepth) ? 1.0 : 0.0;
+        }
+    }
+    return shadow / 9.0;
 }
 
 fragment float4 fragment_main(VertexOut in [[stage_in]],
                                constant float4 &color [[buffer(0)]],
                                constant float3 &emissive [[buffer(3)]],
-                               constant LightingUniforms &lighting [[buffer(2)]],
-                               texture2d<float> shadowMap [[texture(0)]])
+                               constant GlobalUniforms &uniforms [[buffer(1)]],
+                               texture2d_array<float> shadowMapArray [[texture(0)]])
 {
+    if (in.isLight) {
+        return float4(1.0, 1.0, 1.0, 1.0);
+    }
+
     constexpr sampler shadowSampler(coord::normalized,
                                     address::clamp_to_edge,
-                                    filter::linear,
-                                    compare_func::less);
+                                    filter::linear);
 
     float3 norm = normalize(in.vNormal);
     float3 viewDir = normalize(float3(0, 5, 5) - in.vFragPos);
     
-    // Shadow calculation
-    float3 projCoords = in.vFragPosLightSpace.xyz / in.vFragPosLightSpace.w;
-    float2 shadowCoords = projCoords.xy * 0.5 + 0.5;
-    shadowCoords.y = 1.0 - shadowCoords.y; // Flip Y for Metal
-    float currentDepth = projCoords.z;
-    
-    float shadow = 0.0;
-    if (currentDepth <= 1.0) {
-        shadow = shadowMap.sample_compare(shadowSampler, shadowCoords, currentDepth - 0.005);
-    }
-    // sample_compare returns 1.0 if NOT in shadow (test passes), 0.0 if in shadow.
-    // Our calculateLight expects 1.0 for shadow, 0.0 for no shadow.
-    float shadowFactor = 1.0 - shadow;
+    float3 ambient = 0.05 * float3(1.0);
+    float3 result = ambient;
 
-    float heightAO = clamp(in.vFragPos.y * 0.4 + 0.6, 0.3, 1.0);
-    float upFactor = clamp(norm.y * 0.5 + 0.5, 0.6, 1.0);
-    float ao = heightAO * upFactor;
-
-    float3 ambient = 0.3 * color.rgb * ao;
-    float3 result = ambient + emissive;
-
-    for(int i = 0; i < lighting.numLights; i++) {
-        float3 lightColor = calculateLight(lighting.lights[i], in.vFragPos, norm, viewDir);
-        if (!any(isnan(lightColor))) {
-            float s = (i == 0) ? shadowFactor : 0.0;
-            result += lightColor * color.rgb * (1.0 - s);
+    for(int i = 0; i < uniforms.lighting.numLights; i++) {
+        float shadowFactor = 0.0;
+        if (i < 8) {
+            shadowFactor = calculateMetalShadow(shadowMapArray, shadowSampler, in.vFragPosLightSpace[i], i);
         }
+
+        float3 lightDir = normalize(uniforms.lighting.lights[i].position - in.vFragPos);
+        float distance = length(uniforms.lighting.lights[i].position - in.vFragPos);
+        float attenuation = clamp(1.0 - (distance / uniforms.lighting.lights[i].range), 0.0, 1.0);
+        attenuation *= attenuation;
+
+        float diff = max(dot(norm, lightDir), 0.0);
+        float3 diffuse = diff * uniforms.lighting.lights[i].color * uniforms.lighting.lights[i].energy * attenuation;
+        
+        result += diffuse * (1.0 - shadowFactor);
     }
     
     return float4(result, color.a);

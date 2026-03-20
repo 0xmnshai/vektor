@@ -17,6 +17,7 @@ typedef struct GPUTexture {
 } GPUTexture;
 
 GPUTexture *GPU_texture_create_2d(int width, int height, eGPUTextureFormat format);
+GPUTexture *GPU_texture_create_2d_array(int width, int height, int layers, eGPUTextureFormat format);
 void GPU_texture_free(GPUTexture *tex);
 
 }  // namespace vektor::gpu

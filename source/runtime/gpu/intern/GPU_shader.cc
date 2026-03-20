@@ -409,6 +409,17 @@ void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float
   }
 }
 
+void GPU_shader_uniform_matrix4_array(GPUShader *shader, const char *name, const float *val, int count)
+{
+  if (shader && shader->program) {
+    std::vector<QMatrix4x4> mats(count);
+    for (int i = 0; i < count; i++) {
+      mats[i] = QMatrix4x4(&val[i * 16]).transposed();
+    }
+    shader->program->setUniformValueArray(name, mats.data(), count);
+  }
+}
+
 void GPU_shader_uniform_texture(GPUShader *shader, const char *name, int slot)
 {
   if (shader && shader->program) {

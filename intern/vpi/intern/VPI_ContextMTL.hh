@@ -52,6 +52,10 @@ class VPI_ContextMTL : public VPI_Context {
   {
     return current_encoder_;
   }
+  [[nodiscard]] void *get_current_command_buffer() const
+  {
+    return current_command_buffer_;
+  }
   [[nodiscard]] void *get_current_render_pass_descriptor() const
   {
     return current_pass_desc_;

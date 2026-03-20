@@ -76,6 +76,7 @@ void ViewportWidget::paintGL()
   if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_METAL) {
     if (context_) {
       auto *mtl_context = dynamic_cast<vpi::VPI_ContextMTL *>(context_);
+      ::vektor::draw::DRW_prepare_view(nullptr);
       mtl_context->begin_render_pass();
 
       glm::mat4 projection = camera_->projection_matrix((float)width() / (float)height());
@@ -109,6 +110,16 @@ void ViewportWidget::paintGL()
   float aspect = (float)width() / (float)height();
   glm::mat4 projection = camera_->projection_matrix(aspect);
   glm::mat4 view = camera_->view_matrix();
+
+  ::vektor::draw::DRW_prepare_view(nullptr);
+
+  // CRITICAL: Restore viewport after shadow pass prepare
+  if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_OPENGL) {
+    QOpenGLFunctions_4_1_Core gl_func;
+    gl_func.initializeOpenGLFunctions();
+    float dpr = (float)devicePixelRatio();
+    gl_func.glViewport(0, 0, width() * dpr, height() * dpr);
+  }
 
   if (grid_shader_) {
     glDepthMask(GL_FALSE);

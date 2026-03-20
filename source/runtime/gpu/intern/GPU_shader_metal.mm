@@ -107,13 +107,15 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   const char *v_entry = (params && params->vert_entry) ? params->vert_entry : "vertex_main";
   const char *f_entry = (params && params->frag_entry) ? params->frag_entry : "fragment_main";
 
+  CLOG_INFO(LOG_SHADER, "[GPU_shader_metal] Creating functions: %s, %s", v_entry, f_entry);
+
   id<MTLFunction> vert_func = [library
       newFunctionWithName:[NSString stringWithUTF8String:v_entry]];
   id<MTLFunction> frag_func = [library
       newFunctionWithName:[NSString stringWithUTF8String:f_entry]];
 
   if (!vert_func || !frag_func) {
-    // If customized fails, or if using defaults, try "main" fallback
+    CLOG_WARN(LOG_SHADER, "[GPU_shader_metal] Custom entry points failed, trying 'main'");
     if (!vert_func)
       vert_func = [library newFunctionWithName:@"main"];
     if (!frag_func)
@@ -143,6 +145,7 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   desc.colorAttachments[0].sourceAlphaBlendFactor = MTLBlendFactorOne;
   desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 
+  CLOG_INFO(LOG_SHADER, "[GPU_shader_metal] Creating pipeline state...");
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
                                                                                error:&error];
   [vert_func release];
