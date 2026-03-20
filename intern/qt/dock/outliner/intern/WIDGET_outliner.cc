@@ -9,7 +9,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
-#include "../WIDGET_outliner.h"
+#include "../WIDGET_outliner.hh"
 #include "../scene/SCN_notifier.h"
 
 #include "../../../../../intern/clog/CLG_log.h"
@@ -23,7 +23,7 @@ CLG_LOGREF_DECLARE_GLOBAL(LOG_OUTLINER, "outliner");
 
 using namespace vektor::dna;
 
-OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
+OutlinerPanel::OutlinerPanel(QWidget *parent) : QWidget(parent)
 {
   build_ui();
   build_model();
@@ -31,22 +31,22 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   connect(tree_view_->selectionModel(),
           &QItemSelectionModel::selectionChanged,
           this,
-          &OutlinerWidget::on_selection_changed);
+          &OutlinerPanel::on_selection_changed);
 
-  connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerWidget::on_search_text_changed);
+  connect(search_bar_, &QLineEdit::textChanged, this, &OutlinerPanel::on_search_text_changed);
 
   filter_timer_ = new QTimer(this);
   filter_timer_->setSingleShot(true);
-  connect(filter_timer_, &QTimer::timeout, this, &OutlinerWidget::apply_filter);
+  connect(filter_timer_, &QTimer::timeout, this, &OutlinerPanel::apply_filter);
 
   refresh_timer_ = new QTimer(this);
   refresh_timer_->setSingleShot(true);
-  connect(refresh_timer_, &QTimer::timeout, this, &OutlinerWidget::refresh_entities);
+  connect(refresh_timer_, &QTimer::timeout, this, &OutlinerPanel::refresh_entities);
 
   connect(tree_view_,
           &QTreeView::customContextMenuRequested,
           this,
-          &OutlinerWidget::show_context_menu);
+          &OutlinerPanel::show_context_menu);
 
   connect(qt::scene::SCN_notifier::instance(),
           &qt::scene::SCN_notifier::sceneChanged,
@@ -56,7 +56,7 @@ OutlinerWidget::OutlinerWidget(QWidget *parent) : QWidget(parent)
   refresh_entities();
 }
 
-void OutlinerWidget::build_ui()
+void OutlinerPanel::build_ui()
 {
   auto *layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -91,7 +91,7 @@ void OutlinerWidget::build_ui()
   tree_view_->viewport()->installEventFilter(this);
 }
 
-void OutlinerWidget::build_model()
+void OutlinerPanel::build_model()
 {
   model_ = new QStandardItemModel(this);
   model_->setHorizontalHeaderLabels({"Scene Hierarchy", ""});
@@ -106,7 +106,7 @@ void OutlinerWidget::build_model()
   tree_view_->setColumnWidth(1, 24);
 }
 
-void OutlinerWidget::refresh_entities()
+void OutlinerPanel::refresh_entities()
 {
   CLOG_INFO(LOG_OUTLINER, "Refreshing entities...");
   is_refreshing_ = true;
@@ -139,7 +139,7 @@ void OutlinerWidget::refresh_entities()
   CLOG_INFO(LOG_OUTLINER, "Refresh complete.");
 }
 
-QList<QStandardItem *> OutlinerWidget::create_object_item(entt::entity entity,
+QList<QStandardItem *> OutlinerPanel::create_object_item(entt::entity entity,
                                                          const vektor::dna::Object &obj)
 {
   QString name = QString::fromUtf8(obj.id.name);
@@ -176,21 +176,22 @@ QList<QStandardItem *> OutlinerWidget::create_object_item(entt::entity entity,
 }
 
 // Re-implementing refresh_entities loop to handle multi-column
-void OutlinerWidget::rebuild_tree()
+void OutlinerPanel::rebuild_tree()
 {
   refresh_entities();
 }
 
-void OutlinerWidget::on_selection_changed(const QItemSelection &selected,
+void OutlinerPanel::on_selection_changed(const QItemSelection &selected,
                                           const QItemSelection &deselected)
 {
   if (is_refreshing_) {
     return;
   }
   sync_selection_to_scene(selected, deselected);
+  outliner_notify_scene_changed();
 }
 
-void OutlinerWidget::sync_selection_to_scene(const QItemSelection &selected,
+void OutlinerPanel::sync_selection_to_scene(const QItemSelection &selected,
                                              const QItemSelection &deselected)
 {
   auto &registry = vektor::kernel::ECSRegistry::instance();
@@ -219,7 +220,7 @@ void OutlinerWidget::sync_selection_to_scene(const QItemSelection &selected,
   }
 }
 
-void OutlinerWidget::sync_selection_from_scene()
+void OutlinerPanel::sync_selection_from_scene()
 {
   auto &registry = vektor::kernel::ECSRegistry::instance();
   auto &reg = registry.registry();
@@ -246,7 +247,7 @@ void OutlinerWidget::sync_selection_from_scene()
   }
 }
 
-void OutlinerWidget::show_context_menu(const QPoint &pos)
+void OutlinerPanel::show_context_menu(const QPoint &pos)
 {
   QModelIndex proxy_index = tree_view_->indexAt(pos);
   QMenu menu(this);
@@ -265,7 +266,7 @@ void OutlinerWidget::show_context_menu(const QPoint &pos)
   menu.exec(tree_view_->viewport()->mapToGlobal(pos));
 }
 
-void OutlinerWidget::build_object_context_menu(QMenu &menu, entt::entity entity)
+void OutlinerPanel::build_object_context_menu(QMenu &menu, entt::entity entity)
 {
   QAction *select = menu.addAction("Select");
   connect(select, &QAction::triggered, [this, entity]() {
@@ -286,7 +287,7 @@ void OutlinerWidget::build_object_context_menu(QMenu &menu, entt::entity entity)
   menu.addSeparator();
 }
 
-void OutlinerWidget::build_add_menu(QMenu &menu)
+void OutlinerPanel::build_add_menu(QMenu &menu)
 {
   QMenu *add = menu.addMenu("Add");
   QMenu *mesh = add->addMenu("Mesh");
@@ -316,7 +317,7 @@ void OutlinerWidget::build_add_menu(QMenu &menu)
   connect(cylinder, &QAction::triggered, [create]() { create("Cylinder", "Default Cylinder"); });
 }
 
-bool OutlinerWidget::eventFilter(QObject *watched, QEvent *event)
+bool OutlinerPanel::eventFilter(QObject *watched, QEvent *event)
 {
   if (watched == tree_view_->viewport() && event->type() == QEvent::MouseButtonPress) {
     auto *mouse_event = dynamic_cast<QMouseEvent *>(event);
@@ -327,12 +328,12 @@ bool OutlinerWidget::eventFilter(QObject *watched, QEvent *event)
   return QWidget::eventFilter(watched, event);
 }
 
-void OutlinerWidget::on_search_text_changed(const QString &)
+void OutlinerPanel::on_search_text_changed(const QString &)
 {
   filter_timer_->start(200);  // 200ms debounce
 }
 
-void OutlinerWidget::apply_filter()
+void OutlinerPanel::apply_filter()
 {
   proxy_model_->setFilterFixedString(search_bar_->text());
 }

@@ -1,20 +1,20 @@
 #include <QDockWidget>
 #include <QObject>
-#include <QWidget>
 #include <QVBoxLayout>
+#include <QWidget>
 
 #include "../WIDGET_area.h"
 #include "../WIDGET_header.h"
 
 #include "../assets_browser/WIDGET_assets_browser.h"
 #include "../console/WIDGET_console.h"
-#include "../outliner/WIDGET_outliner.h"
-#include "../properties/WIDGET_properties.h"
+#include "../properties/intern/WIDGET_properties.hh"
 #include "../scene/WIDGET_viewport.h"
+#include "../outliner/WIDGET_outliner.hh"
 
 namespace qt::dock {
 
-AreaWidget::AreaWidget(EditorType initial_type, QWidget *parent) 
+AreaWidget::AreaWidget(EditorType initial_type, QWidget *parent)
     : QWidget(parent), header_(nullptr), content_(nullptr)
 {
   auto *layout = new QVBoxLayout(this);
@@ -47,7 +47,6 @@ void AreaWidget::handle_editor_switch(EditorType new_type)
     layout()->addWidget(content_);
     content_->show();
 
-    // Update parent dock widget title if it exists
     QWidget *pw = parentWidget();
     while (pw) {
       if (auto *dock = qobject_cast<QDockWidget *>(pw)) {
@@ -60,7 +59,8 @@ void AreaWidget::handle_editor_switch(EditorType new_type)
         break;
       }
       pw = pw->parentWidget();
-      if (!pw) break;
+      if (!pw)
+        break;
     }
   }
 }
@@ -68,20 +68,19 @@ void AreaWidget::handle_editor_switch(EditorType new_type)
 QWidget *AreaWidget::create_editor(EditorType type)
 {
   switch (type) {
-    case EditorType::VIEWPORT_3D:
-    {
+    case EditorType::VIEWPORT_3D: {
       auto *viewport = new ViewportWidget(this);
       viewport->init();
-      return static_cast<QWidget*>(viewport);
+      return static_cast<QWidget *>(viewport);
     }
     case EditorType::OUTLINER:
-      return static_cast<QWidget*>(new OutlinerWidget(this));
+      return static_cast<QWidget *>(new OutlinerPanel(this));
     case EditorType::PROPERTIES:
-      return static_cast<QWidget*>(new PropertiesWidget(this));
+      return static_cast<QWidget *>(new PropertiesPanel(this));
     case EditorType::ASSETS_BROWSER:
-      return static_cast<QWidget*>(new AssetsBrowserWidget(this));
+      return static_cast<QWidget *>(new AssetsBrowserWidget(this));
     case EditorType::CONSOLE:
-      return static_cast<QWidget*>(new ConsoleWidget(this));
+      return static_cast<QWidget *>(new ConsoleWidget(this));
     case EditorType::GAME_VIEW:
       return new QWidget(this);
     default:

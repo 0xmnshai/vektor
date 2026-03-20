@@ -64,6 +64,9 @@ void DRW_draw_view(vektor::dna::Scene *scene,
           dna::Uniforms uniforms = {};
           auto model = glm::mat4(1.0f);
           model = glm::translate(model, obj.transform.location);
+          model = glm::rotate(model, obj.transform.rotation.x, glm::vec3(1, 0, 0));
+          model = glm::rotate(model, obj.transform.rotation.y, glm::vec3(0, 1, 0));
+          model = glm::rotate(model, obj.transform.rotation.z, glm::vec3(0, 0, 1));
           model = glm::scale(model, obj.transform.scale);
           uniforms.model = model;
           uniforms.view = view;
@@ -104,6 +107,9 @@ void DRW_draw_view(vektor::dna::Scene *scene,
 
           auto model = glm::mat4(1.0f);
           model = glm::translate(model, obj.transform.location);
+          model = glm::rotate(model, obj.transform.rotation.x, glm::vec3(1, 0, 0));
+          model = glm::rotate(model, obj.transform.rotation.y, glm::vec3(0, 1, 0));
+          model = glm::rotate(model, obj.transform.rotation.z, glm::vec3(0, 0, 1));
           model = glm::scale(model, obj.transform.scale);
 
           gpu::GPU_shader_uniform_matrix4(gpu_shader, "model", &model[0][0]);

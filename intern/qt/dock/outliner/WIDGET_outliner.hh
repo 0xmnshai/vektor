@@ -12,17 +12,16 @@
 
 #include "../../../../source/runtime/dna/DNA_object_type.h"
 
-
 class QTreeView;
 class QStandardItemModel;
 class QSortFilterProxyModel;
 class QLineEdit;
 
 namespace qt::dock {
-class OutlinerWidget : public QWidget {
+class OutlinerPanel : public QWidget {
   Q_OBJECT
  public:
-  explicit OutlinerWidget(QWidget *parent = nullptr);
+  explicit OutlinerPanel(QWidget *parent = nullptr);
 
  private slots:
   void refresh_entities();

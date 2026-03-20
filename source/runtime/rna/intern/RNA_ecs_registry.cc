@@ -41,6 +41,12 @@ void RNA_ecs_set_selected(ECSRegistry *registry, entt::entity entity, bool selec
 
 void RNA_ecs_set_active(ECSRegistry *registry, entt::entity entity, bool active)
 {
+  if (active) {
+    auto view = registry->registry().view<dna::Active>();
+    for (auto ent : view) {
+      registry->emplace_or_replace<dna::Active>(ent, false);
+    }
+  }
   registry->emplace_or_replace<dna::Active>(entity, active);
 }
 

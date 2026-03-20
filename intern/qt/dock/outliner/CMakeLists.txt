@@ -1,4 +1,4 @@
-file(GLOB SRC "*.h" "*.cc" "intern/*.hh" "intern/*.cc")
+file(GLOB SRC "*.h" "*.hh" "*.cc" "intern/*.hh" "intern/*.cc")
 
 add_library(vektor_qt_dock_outliner STATIC ${SRC})
 

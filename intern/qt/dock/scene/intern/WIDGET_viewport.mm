@@ -11,6 +11,7 @@
 #include "../../../../source/runtime/gpu/GPU_shader.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_mesh_primitives.h"
 #include "../../../../source/runtime/kernel/ecs/ECS_registry.h"
+#include "../../../../source/runtime/rna/RNA_ecs_registry.h"
 #include "../../../../vpi/intern/VPI_ContextMTL.hh"
 #include "../../../../vpi/intern/VPI_QtWindow.hh"
 #include "../../intern/qt/dock/scene/SCN_setup.h"
@@ -259,14 +260,16 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
     entt::entity closest_entity = entt::null;
     float closest_dist = FLT_MAX;
 
-    auto &registry = vektor::kernel::ECSRegistry::instance().registry();
+    auto &registry_instance = vektor::kernel::ECSRegistry::instance();
+    auto &registry = registry_instance.registry();
     auto objects_view = registry.view<vektor::dna::Object>();
 
     // Clear selection
     for (auto entity : objects_view) {
+      vektor::rna::RNA_ecs_set_selected(&registry_instance, entity, false);
+      vektor::rna::RNA_ecs_set_active(&registry_instance, entity, false);
       auto &obj = objects_view.get<vektor::dna::Object>(entity);
-      obj.select_flag &= ~vektor::dna::BASE_SELECTED;
-      registry.remove<vektor::dna::Selected>(entity);
+      obj.select_flag &= ~(vektor::dna::BASE_SELECTED | vektor::dna::BASE_ACTIVE);
     }
 
     for (auto entity : objects_view) {
@@ -311,8 +314,9 @@ void ViewportWidget::mousePressEvent(QMouseEvent *event)
     }
 
     if (closest_obj) {
-      closest_obj->select_flag |= vektor::dna::BASE_SELECTED;
-      registry.emplace_or_replace<vektor::dna::Selected>(closest_entity, true);
+      vektor::rna::RNA_ecs_set_selected(&registry_instance, closest_entity, true);
+      vektor::rna::RNA_ecs_set_active(&registry_instance, closest_entity, true);
+      closest_obj->select_flag |= (vektor::dna::BASE_SELECTED | vektor::dna::BASE_ACTIVE);
     }
 
     outliner_notify_scene_changed();
