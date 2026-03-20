@@ -58,6 +58,11 @@ void ViewportWidget::init()
 
 void ViewportWidget::paintGL()
 {
+  // Initialize OpenGL functions FIRST before any GL calls or shader/buffer creation
+  if (vektor::creator::G.gpu_backend == vektor::creator::GPU_BACKEND_OPENGL) {
+    initializeOpenGLFunctions();
+  }
+
   qt::scene::SCN_init_default_scene();
 
   if (!grid_initialized_ && grid_shader_) {
@@ -95,9 +100,6 @@ void ViewportWidget::paintGL()
     return;
   }
 
-  // TODO: we will move this to a separate class for WIDGET_viewport.cc and reanme this file to
-  // WIDGET_viewport.mm
-  initializeOpenGLFunctions();
   glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);

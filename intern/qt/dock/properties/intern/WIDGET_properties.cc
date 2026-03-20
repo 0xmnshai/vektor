@@ -3,9 +3,12 @@
 #include <QVBoxLayout>
 
 #include "../../dock/scene/SCN_notifier.h"
+#include "PRP_camera.hh"
+#include "PRP_light.hh"
 #include "PRP_transform.hh"
 #include "WIDGET_properties.hh"
 
+#include "../../../../../source/runtime/dna/DNA_object_type.h"
 #include "../../../../../source/runtime/kernel/ecs/ECS_registry.h"
 
 namespace qt::dock {
@@ -72,15 +75,11 @@ void PropertiesPanel::on_selection_changed()
 
   sub_panel_layout_->addWidget(new TransformPanel(selected_object_, container_widget_));
 
-  /**
-  // 2. Data/Type specific panels
-    if (m_selectedObject->type == OB_TYPE_MESH) {
-      m_subPanelLayout->addWidget(new MaterialSubPanel(m_selectedObject, m_container));
-    } else if (m_selectedObject->type == OB_TYPE_CAMERA) {
-      m_subPanelLayout->addWidget(new CameraSubPanel(m_selectedObject, m_container));
-    }
-  */
-
-
+  if (selected_object_->type == vektor::dna::ObjectType::Light) {
+    sub_panel_layout_->addWidget(new LightPanel(selected_object_, container_widget_));
+  }
+  else if (selected_object_->type == vektor::dna::ObjectType::Camera) {
+    sub_panel_layout_->addWidget(new CameraPanel(selected_object_, container_widget_));
+  }
 }
 }  // namespace qt::dock

@@ -40,11 +40,14 @@ QOpenGLShaderProgram *GPU_shader_get_program(GPUShader *shader);
 static void print_compute_results();
 
 void GPU_shader_bind(GPUShader *shader);
+void GPU_shader_bind_metal(GPUShader *shader, void *encoder);
 void GPU_shader_unbind(GPUShader *shader);
 void GPU_shader_free(GPUShader *shader);
 
 void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val);
+void GPU_shader_uniform_int(GPUShader *shader, const char *name, int val);
 void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float val[3]);
 void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float val[16]);
+void GPU_shader_uniform_texture(GPUShader *shader, const char *name, int slot);
 
 }  // namespace vektor::gpu

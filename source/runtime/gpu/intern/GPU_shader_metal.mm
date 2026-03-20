@@ -61,8 +61,8 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
   desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
-                                                                                error:&error];
-  
+                                                                               error:&error];
+
   [vert_func release];
   [frag_func release];
   [vert_lib release];
@@ -80,7 +80,7 @@ void *GPU_metal_pipeline_create(const QByteArray &vert_code, const QByteArray &f
 }
 
 void *GPU_metal_pipeline_create_from_source(const char *source,
-                                           const GPUShaderSourceParameters *params)
+                                            const GPUShaderSourceParameters *params)
 {
   auto device = (id<MTLDevice>)vpi::VPI_ContextMTL::get_current_device();
   if (!device) {
@@ -107,8 +107,10 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   const char *v_entry = (params && params->vert_entry) ? params->vert_entry : "vertex_main";
   const char *f_entry = (params && params->frag_entry) ? params->frag_entry : "fragment_main";
 
-  id<MTLFunction> vert_func = [library newFunctionWithName:[NSString stringWithUTF8String:v_entry]];
-  id<MTLFunction> frag_func = [library newFunctionWithName:[NSString stringWithUTF8String:f_entry]];
+  id<MTLFunction> vert_func = [library
+      newFunctionWithName:[NSString stringWithUTF8String:v_entry]];
+  id<MTLFunction> frag_func = [library
+      newFunctionWithName:[NSString stringWithUTF8String:f_entry]];
 
   if (!vert_func || !frag_func) {
     // If customized fails, or if using defaults, try "main" fallback
@@ -142,7 +144,7 @@ void *GPU_metal_pipeline_create_from_source(const char *source,
   desc.colorAttachments[0].destinationAlphaBlendFactor = MTLBlendFactorOneMinusSourceAlpha;
 
   id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:desc
-                                                                                error:&error];
+                                                                               error:&error];
   [vert_func release];
   [frag_func release];
   [library release];
@@ -163,6 +165,14 @@ void GPU_metal_pipeline_free(void *pipeline)
 {
   if (pipeline) {
     [(id<MTLRenderPipelineState>)pipeline release];
+  }
+}
+
+void GPU_shader_bind_metal(GPUShader *shader, void *encoder)
+{
+  if (shader && shader->metal_pipeline && encoder) {
+    auto mtl_encoder = (id<MTLRenderCommandEncoder>)encoder;
+    [mtl_encoder setRenderPipelineState:(id<MTLRenderPipelineState>)shader->metal_pipeline];
   }
 }
 

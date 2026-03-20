@@ -43,4 +43,24 @@ void add_primitive_plane_exec(dna::Object *obj, float size)
   obj->mesh->materials.push_back(mat);
 }
 
+void add_primitive_light_exec(dna::Object *obj, float size)
+{
+  /* Initialize Light DNA */
+  obj->light = std::make_shared<dna::DNA_Light>();
+  obj->light->type = dna::LA_LOCAL;
+  obj->light->color = glm::vec3(1.0f, 1.0f, 1.0f);
+  obj->light->energy = 1.0f;
+  obj->light->distance = 25.0f; // Default range
+
+  /* Create Visual Bulb Mesh */
+  obj->mesh = std::make_shared<dna::Mesh>();
+  vmo::vmo_create_light_exec(obj->mesh.get(), size * 0.5f);
+
+  auto mat = std::make_shared<dna::Material>();
+  mat->color = dna::Color(obj->light->color.r, obj->light->color.g, obj->light->color.b, 1.0f); // Primary icon color
+  strcpy(mat->name, "LightBulbMaterial");
+  mat->emissive_color = dna::Color(obj->light->color.r, obj->light->color.g, obj->light->color.b, 1.0f); // Glow color
+  obj->mesh->materials.push_back(mat);
+}
+
 }  // namespace vektor::kernel

@@ -387,6 +387,13 @@ void GPU_shader_uniform_float(GPUShader *shader, const char *name, float val)
   }
 }
 
+void GPU_shader_uniform_int(GPUShader *shader, const char *name, int val)
+{
+  if (shader && shader->program) {
+    shader->program->setUniformValue(name, val);
+  }
+}
+
 void GPU_shader_uniform_vector3(GPUShader *shader, const char *name, const float val[3])
 {
   if (shader && shader->program) {
@@ -399,6 +406,13 @@ void GPU_shader_uniform_matrix4(GPUShader *shader, const char *name, const float
   if (shader && shader->program) {
     QMatrix4x4 mat(val);
     shader->program->setUniformValue(name, mat.transposed());
+  }
+}
+
+void GPU_shader_uniform_texture(GPUShader *shader, const char *name, int slot)
+{
+  if (shader && shader->program) {
+    shader->program->setUniformValue(name, slot);
   }
 }
 }  // namespace vektor::gpu

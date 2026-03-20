@@ -315,6 +315,25 @@ void OutlinerPanel::build_add_menu(QMenu &menu)
 
   QAction *cylinder = mesh->addAction("Cylinder");
   connect(cylinder, &QAction::triggered, [create]() { create("Cylinder", "Default Cylinder"); });
+
+  QMenu *light = add->addMenu("Light");
+  
+  auto create_light = [](const char *name, int type) {
+    vektor::kernel::create_entity(nullptr,
+                                  nullptr,
+                                  name,
+                                  "Light Object",
+                                  (int)vektor::dna::ObjectType::Light,
+                                  0.0f, 3.0f, 0.0f, // Positioned above
+                                  1.0f, 1.0f, 1.0f); // White light
+    
+    // We need to set the specific light type after creation if create_entity doesn't handle subtypes
+    // For now, let's assume create_entity sets a default point light.
+    outliner_notify_scene_changed();
+  };
+
+  QAction *point = light->addAction("Point Light");
+  connect(point, &QAction::triggered, [create_light]() { create_light("Point Light", 0); });
 }
 
 bool OutlinerPanel::eventFilter(QObject *watched, QEvent *event)

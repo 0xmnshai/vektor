@@ -4,7 +4,9 @@
 #include <memory>
 
 #include "../kernel/VKE_object_component.hh"
+#include "DNA_camera.h"
 #include "DNA_id.h"
+#include "DNA_light.h"
 #include "DNA_mesh_types.h"
 
 namespace vektor::dna {
@@ -39,6 +41,8 @@ typedef struct Object {
   uint32_t select_flag = 0;
 
   std::shared_ptr<dna::Mesh> mesh;
+  std::shared_ptr<dna::DNA_Light> light;
+  std::shared_ptr<dna::DNA_Camera> camera;
 
   ObjectType type = ObjectType::Empty;
 

@@ -111,3 +111,16 @@ float ray_mesh_intersect(const glm::vec3 &ray_origin,
 }
 
 }  // namespace vektor::lib
+
+
+/**
+TODO: 
+
+BVH acceleration   (massive improvement)
+2. SoA mesh layout    (large improvement)
+3. SIMD triangle test (large improvement)
+4. multithreading     (large improvement)
+
+we can implement such things in rust for improvements 
+
+*/

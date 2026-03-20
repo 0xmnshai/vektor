@@ -63,6 +63,23 @@ void MENU_edit_register(void *window)
                                   0.27f,
                                   0.29f);
   });
+
+  menu->addSeparator();
+
+  QMenu *add_light_menu = menu->addMenu("Add Light");
+
+  auto create_light = [](const char *name, int type) {
+    vektor::kernel::create_entity(nullptr,
+                                  nullptr,
+                                  name,
+                                  "Light Source",
+                                  (int)vektor::dna::ObjectType::Light,
+                                  0.0f, 5.0f, 0.0f,
+                                  1.0f, 1.0f, 1.0f);
+  };
+
+  QAction *add_point = add_light_menu->addAction("Point Light");
+  QObject::connect(add_point, &QAction::triggered, [create_light]() { create_light("Point Light", 0); });
 }
 
 }  // namespace qt::menu
