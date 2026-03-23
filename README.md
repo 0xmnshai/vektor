@@ -1,4 +1,4 @@
-# Vektor
+# Vektor ( PAUSED WORKING ON THIS PROJECT, FOR SOME TIME)
 
 A hybrid C++20/Rust real-time engine and DCC editor built for performance and modularity. Vektor leverages a Blender-inspired DNA/RNA data model, a Rust-accelerated compute pipeline, and a dual-backend (OpenGL/Metal) Hardware Abstraction Layer.
 
